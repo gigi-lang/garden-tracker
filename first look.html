@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Garden Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink:      #20392b;   /* dark botanical green, the "ink" */
+    --paper:    #eef0e4;   /* warm pale green-gray, the page */
+    --plot:     #f7f8f1;   /* lighter paper, the cards */
+    --seedling: #5e9367;   /* fresh living green */
+    --tomato:   #cf5e52;   /* warm cherry-tomato red */
+    --soil:     #7a6a55;   /* muted brown for labels + hairlines */
+    --line:     rgba(122,106,85,0.16);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--ink);
+    background-color: var(--paper);
+    /* signature: faint grid paper, like a seed journal + a raised-bed grid */
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 26px 26px;
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: clamp(1.5rem, 5vw, 4rem) 1.25rem;
+  }
+
+  .wrap { max-width: 720px; margin: 0 auto; }
+
+  /* ---- header ---- */
+  header { margin-bottom: clamp(2rem, 6vw, 3.5rem); }
+
+  .mark {
+    display: inline-flex; align-items: center; gap: 0.55rem;
+    margin-bottom: 0.9rem;
+  }
+  .mark .sprout {
+    width: 26px; height: 26px; flex: none;
+  }
+  .wordmark {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(2.2rem, 7vw, 3.1rem);
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+  }
+  .wordmark .leaf { color: var(--seedling); }
+
+  .tagline {
+    font-size: 1.05rem;
+    color: var(--soil);
+    max-width: 34ch;
+  }
+
+  .today {
+    margin-top: 1.1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--seedling);
+    font-weight: 600;
+  }
+
+  /* ---- feature plots ---- */
+  .plots {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .plot {
+    position: relative;
+    background: var(--plot);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1.5rem 1.5rem 1.4rem;
+    /* the little "marker stake" tab */
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: rise 0.6s ease forwards;
+  }
+  .plot::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--seedling);
+  }
+  .plot:nth-child(2)::before { background: var(--soil); }
+  .plot:nth-child(3)::before { background: var(--tomato); }
+
+  .plot:nth-child(1) { animation-delay: 0.05s; }
+  .plot:nth-child(2) { animation-delay: 0.15s; }
+  .plot:nth-child(3) { animation-delay: 0.25s; }
+
+  .marker {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 600;
+    color: var(--soil);
+    margin-bottom: 0.5rem;
+  }
+  .plot h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.4rem;
+    margin-bottom: 0.35rem;
+  }
+  .plot p {
+    color: var(--soil);
+    font-size: 0.97rem;
+    max-width: 46ch;
+  }
+  .status {
+    margin-top: 1rem;
+    display: inline-block;
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
+    color: var(--seedling);
+    border: 1px dashed var(--seedling);
+    border-radius: 999px;
+    padding: 0.2rem 0.7rem;
+  }
+
+  /* ---- footer ---- */
+  footer {
+    margin-top: clamp(2.5rem, 7vw, 4rem);
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.82rem;
+    color: var(--soil);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  footer a { color: var(--seedling); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @keyframes rise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plot { animation: none; opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="mark">
+        <svg class="sprout" viewBox="0 0 24 24" fill="none" stroke="#5e9367" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22V11" />
+          <path d="M12 11C12 7 9 5 4 5c0 4 3 6 8 6Z" />
+          <path d="M12 13c0-3 2.5-5 7-5 0 3.5-2.5 5-7 5Z" />
+        </svg>
+        <span class="wordmark">Garden <span class="leaf">Tracker</span></span>
+      </div>
+      <p class="tagline">A quiet place to keep track of everything growing.</p>
+      <p class="today" id="today"></p>
+    </header>
+
+    <main class="plots">
+      <section class="plot">
+        <p class="marker">Plantings</p>
+        <h2>What you planted, and when</h2>
+        <p>Log each seed and seedling with its date, then follow how it comes along over the weeks.</p>
+        <span class="status">Opening next</span>
+      </section>
+
+      <section class="plot">
+        <p class="marker">Bed planner</p>
+        <h2>Your beds, on a grid</h2>
+        <p>Lay out each bed square by square and see exactly what's growing where.</p>
+        <span class="status">Coming soon</span>
+      </section>
+
+      <section class="plot">
+        <p class="marker">Plant doctor</p>
+        <h2>A read on a struggling leaf</h2>
+        <p>Snap a photo of a plant that looks off and get a sense of what it might need.</p>
+        <span class="status">Coming soon</span>
+      </section>
+    </main>
+
+    <footer>
+      <span>Built by gigi-lang &middot; v0.1</span>
+      <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
+    </footer>
+  </div>
+
+<script>
+  // tiny living touch: show today's date + a rough season
+  (function () {
+    const now = new Date();
+    const date = now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+    const m = now.getMonth();
+    const season = m <= 1 || m === 11 ? 'winter'
+                 : m <= 4 ? 'spring'
+                 : m <= 7 ? 'summer'
+                 : 'autumn';
+    document.getElementById('today').textContent = date + ' \u00B7 ' + season;
+  })();
+</script>
+</body>
+</html>

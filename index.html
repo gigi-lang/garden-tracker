@@ -269,7 +269,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.6</span>
+      <span>Built by gigi-lang &middot; v0.7</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -311,7 +311,7 @@
       pests:[{p:'Cucumber beetle',d:'row cover till flowering; marigold/nasturtium'},{p:'Powdery mildew',d:'space for airflow; water at the roots'}],
       note:'A trellis saves space and keeps fruit clean and straight. Keep picking to keep it producing.' },
 
-    { match:['cantaloupe','muskmelon','melon'], name:'Cantaloupe', fam:'Cucurbit family', season:'warm', from:'sow', indoors:3, dtm:[75,90],
+    { match:['cantaloupe','muskmelon'], name:'Cantaloupe', fam:'Cucurbit family', season:'warm', from:'sow', indoors:3, dtm:[75,90],
       sun:'Full sun \u2014 loves heat', soil:'Rich, warm, well-draining', water:'Steady while growing; ease off as fruit ripens for sweetness', feed:'Balanced, less nitrogen once fruit sets',
       companions:['Corn','Beans','Radish','Nasturtium','Marigold','Sunflower'], avoid:['Potatoes'],
       pests:[{p:'Cucumber beetle',d:'row cover early; stay on top of them'},{p:'Squash bug',d:'check leaf undersides; remove egg clusters'}],
@@ -364,6 +364,186 @@
       companions:['Basil','Tomatoes','Onions','Carrots','Marigold'], avoid:['Broccoli/cauliflower','Fennel'],
       pests:[{p:'Aphids',d:'water blast; ladybugs'},{p:'Flea beetle',d:'row cover young plants'}],
       note:'Slow to start and loves heat \u2014 don\u2019t rush it outside until nights are reliably warm.' },
+
+    { match:['zucchini','summer squash','yellow squash','courgette'], name:'Zucchini / summer squash', fam:'Cucurbit family', season:'warm', from:'sow', indoors:3, dtm:[45,60],
+      sun:'Full sun', soil:'Rich, well-draining', water:'Deep and consistent', feed:'Balanced; a bit more once fruiting',
+      companions:['Beans','Corn','Nasturtium','Marigold','Radish'], avoid:['Potatoes'],
+      pests:[{p:'Squash bug',d:'check under leaves and rub off the bronze egg clusters'},{p:'Powdery mildew',d:'space plants and water at the soil, not the leaves'}],
+      note:'Wildly productive once it starts - pick fruit young and often. If small fruits shrivel, pollination was short; hand-pollinate in the morning.' },
+
+    { match:['winter squash','butternut','acorn squash','spaghetti squash'], name:'Winter squash', fam:'Cucurbit family', season:'warm', from:'sow', indoors:3, dtm:[80,110],
+      sun:'Full sun', soil:'Rich, well-draining', water:'Deep, even', feed:'Balanced; ease off late so fruit cures',
+      companions:['Corn','Beans','Nasturtium','Marigold'], avoid:['Potatoes'],
+      pests:[{p:'Squash bug',d:'remove egg clusters under the leaves'},{p:'Squash vine borer',d:'watch for sudden wilting; inspect the stem base'}],
+      note:'Needs room to sprawl and a long season. Harvest when the rind is hard and the stem is corky, then cure in the sun before storing.' },
+
+    { match:['pumpkin'], name:'Pumpkin', fam:'Cucurbit family', season:'warm', from:'sow', indoors:3, dtm:[90,120],
+      sun:'Full sun', soil:'Rich, well-draining', water:'Deep, even', feed:'Balanced; more once the vines run',
+      companions:['Corn','Beans','Nasturtium','Marigold'], avoid:['Potatoes'],
+      pests:[{p:'Squash bug',d:'remove egg clusters under the leaves'},{p:'Squash vine borer',d:'watch for sudden wilting at the stem'}],
+      note:'Long season and lots of space. Ripe when the rind is hard and the color is deep; leave a few inches of stem when you cut it.' },
+
+    { match:['watermelon'], name:'Watermelon', fam:'Cucurbit family', season:'warm', from:'sow', indoors:4, dtm:[70,90],
+      sun:'Full sun - loves heat', soil:'Rich, sandy, well-draining', water:'Deep; ease off as fruit ripens', feed:'Balanced; less nitrogen once fruiting',
+      companions:['Corn','Beans','Radish','Nasturtium','Marigold'], avoid:['Potatoes'],
+      pests:[{p:'Cucumber beetle',d:'row-cover young plants; they also spread wilt'},{p:'Aphids',d:'blast with water; ladybugs'}],
+      note:'Ripe when the curly tendril nearest the fruit dries and the ground spot turns creamy yellow. Needs warmth and a long season.' },
+
+    { match:['eggplant','aubergine'], name:'Eggplant', fam:'Nightshade family', season:'warm', from:'transplant', indoors:8, dtm:[60,85],
+      sun:'Full sun - needs warmth', soil:'Rich, well-draining', water:'Consistent, not soggy', feed:'Balanced; steady feeding',
+      companions:['Beans','Peppers','Basil','Marigold','Spinach'], avoid:['Fennel'],
+      pests:[{p:'Flea beetle',d:'row-cover young plants; they riddle leaves with tiny holes'},{p:'Aphids',d:'blast with water; ladybugs'}],
+      note:'A heat lover - do not rush it outside. Harvest when the skin is glossy; dull skin means it is past its best.' },
+
+    { match:['potato'], name:'Potatoes', fam:'Nightshade family', season:'cool', from:'sow', indoors:null, dtm:[70,120],
+      sun:'Full sun', soil:'Loose, slightly acidic', water:'Even while tubers form', feed:'Moderate; avoid high nitrogen',
+      companions:['Beans','Corn','Marigold','Horseradish'], avoid:['Tomatoes','Squash family','Sunflower'],
+      pests:[{p:'Colorado potato beetle',d:'hand-pick the adults and the orange egg clusters'},{p:'Aphids',d:'blast with water; ladybugs'}],
+      note:'Plant seed-potato pieces in early spring. Mound (hill) soil over the stems as they grow so the tubers do not green, and harvest after the tops die back.' },
+
+    { match:['cabbage'], name:'Cabbage', fam:'Brassica family', season:'cool', from:'transplant', indoors:5, dtm:[60,100],
+      sun:'Full sun', soil:'Rich, firm, well-draining', water:'Even and steady', feed:'Moderate nitrogen early',
+      companions:['Onions','Beets','Celery','Dill','Sage','Nasturtium'], avoid:['Tomatoes','Strawberries'],
+      pests:[{p:'Cabbage worm / looper',d:'row cover, or hand-pick; Bt if needed'},{p:'Aphids',d:'blast with water; ladybugs'}],
+      note:'A cool-season crop - grow it in spring and again in fall. Even watering keeps the heads from splitting.' },
+
+    { match:['kale'], name:'Kale', fam:'Brassica family', season:'cool', from:'transplant', indoors:5, dtm:[50,75],
+      sun:'Full sun to part shade', soil:'Rich, well-draining', water:'Even', feed:'Moderate nitrogen',
+      companions:['Onions','Beets','Herbs','Nasturtium'], avoid:['Tomatoes','Strawberries'],
+      pests:[{p:'Cabbage worm',d:'row cover, or hand-pick; Bt if needed'},{p:'Aphids',d:'blast with water; ladybugs'}],
+      note:'Very hardy and forgiving - a light frost actually sweetens it. Pick the outer leaves and the plant keeps producing.' },
+
+    { match:['brussels'], name:'Brussels sprouts', fam:'Brassica family', season:'cool', from:'transplant', indoors:5, dtm:[90,110],
+      sun:'Full sun', soil:'Rich, firm', water:'Even and steady', feed:'Moderate nitrogen early',
+      companions:['Onions','Beets','Dill','Nasturtium'], avoid:['Tomatoes','Strawberries'],
+      pests:[{p:'Cabbage worm',d:'row cover, or hand-pick; Bt if needed'},{p:'Aphids',d:'blast with water; ladybugs'}],
+      note:'A long-season crop best for a fall harvest - the sprouts taste sweetest after a frost. Pick from the bottom of the stalk upward.' },
+
+    { match:['radish'], name:'Radish', fam:'Brassica family', season:'cool', from:'sow', indoors:null, dtm:[22,35],
+      sun:'Full sun to part shade', soil:'Loose, stone-free', water:'Even - steady moisture keeps them mild', feed:'Light',
+      companions:['Carrots','Lettuce','Peas','Cucumbers','Spinach'], avoid:[],
+      pests:[{p:'Flea beetle',d:'row cover; tiny shot-holes in the leaves'},{p:'Root maggot',d:'rotate; a floating row cover keeps the fly off'}],
+      note:'Fast and easy - often ready in a month, so great for kids and for marking rows. Sow a few every couple of weeks and pull promptly or they turn woody and hot.' },
+
+    { match:['pole bean','runner bean'], name:'Pole beans', fam:'Legume family', season:'warm', from:'sow', indoors:null, dtm:[60,75],
+      sun:'Full sun', soil:'Well-draining', water:'Even', feed:'Light - they fix their own nitrogen',
+      companions:['Corn','Cucumbers','Radish','Marigold','Nasturtium'], avoid:['Onions','Garlic'],
+      pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Bean beetle',d:'check leaf undersides; hand-pick'}],
+      note:'Needs a trellis, poles, or netting to climb. Keep picking and the vines keep setting new pods all season.' },
+
+    { match:['green bean','bush bean','snap bean','string bean','bean'], name:'Bush (green) beans', fam:'Legume family', season:'warm', from:'sow', indoors:null, dtm:[50,60],
+      sun:'Full sun', soil:'Well-draining', water:'Even', feed:'Light - they fix their own nitrogen',
+      companions:['Corn','Cucumbers','Radish','Marigold','Nasturtium'], avoid:['Onions','Garlic'],
+      pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Mexican bean beetle',d:'check leaf undersides; hand-pick eggs and larvae'}],
+      note:'No support needed. Sow a fresh short row every couple of weeks for a steady supply rather than one big glut.' },
+
+    { match:['snap pea','snow pea','shelling pea','garden pea','peas'], name:'Peas', fam:'Legume family', season:'cool', from:'sow', indoors:null, dtm:[55,70],
+      sun:'Full sun to part shade', soil:'Well-draining', water:'Even', feed:'Light - they fix their own nitrogen',
+      companions:['Carrots','Radish','Cucumbers','Lettuce'], avoid:['Onions','Garlic'],
+      pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Powdery mildew',d:'airflow; water at the soil'}],
+      note:'A cool-season crop - sow as early as the soil can be worked, and again in late summer for fall. Most types climb, so give them a short trellis.' },
+
+    { match:['onion'], name:'Onions (bulb)', fam:'Allium family', season:'cool', from:'sow', indoors:8, dtm:[90,120],
+      sun:'Full sun', soil:'Loose, rich, well-draining', water:'Even while bulbing', feed:'Moderate nitrogen early, then ease off',
+      companions:['Carrots','Beets','Lettuce','Cabbage','Tomatoes'], avoid:['Beans','Peas'],
+      pests:[{p:'Onion thrips',d:'silvery streaks on leaves; blast with water'},{p:'Onion maggot',d:'rotate; row cover keeps the fly off'}],
+      note:'Day length decides bulbing, so pick a type suited to your latitude (long-day north, short-day south). Plant early; harvest once the tops flop and brown.' },
+
+    { match:['garlic'], name:'Garlic', fam:'Allium family', season:'cool', from:'sow', indoors:null, dtm:[240,270],
+      sun:'Full sun', soil:'Loose, rich, well-draining', water:'Even in spring; dry it off before harvest', feed:'Moderate nitrogen in spring',
+      companions:['Tomatoes','Carrots','Beets','Brassicas','Roses'], avoid:['Beans','Peas'],
+      pests:[{p:'Onion maggot',d:'rotate; row cover early'},{p:'White rot',d:'rotate beds; do not replant alliums in the same spot'}],
+      note:'Plant individual cloves in fall and harvest the next summer - almost hands-off over winter. Dig when the lower leaves brown but several green ones remain, then cure in a dry, airy spot.' },
+
+    { match:['leek'], name:'Leeks', fam:'Allium family', season:'cool', from:'transplant', indoors:8, dtm:[100,120],
+      sun:'Full sun', soil:'Rich, deep, well-draining', water:'Even', feed:'Moderate nitrogen',
+      companions:['Carrots','Celery','Onions','Beets'], avoid:['Beans','Peas'],
+      pests:[{p:'Onion thrips',d:'blast with water'},{p:'Leek moth',d:'row cover; remove damaged leaves'}],
+      note:'A long, easy season and very cold-hardy. Hill soil up around the stems (or plant in a deep hole) to grow more of the tender white shaft.' },
+
+    { match:['beet'], name:'Beets', fam:'Root vegetable', season:'cool', from:'sow', indoors:null, dtm:[50,65],
+      sun:'Full sun to part shade', soil:'Loose, deep, stone-free', water:'Even - steady moisture keeps them tender', feed:'Moderate',
+      companions:['Onions','Lettuce','Cabbage','Bush beans'], avoid:['Pole beans'],
+      pests:[{p:'Leaf miner',d:'remove blistered leaves; row cover'},{p:'Flea beetle',d:'row-cover young plants'}],
+      note:'Two crops in one - the greens are as good as the roots. Each wrinkly seed is a cluster, so thin the seedlings to give the roots room.' },
+
+    { match:['lettuce'], name:'Lettuce', fam:'Leafy green', season:'cool', from:'sow', indoors:4, dtm:[45,60],
+      sun:'Full sun to part shade', soil:'Rich, moist', water:'Frequent and shallow', feed:'Light nitrogen',
+      companions:['Carrots','Radish','Onions','Cucumbers'], avoid:[],
+      pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Slugs',d:'hand-pick at night; rough barriers'}],
+      note:'Turns bitter and bolts in heat - grow it spring and fall, and give it afternoon shade in summer. Pick outer leaves for a cut-and-come-again harvest.' },
+
+    { match:['spinach'], name:'Spinach', fam:'Leafy green', season:'cool', from:'sow', indoors:null, dtm:[40,50],
+      sun:'Full sun to part shade', soil:'Rich, well-draining', water:'Even', feed:'Light nitrogen',
+      companions:['Strawberries','Radish','Peas','Brassicas'], avoid:[],
+      pests:[{p:'Leaf miner',d:'remove blistered leaves; row cover'},{p:'Aphids',d:'blast with water; ladybugs'}],
+      note:'Fast and cold-hardy but bolts as the days lengthen and warm - a spring and fall crop. Sow in succession for a steady supply.' },
+
+    { match:['chard','swiss chard'], name:'Swiss chard', fam:'Leafy green', season:'cool', from:'sow', indoors:null, dtm:[50,60],
+      sun:'Full sun to part shade', soil:'Rich, well-draining', water:'Even', feed:'Moderate',
+      companions:['Beans','Onions','Brassicas'], avoid:[],
+      pests:[{p:'Leaf miner',d:'remove blistered leaves; row cover'},{p:'Aphids',d:'blast with water; ladybugs'}],
+      note:'One of the most forgiving greens - it shrugs off both heat and cold. Cut the outer stalks and it keeps going for months.' },
+
+    { match:['arugula','rocket'], name:'Arugula', fam:'Brassica family', season:'cool', from:'sow', indoors:null, dtm:[30,45],
+      sun:'Full sun to part shade', soil:'Rich, moist', water:'Even', feed:'Light',
+      companions:['Lettuce','Carrots','Onions','Beans'], avoid:[],
+      pests:[{p:'Flea beetle',d:'row cover; tiny shot-holes in the leaves'},{p:'Aphids',d:'blast with water; ladybugs'}],
+      note:'Quick and peppery, ready in weeks. It bolts fast in heat and gets sharper, so sow a little often and harvest young.' },
+
+    { match:['parsley'], name:'Parsley', fam:'Herb \u00b7 umbellifer', season:'cool', from:'sow', indoors:8, dtm:[70,90],
+      sun:'Full sun to part shade', soil:'Rich, moist, well-draining', water:'Even', feed:'Light',
+      companions:['Tomatoes','Peppers','Carrots','Asparagus'], avoid:[],
+      pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Swallowtail caterpillar',d:'often left be - they turn into butterflies'}],
+      note:'Slow to germinate, so be patient (soaking the seed overnight helps). It is a biennial usually grown as an annual; let one plant flower to feed beneficial wasps.' },
+
+    { match:['cilantro','coriander'], name:'Cilantro / coriander', fam:'Herb \u00b7 umbellifer', season:'cool', from:'sow', indoors:null, dtm:[45,70],
+      sun:'Full sun to part shade', soil:'Well-draining', water:'Even', feed:'Light',
+      companions:['Tomatoes','Peppers','Spinach','Beans'], avoid:[],
+      pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Powdery mildew',d:'airflow; do not overcrowd'}],
+      note:'Bolts fast in heat - sow a little every couple of weeks. Let it flower and the same plant gives you coriander seed (and feeds beneficials).' },
+
+    { match:['thyme'], name:'Thyme', fam:'Herb \u00b7 perennial', season:'perennial', from:'transplant', indoors:8, dtm:[90,90],
+      sun:'Full sun', soil:'Lean, gritty, well-draining', water:'Low - let it dry between waterings', feed:'Minimal',
+      companions:['Cabbage','Brassicas','Strawberries'], avoid:[],
+      pests:[{p:'Spider mites',d:'rare; rinse the foliage; improve airflow'},{p:'Root rot',d:'it hates wet feet, so drainage is everything'}],
+      note:'A tough, drought-tolerant perennial that comes back each year and helps deter cabbage worms. Trim lightly after it flowers to keep it bushy.' },
+
+    { match:['rosemary'], name:'Rosemary', fam:'Herb \u00b7 perennial', season:'perennial', from:'transplant', indoors:10, dtm:[90,90],
+      sun:'Full sun', soil:'Lean, gritty, well-draining', water:'Low - let it dry between waterings', feed:'Minimal',
+      companions:['Cabbage','Beans','Carrots','Sage'], avoid:[],
+      pests:[{p:'Powdery mildew',d:'airflow; avoid crowding'},{p:'Spittlebug',d:'harmless; rinse off the foam'}],
+      note:'A woody Mediterranean perennial - it wants sun and sharp drainage far more than water. In cold winters, grow it in a pot and bring it indoors.' },
+
+    { match:['oregano'], name:'Oregano', fam:'Herb \u00b7 perennial', season:'perennial', from:'transplant', indoors:8, dtm:[80,90],
+      sun:'Full sun', soil:'Lean, well-draining', water:'Low to moderate', feed:'Light',
+      companions:['Peppers','Tomatoes','Brassicas'], avoid:[],
+      pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Spider mites',d:'rinse the foliage; improve airflow'}],
+      note:'A hardy perennial that spreads, so give it room or a pot. The flavor is strongest just before it flowers - trim then for the best leaves.' },
+
+    { match:['mint'], name:'Mint', fam:'Herb \u00b7 perennial', season:'perennial', from:'transplant', indoors:null, dtm:[80,90],
+      sun:'Full sun to part shade', soil:'Rich, moist', water:'Regular - it likes steady moisture', feed:'Light',
+      companions:['Cabbage','Brassicas','Tomatoes'], avoid:[],
+      pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Rust',d:'remove affected leaves; improve airflow'}],
+      note:'Wonderful but genuinely invasive - grow it in a container (or a sunken pot) or it will take over the whole bed. Its scent helps deter cabbage pests.' },
+
+    { match:['chive'], name:'Chives', fam:'Herb \u00b7 allium', season:'perennial', from:'sow', indoors:8, dtm:[80,90],
+      sun:'Full sun to part shade', soil:'Rich, well-draining', water:'Even', feed:'Light',
+      companions:['Carrots','Tomatoes','Brassicas','Roses'], avoid:['Beans','Peas'],
+      pests:[{p:'Aphids',d:'rare - chives actually help repel them'},{p:'Thrips',d:'blast with water'}],
+      note:'A tidy little perennial that comes back every spring. The purple flowers are edible, and it helps keep aphids and carrot fly away. Snip as needed.' },
+
+    { match:['corn','sweet corn','maize'], name:'Sweet corn', fam:'Grass family', season:'warm', from:'sow', indoors:null, dtm:[60,90],
+      sun:'Full sun', soil:'Rich, well-draining', water:'Consistent, especially at tasseling', feed:'High nitrogen - it is a hungry crop',
+      companions:['Beans','Squash','Cucumbers','Peas'], avoid:['Tomatoes'],
+      pests:[{p:'Corn earworm',d:'a few drops of oil on the silk; accept some tip damage'},{p:'Aphids',d:'blast with water; ladybugs'}],
+      note:'Plant in a block of short rows, not one long row, so the wind can pollinate it well (the classic three-sisters trio with beans and squash). Pick when the silks brown and a poked kernel runs milky.' },
+
+    { match:['okra'], name:'Okra', fam:'Mallow family', season:'warm', from:'sow', indoors:4, dtm:[55,65],
+      sun:'Full sun - loves heat', soil:'Rich, well-draining', water:'Moderate', feed:'Balanced',
+      companions:['Peppers','Eggplant','Basil','Melons'], avoid:[],
+      pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Stink bug',d:'hand-pick; keep weeds down'}],
+      note:'Thrives in the heat of high summer when other crops sulk. Pick the pods young (2-4 inches) every day or two, or they turn woody fast.' },
 
     { match:['tomato'], name:'Tomatoes', fam:'Nightshade family', season:'warm', from:'transplant', indoors:6, dtm:[60,85],
       sun:'Full sun (6-8 hrs)', soil:'Rich, well-draining, slightly acidic', water:'Deep and even', feed:'Balanced, then more potassium once fruiting',

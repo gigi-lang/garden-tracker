@@ -100,6 +100,17 @@
   .pests .pest span { color:var(--soil); }
   .gnote { margin-top:0.8rem; font-size:0.84rem; color:var(--soil); font-style:italic; }
 
+  /* schedule */
+  .water-line { display:flex; gap:0.5rem; align-items:center; font-size:0.9rem; color:var(--ink); margin-top:0.5rem; }
+  .sched-list { list-style:none; margin-top:0.9rem; display:grid; gap:0.5rem; }
+  .task { display:flex; align-items:center; gap:0.7rem; border-top:1px solid var(--line); padding-top:0.5rem; font-size:0.92rem; }
+  .task .tdate { font-variant-numeric:tabular-nums; color:var(--soil); width:4.2rem; flex:none; }
+  .task .tkind { font-size:0.66rem; text-transform:uppercase; letter-spacing:0.08em; border-radius:999px; padding:0.1rem 0.5rem; flex:none; }
+  .task-move .tkind { color:var(--soil); background:rgba(122,106,85,0.14); }
+  .task-feed .tkind { color:var(--seedling); background:rgba(94,147,103,0.14); }
+  .task-harvest .tkind { color:var(--tomato); background:rgba(207,94,82,0.12); }
+  .task .ttitle { flex:1; }
+
   footer { margin-top:clamp(2.5rem,7vw,4rem); padding-top:1.25rem; border-top:1px solid var(--line); font-size:0.82rem; color:var(--soil); display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; }
   footer a { color:var(--seedling); text-decoration:none; }
   footer a:hover { text-decoration:underline; }
@@ -178,6 +189,15 @@
         <p class="empty" id="empty">Nothing planted yet &mdash; add your first seed above.</p>
       </section>
 
+      <section class="plot">
+        <p class="marker">Schedule</p>
+        <h2>What's coming up</h2>
+        <p class="lede">Your watering, feeding, transplant, and harvest dates &mdash; pulled from your plantings and your zone. Send them to your phone's calendar and it does the reminding.</p>
+        <div id="sched-body"></div>
+        <button class="btn" id="export-btn" style="margin-top:1.2rem;">Add to my calendar</button>
+        <p style="margin-top:0.6rem;color:var(--soil);font-size:0.8rem;">Downloads a calendar file (.ics) &mdash; open it to drop these into Google or Apple Calendar, reminders and all. Re-export whenever you add plants.</p>
+      </section>
+
       <section class="plot soil">
         <p class="marker">Bed planner</p>
         <h2>Your beds, on a grid</h2>
@@ -195,7 +215,7 @@
     </main>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.3</span>
+      <span>Built by gigi-lang &middot; v0.4</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -427,7 +447,118 @@
     return h;
   }
 
+  /* ---------- schedule: tasks from plantings + guide + zone ---------- */
+  function buildTasks(){
+    const tasks = [];
+    plantings.forEach(function(p){
+      const g = matchGuide(p.name);
+      if (!g) return;
+      const d = asDate(p.date);
+      // move outdoors (only for indoor-started seeds of non-perennials)
+      if (p.type === 'Seed' && g.indoors && g.season !== 'perennial'){
+        let t = addDays(d, g.indoors*7);
+        if (zoneCfg.last){ const lf = asDate(zoneCfg.last); if (lf > t) t = lf; }
+        tasks.push({ id:p.id, when:t, plant:p.name, kind:'move', title:'Move ' + p.name + ' outdoors' });
+      }
+      // feed a few weeks in
+      tasks.push({ id:p.id, when:addDays(d, 21), plant:p.name, kind:'feed', title:'Feed ' + p.name });
+      // harvest window opens
+      tasks.push({ id:p.id, when:addDays(d, g.dtm[0]), plant:p.name, kind:'harvest', title:'Start harvesting ' + p.name });
+    });
+    tasks.sort(function(a,b){ return a.when - b.when; });
+    return tasks;
+  }
+
+  function harvestEnd(){
+    let latest = null;
+    plantings.forEach(function(p){
+      const g = matchGuide(p.name); if (!g) return;
+      const e = addDays(asDate(p.date), g.dtm[1]);
+      if (!latest || e > latest) latest = e;
+    });
+    return latest;
+  }
+
+  function renderSchedule(){
+    const body = document.getElementById('sched-body');
+    const btn = document.getElementById('export-btn');
+    if (!body) return;
+    if (plantings.length === 0){
+      body.innerHTML = '<p class="empty" style="margin-top:0.5rem;">Add a planting and your watering, feeding, and harvest dates will show up here.</p>';
+      if (btn) btn.style.display = 'none';
+      return;
+    }
+    if (btn) btn.style.display = 'inline-block';
+    const today = new Date(); today.setHours(0,0,0,0);
+    const upcoming = buildTasks().filter(function(t){ return t.when >= today; }).slice(0, 12);
+    const labels = { move:'transplant', feed:'feed', harvest:'harvest' };
+    let h = '<div class="water-line"><span>\uD83D\uDCA7</span><span>Daily watering reminder at 7:00am while things are growing.</span></div>';
+    if (upcoming.length === 0){
+      h += '<p class="empty" style="margin-top:0.8rem;">No dated tasks coming up right now.</p>';
+      body.innerHTML = h; return;
+    }
+    h += '<ul class="sched-list">';
+    upcoming.forEach(function(t){
+      h += '<li class="task task-' + t.kind + '"><span class="tdate">' + fmt(t.when) + '</span><span class="tkind">' + labels[t.kind] + '</span><span class="ttitle"></span></li>';
+    });
+    h += '</ul>';
+    body.innerHTML = h;
+    const titleEls = body.querySelectorAll('.ttitle');
+    upcoming.forEach(function(t, i){ if (titleEls[i]) titleEls[i].textContent = t.title; });
+  }
+
+  /* ---------- calendar export (.ics) ---------- */
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function icsDate(d){ return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()); }
+  function icsFloat(d){ return icsDate(d) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00'; }
+  function icsStampUTC(d){ return d.getUTCFullYear() + pad(d.getUTCMonth()+1) + pad(d.getUTCDate()) + 'T' + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + 'Z'; }
+  function icsEsc(s){ return String(s).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n'); }
+
+  function buildICS(){
+    const now = new Date();
+    const stamp = icsStampUTC(now);
+    const L = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Garden Tracker//EN','CALSCALE:GREGORIAN'];
+    let uid = 0;
+    buildTasks().forEach(function(t){
+      L.push('BEGIN:VEVENT');
+      L.push('UID:gt-' + t.id + '-' + t.kind + '@garden-tracker');
+      L.push('DTSTAMP:' + stamp);
+      L.push('DTSTART;VALUE=DATE:' + icsDate(t.when));
+      L.push('DTEND;VALUE=DATE:' + icsDate(addDays(t.when, 1)));
+      L.push('SUMMARY:' + icsEsc(t.title));
+      L.push('DESCRIPTION:' + icsEsc('From your Garden Tracker.'));
+      L.push('BEGIN:VALARM','ACTION:DISPLAY','TRIGGER:PT9H','DESCRIPTION:' + icsEsc(t.title),'END:VALARM');
+      L.push('END:VEVENT');
+    });
+    // recurring daily watering at 7am (floating local time) until the last harvest
+    const start = new Date(); start.setHours(7,0,0,0);
+    let until = harvestEnd(); if (!until) until = addDays(new Date(), 120);
+    until = new Date(until); until.setHours(7,0,0,0);
+    L.push('BEGIN:VEVENT');
+    L.push('UID:gt-water@garden-tracker');
+    L.push('DTSTAMP:' + stamp);
+    L.push('DTSTART:' + icsFloat(start));
+    L.push('DURATION:PT15M');
+    L.push('RRULE:FREQ=DAILY;UNTIL=' + icsFloat(until));
+    L.push('SUMMARY:' + icsEsc('Water the garden'));
+    L.push('DESCRIPTION:' + icsEsc('Daily watering reminder from Garden Tracker \u2014 adjust to your weather.'));
+    L.push('BEGIN:VALARM','ACTION:DISPLAY','TRIGGER:PT0M','DESCRIPTION:' + icsEsc('Water the garden'),'END:VALARM');
+    L.push('END:VEVENT');
+    L.push('END:VCALENDAR');
+    return L.join('\r\n');
+  }
+
+  function downloadICS(){
+    const blob = new Blob([buildICS()], { type:'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'garden-tracker.ics';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+  }
+
   function render(){
+    renderSchedule();
     const list = document.getElementById('list');
     const empty = document.getElementById('empty');
     list.innerHTML = '';
@@ -488,6 +619,8 @@
     document.getElementById('date').value = date;
     document.getElementById('name').focus();
   });
+
+  document.getElementById('export-btn').addEventListener('click', downloadICS);
 
   /* ---------- start up ---------- */
   document.getElementById('date').value = new Date().toISOString().slice(0,10);

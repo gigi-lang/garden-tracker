@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Garden Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink:#20392b; --paper:#eef0e4; --plot:#f7f8f1; --seedling:#5e9367;
+    --tomato:#cf5e52; --soil:#7a6a55; --line:rgba(122,106,85,0.16);
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    font-family:'Inter',system-ui,sans-serif; color:var(--ink); background-color:var(--paper);
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:26px 26px; line-height:1.5; min-height:100vh; padding:clamp(1.5rem,5vw,4rem) 1.25rem;
+  }
+  .wrap { max-width:720px; margin:0 auto; }
+
+  header { margin-bottom:clamp(1.5rem,5vw,2.5rem); }
+  .mark { display:inline-flex; align-items:center; gap:0.55rem; margin-bottom:0.9rem; }
+  .mark .sprout { width:26px; height:26px; flex:none; }
+  .wordmark { font-family:'Fraunces',serif; font-weight:600; font-size:clamp(2.2rem,7vw,3.1rem); letter-spacing:-0.01em; line-height:1.05; }
+  .wordmark .leaf { color:var(--seedling); }
+  .tagline { font-size:1.05rem; color:var(--soil); max-width:34ch; }
+  .today { margin-top:1.1rem; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--seedling); font-weight:600; }
+
+  /* zone bar */
+  .zone {
+    margin:1.25rem 0 0; background:var(--plot); border:1px solid var(--line); border-radius:4px;
+    padding:0.7rem 0.95rem; font-size:0.88rem;
+  }
+  .zone summary { cursor:pointer; color:var(--ink); list-style:none; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; }
+  .zone summary::-webkit-details-marker { display:none; }
+  .zone summary .val { color:var(--seedling); font-weight:600; }
+  .zone .controls { margin-top:0.85rem; display:grid; gap:0.7rem; }
+  .zone .controls .row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.6rem; }
+  @media (max-width:520px){ .zone .controls .row3 { grid-template-columns:1fr; } }
+  .zone label { display:block; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; margin-bottom:0.25rem; }
+  .zone select, .zone input { width:100%; font-family:inherit; font-size:0.9rem; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:4px; padding:0.45rem 0.6rem; }
+  .zone .hint { font-size:0.78rem; color:var(--soil); }
+
+  .plots { display:grid; gap:1rem; }
+  .plot { position:relative; background:var(--plot); border:1px solid var(--line); border-radius:4px; padding:1.5rem 1.5rem 1.4rem; overflow:hidden; }
+  .plot::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--seedling); }
+  .plot.soil::before { background:var(--soil); }
+  .plot.tomato::before { background:var(--tomato); }
+  .marker { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.16em; font-weight:600; color:var(--soil); margin-bottom:0.5rem; }
+  .plot h2 { font-family:'Fraunces',serif; font-weight:500; font-size:1.4rem; margin-bottom:0.35rem; }
+  .plot p.lede { color:var(--soil); font-size:0.97rem; max-width:46ch; }
+  .status { margin-top:1rem; display:inline-block; font-size:0.74rem; letter-spacing:0.04em; color:var(--seedling); border:1px dashed var(--seedling); border-radius:999px; padding:0.2rem 0.7rem; }
+
+  .add-form { margin-top:1.25rem; display:grid; gap:0.75rem; }
+  .field { display:grid; gap:0.3rem; }
+  .field label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; }
+  .field input, .field select, .field textarea { font-family:inherit; font-size:0.95rem; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:4px; padding:0.55rem 0.7rem; width:100%; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline:2px solid var(--seedling); outline-offset:1px; border-color:var(--seedling); }
+  .field textarea { resize:vertical; min-height:2.6rem; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
+  @media (max-width:460px){ .row { grid-template-columns:1fr; } }
+  .btn { font-family:inherit; font-size:0.9rem; font-weight:600; cursor:pointer; background:var(--seedling); color:#fff; border:none; border-radius:4px; padding:0.6rem 1.1rem; justify-self:start; }
+  .btn:hover { background:#4f8059; }
+  .btn:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+
+  .list { margin-top:1.5rem; display:grid; gap:0.6rem; list-style:none; }
+  .empty { margin-top:1.4rem; color:var(--soil); font-size:0.95rem; font-style:italic; }
+  .plant { border-top:1px solid var(--line); padding-top:0.8rem; }
+  .plant .head { display:flex; align-items:flex-start; gap:0.8rem; }
+  .plant .dot { width:9px; height:9px; border-radius:50%; background:var(--seedling); margin-top:0.45rem; flex:none; }
+  .plant .body { flex:1; min-width:0; }
+  .plant .name { font-weight:600; font-size:1.02rem; }
+  .plant .meta { font-size:0.82rem; color:var(--soil); margin-top:0.1rem; }
+  .plant .note { font-size:0.9rem; margin-top:0.3rem; color:var(--ink); }
+  .age { font-size:0.72rem; letter-spacing:0.04em; color:var(--seedling); background:rgba(94,147,103,0.12); border-radius:999px; padding:0.15rem 0.6rem; white-space:nowrap; align-self:center; }
+  .remove { background:none; border:none; cursor:pointer; color:var(--soil); font-size:1.1rem; line-height:1; padding:0.2rem; opacity:0.6; align-self:center; }
+  .remove:hover { opacity:1; color:var(--tomato); }
+  .guide-toggle { margin-top:0.55rem; margin-left:1.7rem; background:none; border:none; cursor:pointer; color:var(--seedling); font-family:inherit; font-size:0.8rem; font-weight:600; padding:0; }
+  .guide-toggle:hover { text-decoration:underline; }
+  .no-guide { margin-top:0.5rem; margin-left:1.7rem; font-size:0.8rem; color:var(--soil); font-style:italic; }
+
+  /* care guide card */
+  .guide { margin:0.7rem 0 0.2rem 1.7rem; background:#fff; border:1px solid var(--line); border-radius:4px; padding:1rem 1.1rem; display:none; }
+  .guide.open { display:block; }
+  .guide .gfam { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--soil); font-weight:600; margin-bottom:0.6rem; }
+  .guide .grow { display:grid; grid-template-columns:90px 1fr; gap:0.35rem 0.8rem; font-size:0.88rem; margin-bottom:0.2rem; }
+  .guide .grow .k { color:var(--soil); font-weight:600; }
+  .guide .timing { margin-top:0.8rem; padding-top:0.7rem; border-top:1px solid var(--line); font-size:0.88rem; display:grid; gap:0.4rem; }
+  .guide .timing .t { display:flex; gap:0.5rem; }
+  .guide .timing .t .ic { color:var(--seedling); flex:none; }
+  .chips { display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.7rem; }
+  .chip { font-size:0.76rem; border-radius:999px; padding:0.12rem 0.55rem; border:1px solid var(--line); }
+  .chip.good { color:var(--seedling); border-color:rgba(94,147,103,0.4); background:rgba(94,147,103,0.08); }
+  .chip.bad { color:var(--tomato); border-color:rgba(207,94,82,0.4); background:rgba(207,94,82,0.07); }
+  .clabel { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; margin-top:0.8rem; }
+  .pests { margin-top:0.5rem; display:grid; gap:0.3rem; font-size:0.84rem; }
+  .pests .pest b { color:var(--ink); }
+  .pests .pest span { color:var(--soil); }
+  .gnote { margin-top:0.8rem; font-size:0.84rem; color:var(--soil); font-style:italic; }
+
+  footer { margin-top:clamp(2.5rem,7vw,4rem); padding-top:1.25rem; border-top:1px solid var(--line); font-size:0.82rem; color:var(--soil); display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; }
+  footer a { color:var(--seedling); text-decoration:none; }
+  footer a:hover { text-decoration:underline; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="mark">
+        <svg class="sprout" viewBox="0 0 24 24" fill="none" stroke="#5e9367" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22V11" /><path d="M12 11C12 7 9 5 4 5c0 4 3 6 8 6Z" /><path d="M12 13c0-3 2.5-5 7-5 0 3.5-2.5 5-7 5Z" />
+        </svg>
+        <span class="wordmark">Garden <span class="leaf">Tracker</span></span>
+      </div>
+      <p class="tagline">A quiet place to keep track of everything growing.</p>
+      <p class="today" id="today"></p>
+
+      <details class="zone" id="zone">
+        <summary>Your zone &amp; frost dates: <span class="val" id="zone-val">not set yet</span></summary>
+        <div class="controls">
+          <p class="hint">Set these once and your care cards will show the right sow, transplant, and harvest timing for where you garden. Pick a zone to fill in typical dates, then nudge them if you know your own.</p>
+          <div class="row3">
+            <div>
+              <label for="z-zone">Hardiness zone</label>
+              <select id="z-zone">
+                <option value="">Select…</option>
+                <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                <option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                <option value="9">9</option><option value="10">10</option><option value="11">11</option>
+              </select>
+            </div>
+            <div>
+              <label for="z-last">Last spring frost</label>
+              <input id="z-last" type="date" />
+            </div>
+            <div>
+              <label for="z-first">First fall frost</label>
+              <input id="z-first" type="date" />
+            </div>
+          </div>
+          <p class="hint" id="zone-region"></p>
+        </div>
+      </details>
+    </header>
+
+    <main class="plots">
+
+      <section class="plot">
+        <p class="marker">Plantings</p>
+        <h2>What you planted, and when</h2>
+        <p class="lede">Add a seed or seedling. If it's one of the plants in the guide, a care card comes with it.</p>
+
+        <form class="add-form" id="add-form">
+          <div class="field">
+            <label for="name">Plant</label>
+            <input id="name" type="text" placeholder="Cherry tomatoes" required autocomplete="off" />
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="type">Started as</label>
+              <select id="type"><option value="Seed">Seed</option><option value="Seedling">Seedling</option></select>
+            </div>
+            <div class="field">
+              <label for="date">Date planted</label>
+              <input id="date" type="date" required />
+            </div>
+          </div>
+          <div class="field">
+            <label for="plnote">Note (optional)</label>
+            <textarea id="plnote" placeholder="Back bed, by the fence"></textarea>
+          </div>
+          <button class="btn" type="submit">Add planting</button>
+        </form>
+
+        <ul class="list" id="list"></ul>
+        <p class="empty" id="empty">Nothing planted yet &mdash; add your first seed above.</p>
+      </section>
+
+      <section class="plot soil">
+        <p class="marker">Bed planner</p>
+        <h2>Your beds, on a grid</h2>
+        <p class="lede">Lay out each bed square by square and see exactly what's growing where.</p>
+        <span class="status">Coming soon</span>
+      </section>
+
+      <section class="plot tomato">
+        <p class="marker">Plant doctor</p>
+        <h2>A read on a struggling leaf</h2>
+        <p class="lede">Snap a photo of a plant that looks off and get a sense of what it might need.</p>
+        <span class="status">Coming soon</span>
+      </section>
+
+    </main>
+
+    <footer>
+      <span>Built by gigi-lang &middot; v0.3</span>
+      <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
+    </footer>
+  </div>
+
+<script>
+  /* ---------- today + season ---------- */
+  (function () {
+    const now = new Date();
+    const date = now.toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' });
+    const m = now.getMonth();
+    const season = m <= 1 || m === 11 ? 'winter' : m <= 4 ? 'spring' : m <= 7 ? 'summer' : 'autumn';
+    document.getElementById('today').textContent = date + ' \u00B7 ' + season;
+  })();
+
+  /* ---------- the plant guide (data sourced from horticultural references;
+     days-to-maturity are typical ranges and vary by variety and region) ---------- */
+  const GUIDE = [
+    { match:['cherry tomato'], name:'Cherry tomatoes', fam:'Nightshade family', season:'warm', from:'transplant', indoors:6, dtm:[55,70],
+      sun:'Full sun (6\u20138 hrs)', soil:'Rich, well-draining, slightly acidic', water:'Deep and even \u2014 avoid wet/dry swings', feed:'Balanced at first, then higher potassium once fruiting',
+      companions:['Basil','Borage','Carrots','Onions','Marigold','Nasturtium'], avoid:['Broccoli/cauliflower','Potatoes','Fennel'],
+      pests:[{p:'Tomato hornworm',d:'plant basil/borage nearby; hand-pick'},{p:'Aphids',d:'encourage ladybugs; blast with water'}],
+      note:'Water evenly to prevent cracking and blossom-end rot. Pinch side shoots if you want fewer, bigger trusses.' },
+
+    { match:['german johnson','german','johnson'], name:'German Johnson tomato', fam:'Nightshade family \u00b7 heirloom beefsteak', season:'warm', from:'transplant', indoors:7, dtm:[75,90],
+      sun:'Full sun (6\u20138 hrs)', soil:'Rich, deep, well-draining', water:'Deep and consistent', feed:'Balanced, easing nitrogen once flowering; add calcium',
+      companions:['Basil','Borage','Carrots','Onions','Marigold'], avoid:['Broccoli/cauliflower','Potatoes','Fennel'],
+      pests:[{p:'Tomato hornworm',d:'basil nearby; hand-pick'},{p:'Blossom-end rot',d:'steady watering + calcium'}],
+      note:'Indeterminate \u2014 give it a tall cage or stake. Loves hot, humid summers, so it suits the Mid-Atlantic well.' },
+
+    { match:['pickling cucumber','pickling'], name:'Pickling cucumbers', fam:'Cucurbit family', season:'warm', from:'sow', indoors:null, dtm:[50,58],
+      sun:'Full sun', soil:'Rich, well-draining, kept moist', water:'Plenty and consistent \u2014 dry spells make them bitter', feed:'Balanced, side-dress when vines run',
+      companions:['Beans','Peas','Corn','Radish','Dill','Nasturtium','Marigold','Sunflower'], avoid:['Sage & strong herbs','Potatoes'],
+      pests:[{p:'Cucumber beetle',d:'row cover till flowering; marigold/nasturtium'},{p:'Powdery mildew',d:'space for airflow; water at the roots'}],
+      note:'Pick small and often for crisp picklers \u2014 the more you harvest, the more it sets.' },
+
+    { match:['cucumber','cuke'], name:'Cucumbers', fam:'Cucurbit family', season:'warm', from:'sow', indoors:null, dtm:[55,65],
+      sun:'Full sun', soil:'Rich, well-draining, kept moist', water:'Plenty and consistent \u2014 dry spells make them bitter', feed:'Balanced, side-dress when vines run',
+      companions:['Beans','Peas','Corn','Radish','Dill','Nasturtium','Marigold','Sunflower'], avoid:['Sage & strong herbs','Potatoes'],
+      pests:[{p:'Cucumber beetle',d:'row cover till flowering; marigold/nasturtium'},{p:'Powdery mildew',d:'space for airflow; water at the roots'}],
+      note:'A trellis saves space and keeps fruit clean and straight. Keep picking to keep it producing.' },
+
+    { match:['cantaloupe','muskmelon','melon'], name:'Cantaloupe', fam:'Cucurbit family', season:'warm', from:'sow', indoors:3, dtm:[75,90],
+      sun:'Full sun \u2014 loves heat', soil:'Rich, warm, well-draining', water:'Steady while growing; ease off as fruit ripens for sweetness', feed:'Balanced, less nitrogen once fruit sets',
+      companions:['Corn','Beans','Radish','Nasturtium','Marigold','Sunflower'], avoid:['Potatoes'],
+      pests:[{p:'Cucumber beetle',d:'row cover early; stay on top of them'},{p:'Squash bug',d:'check leaf undersides; remove egg clusters'}],
+      note:'Ripe when it slips off the vine with a gentle tug and smells sweet at the stem end.' },
+
+    { match:['carrot'], name:'Carrots', fam:'Root \u00b7 umbellifer', season:'cool', from:'sow', indoors:null, dtm:[50,65],
+      sun:'Full sun to part shade', soil:'Loose, sandy, deep and stone-free \u2014 the key to straight roots', water:'Even moisture; never let it crust over seedlings', feed:'Go easy on nitrogen (it forks the roots); favor potassium',
+      companions:['Onions','Leeks','Lettuce','Peas','Rosemary','Sage','Tomatoes'], avoid:['Dill','Fennel','Parsnip'],
+      pests:[{p:'Carrot rust fly',d:'plant onions/sage nearby; use row cover'},{p:'Aphids',d:'encourage beneficials'}],
+      note:'Direct-sow (they hate being moved) and thin the seedlings so each root has room. Sow a little every few weeks.' },
+
+    { match:['broccoli'], name:'Broccoli', fam:'Brassica family', season:'cool', from:'transplant', indoors:5, dtm:[60,85],
+      sun:'Full sun', soil:'Rich, firm, slightly alkaline', water:'Steady moisture \u2014 stress bolts it', feed:'Nitrogen-rich early on',
+      companions:['Onions','Dill','Beets','Celery','Lettuce','Rosemary','Sage','Nasturtium'], avoid:['Tomatoes','Peppers','Strawberries'],
+      pests:[{p:'Cabbage worm/looper',d:'row cover; nasturtium & dill nearby; Bt if needed'},{p:'Aphids',d:'blast with water; ladybugs'}],
+      note:'Cool-season crop \u2014 best in spring and fall. Cut the main head before the buds open; side shoots keep coming.' },
+
+    { match:['cauliflower'], name:'Cauliflower', fam:'Brassica family', season:'cool', from:'transplant', indoors:5, dtm:[55,80],
+      sun:'Full sun', soil:'Rich, firm, consistent', water:'Very steady \u2014 it\u2019s the fussiest brassica about even moisture', feed:'Nitrogen-rich early on',
+      companions:['Onions','Dill','Beets','Celery','Lettuce','Sage','Nasturtium'], avoid:['Tomatoes','Peppers','Strawberries'],
+      pests:[{p:'Cabbage worm/looper',d:'row cover; Bt; nasturtium as a trap'},{p:'Aphids',d:'water blast; beneficials'}],
+      note:'For white heads, blanch them: tie the outer leaves over the curd once it\u2019s egg-sized (unless yours is self-blanching).' },
+
+    { match:['basil'], name:'Basil', fam:'Herb \u00b7 annual', season:'warm', from:'sow', indoors:5, dtm:[50,70],
+      sun:'Full sun', soil:'Rich, moist, well-draining', water:'Regular \u2014 keep it from wilting', feed:'Light; too much makes it leafy but bland',
+      companions:['Tomatoes','Peppers'], avoid:['Rue'],
+      pests:[{p:'Aphids',d:'water blast; beneficials'},{p:'Slugs',d:'remove hiding spots; traps'}],
+      note:'Pinch the tops and snip off any flower buds to keep it bushy and the leaves sweet. A classic partner for your tomatoes.' },
+
+    { match:['sage'], name:'Sage', fam:'Herb \u00b7 perennial', season:'perennial', from:'transplant', indoors:6, dtm:[75,75],
+      sun:'Full sun', soil:'Lean, well-draining \u2014 happier on the dry side', water:'Low once established; let it dry between waterings', feed:'Minimal',
+      companions:['Carrots','Broccoli/cauliflower','Rosemary'], avoid:['Cucumbers (sage can stunt them)'],
+      pests:[{p:'Powdery mildew',d:'good airflow; avoid wet leaves'},{p:'Spittlebugs',d:'hose them off'}],
+      note:'A woody perennial \u2014 it comes back each year. Prune lightly in spring. Earns its keep near carrots and cabbage by deterring their pests.' },
+
+    { match:['bunching onion','scallion','green onion','spring onion'], name:'Bunching onions', fam:'Allium family', season:'cool', from:'sow', indoors:null, dtm:[60,70],
+      sun:'Full sun to part shade', soil:'Rich, well-draining', water:'Even moisture', feed:'Moderate nitrogen',
+      companions:['Carrots','Beets','Lettuce','Broccoli/cauliflower','Tomatoes'], avoid:['Beans','Peas'],
+      pests:[{p:'Onion thrips',d:'hose off; encourage beneficials'},{p:'Onion maggot',d:'rotate; row cover'}],
+      note:'Forgiving and quick \u2014 snip what you need and they keep coming. A good pest-deterrent neighbor for carrots and brassicas.' },
+
+    { match:['dill'], name:'Dill', fam:'Herb \u00b7 umbellifer', season:'warm', from:'sow', indoors:null, dtm:[40,60],
+      sun:'Full sun', soil:'Well-draining', water:'Moderate', feed:'Light',
+      companions:['Cucumbers','Broccoli/cauliflower','Onions','Lettuce'], avoid:['Carrots (can stunt them)','Mature tomatoes'],
+      pests:[{p:'Aphids',d:'it actually attracts the beneficials that eat them'}],
+      note:'Direct-sow (taproot dislikes moving). Let some go to flower \u2014 it pulls in ladybugs and wasps and helps your cucumbers and cabbage. Swallowtail caterpillars love it; many gardeners leave them be.' },
+
+    { match:['pepper','bell pepper','chili','chile'], name:'Peppers', fam:'Nightshade family', season:'warm', from:'transplant', indoors:8, dtm:[60,90],
+      sun:'Full sun \u2014 needs warmth', soil:'Rich, well-draining', water:'Consistent, not soggy', feed:'Balanced; lower nitrogen once fruiting',
+      companions:['Basil','Tomatoes','Onions','Carrots','Marigold'], avoid:['Broccoli/cauliflower','Fennel'],
+      pests:[{p:'Aphids',d:'water blast; ladybugs'},{p:'Flea beetle',d:'row cover young plants'}],
+      note:'Slow to start and loves heat \u2014 don\u2019t rush it outside until nights are reliably warm.' },
+
+    { match:['tomato'], name:'Tomatoes', fam:'Nightshade family', season:'warm', from:'transplant', indoors:6, dtm:[60,85],
+      sun:'Full sun (6-8 hrs)', soil:'Rich, well-draining, slightly acidic', water:'Deep and even', feed:'Balanced, then more potassium once fruiting',
+      companions:['Basil','Borage','Carrots','Onions','Marigold','Nasturtium'], avoid:['Broccoli/cauliflower','Potatoes','Fennel'],
+      pests:[{p:'Tomato hornworm',d:'basil/borage nearby; hand-pick'},{p:'Aphids',d:'ladybugs; water blast'}],
+      note:'Water evenly to prevent cracking and blossom-end rot.' },
+
+    { match:['marijuana','cannabis','weed','hemp'], name:'Cannabis', fam:'Annual \u00b7 full-season', season:'warm', from:'transplant', indoors:6, dtm:[120,180],
+      sun:'Full sun (8+ hrs)', soil:'Rich, airy, well-draining', water:'Moderate \u2014 let the top inch dry; it dislikes soggy roots', feed:'Nitrogen-leaning while growing, more phosphorus/potassium once flowering',
+      companions:['Basil','Dill','Marigold','Beans','Sunflower'], avoid:[],
+      pests:[{p:'Spider mites',d:'check leaf undersides; spray; airflow'},{p:'Caterpillars/budworm',d:'inspect buds; Bt if needed'},{p:'Powdery mildew',d:'spacing and airflow'}],
+      note:'Outdoors it grows through summer and flowers as the days shorten, with harvest usually in early\u2013mid fall. Home cultivation is regulated and varies by location \u2014 check your local laws (adults 21+ where permitted; Virginia allows limited home growing).' }
+  ];
+
+  function normalize(s){ return (s||'').toLowerCase().trim(); }
+  function matchGuide(name){
+    const n = normalize(name);
+    for (const g of GUIDE){ for (const kw of g.match){ if (n.includes(kw)) return g; } }
+    return null;
+  }
+
+  /* ---------- zone / frost settings ---------- */
+  const ZONE_KEY = 'garden-tracker:zone';
+  // approximate average frost dates by USDA zone (US-centric, editable by the user)
+  const ZONE_FROST = {
+    '3':['05-15','09-15'], '4':['05-10','09-25'], '5':['05-01','10-05'],
+    '6':['04-20','10-15'], '7':['04-10','10-25'], '8':['04-01','11-10'],
+    '9':['02-25','12-05'], '10':['01-30','12-15'], '11':['','']
+  };
+  let zoneCfg = { zone:'', last:'', first:'' };
+
+  function loadZone(){ try { const r=localStorage.getItem(ZONE_KEY); if(r) zoneCfg=JSON.parse(r); } catch(e){} }
+  function saveZone(){ try { localStorage.setItem(ZONE_KEY, JSON.stringify(zoneCfg)); } catch(e){} }
+
+  function applyZoneToUI(){
+    document.getElementById('z-zone').value = zoneCfg.zone || '';
+    document.getElementById('z-last').value = zoneCfg.last || '';
+    document.getElementById('z-first').value = zoneCfg.first || '';
+    const val = document.getElementById('zone-val');
+    if (zoneCfg.zone){ val.textContent = 'Zone ' + zoneCfg.zone + (zoneCfg.last ? ' \u00b7 last frost ' + fmt(zoneCfg.last) : ''); }
+    else { val.textContent = 'not set yet'; }
+    document.getElementById('zone-region').textContent =
+      zoneCfg.zone ? 'These suggested dates are US-style averages \u2014 adjust them to match your own yard.' : '';
+  }
+
+  document.getElementById('z-zone').addEventListener('change', function(e){
+    zoneCfg.zone = e.target.value;
+    const f = ZONE_FROST[e.target.value];
+    if (f){
+      const yr = new Date().getFullYear();
+      if (f[0]) zoneCfg.last = yr + '-' + f[0];
+      if (f[1]) zoneCfg.first = yr + '-' + f[1];
+    }
+    saveZone(); applyZoneToUI(); render();
+  });
+  document.getElementById('z-last').addEventListener('change', function(e){ zoneCfg.last=e.target.value; saveZone(); applyZoneToUI(); render(); });
+  document.getElementById('z-first').addEventListener('change', function(e){ zoneCfg.first=e.target.value; saveZone(); applyZoneToUI(); render(); });
+
+  /* ---------- date helpers ---------- */
+  function asDate(str){ return new Date(str + 'T00:00:00'); }
+  function addDays(d, n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
+  function fmt(d){ const dd = (typeof d === 'string') ? asDate(d) : d; return dd.toLocaleDateString(undefined,{month:'short', day:'numeric'}); }
+  function daysSince(dateStr){
+    const planted = asDate(dateStr); const today = new Date(); today.setHours(0,0,0,0);
+    const diff = Math.round((today - planted)/86400000);
+    if (diff < 0) return 'not yet'; if (diff === 0) return 'planted today';
+    if (diff === 1) return 'day 1'; return 'day ' + diff;
+  }
+  function prettyFull(dateStr){ return asDate(dateStr).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); }
+
+  /* ---------- timing text from a planting + the guide + the zone ---------- */
+  function timingRows(g, plantDateStr){
+    const rows = [];
+    const start = asDate(plantDateStr);
+    // harvest window from planting date
+    const h0 = fmt(addDays(start, g.dtm[0]));
+    const h1 = fmt(addDays(start, g.dtm[1]));
+    const basis = g.from === 'transplant' ? 'from transplant' : 'from sowing';
+    rows.push({ ic:'\u2713', txt:'Likely harvest around <b>'+h0+'\u2013'+h1+'</b> ('+g.dtm[0]+'\u2013'+g.dtm[1]+' days '+basis+').' });
+
+    // sow / transplant guidance, tuned to zone if set
+    const last = zoneCfg.last;
+    if (g.season === 'perennial'){
+      rows.push({ ic:'\u2740', txt:'Perennial \u2014 plant in spring after frost; it returns each year.' });
+    } else if (g.season === 'cool'){
+      rows.push({ ic:'\u2740', txt:'Cool-season \u2014 best in early spring'+(last?' (around your last frost, '+fmt(last)+')':'')+' and again in late summer for a fall crop.' });
+    } else { // warm
+      if (g.indoors){
+        const indoorTxt = last ? ' (around <b>'+fmt(addDays(asDate(last), -g.indoors*7))+'</b>)' : '';
+        const outTxt = last ? ' (after <b>'+fmt(last)+'</b>)' : '';
+        rows.push({ ic:'\u2740', txt:'Start indoors ~'+g.indoors+' weeks before last frost'+indoorTxt+', then move outside once frost has passed'+outTxt+'.' });
+      } else {
+        rows.push({ ic:'\u2740', txt:'Direct-sow after the last frost'+(last?' ('+fmt(last)+')':'')+', once the soil is warm.' });
+      }
+    }
+    if (!last){ rows.push({ ic:'\u2691', txt:'<i>Set your zone above to turn these into calendar dates.</i>' }); }
+    return rows;
+  }
+
+  /* ---------- plantings data ---------- */
+  const KEY = 'garden-tracker:plantings';
+  let plantings = [];
+  let openGuides = {}; // id -> bool
+  function load(){ try { const r=localStorage.getItem(KEY); plantings = r?JSON.parse(r):[]; } catch(e){ plantings=[]; } }
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(plantings)); } catch(e){} }
+
+  function guideHTML(g, p){
+    let h = '<div class="guide '+(openGuides[p.id]?'open':'')+'" id="guide-'+p.id+'">';
+    h += '<div class="gfam">'+g.fam+'</div>';
+    h += '<div class="grow">'
+       + '<span class="k">Sun</span><span>'+g.sun+'</span>'
+       + '<span class="k">Soil</span><span>'+g.soil+'</span>'
+       + '<span class="k">Water</span><span>'+g.water+'</span>'
+       + '<span class="k">Feed</span><span>'+g.feed+'</span>'
+       + '</div>';
+    // companions
+    if (g.companions.length || g.avoid.length){
+      h += '<div class="clabel">Plant with / keep apart</div><div class="chips">';
+      g.companions.forEach(function(c){ h += '<span class="chip good">'+c+'</span>'; });
+      g.avoid.forEach(function(c){ h += '<span class="chip bad">\u2715 '+c+'</span>'; });
+      h += '</div>';
+    }
+    // pests
+    if (g.pests.length){
+      h += '<div class="clabel">Watch for</div><div class="pests">';
+      g.pests.forEach(function(x){ h += '<div class="pest"><b>'+x.p+'</b> &mdash; <span>'+x.d+'</span></div>'; });
+      h += '</div>';
+    }
+    // timing
+    h += '<div class="timing">';
+    timingRows(g, p.date).forEach(function(r){ h += '<div class="t"><span class="ic">'+r.ic+'</span><span>'+r.txt+'</span></div>'; });
+    h += '</div>';
+    if (g.note) h += '<div class="gnote">'+g.note+'</div>';
+    h += '</div>';
+    return h;
+  }
+
+  function render(){
+    const list = document.getElementById('list');
+    const empty = document.getElementById('empty');
+    list.innerHTML = '';
+    if (plantings.length === 0){ empty.style.display='block'; return; }
+    empty.style.display='none';
+
+    [...plantings].reverse().forEach(function(p){
+      const g = matchGuide(p.name);
+      const li = document.createElement('li');
+      li.className = 'plant';
+
+      let inner = '<div class="head">'
+        + '<span class="dot"></span>'
+        + '<div class="body"><div class="name"></div><div class="meta"></div>'
+        + (p.note ? '<div class="note"></div>' : '')
+        + '</div>'
+        + '<span class="age">'+daysSince(p.date)+'</span>'
+        + '<button class="remove" title="Remove" aria-label="Remove planting">&times;</button>'
+        + '</div>';
+
+      if (g){
+        inner += '<button class="guide-toggle" data-id="'+p.id+'">'+(openGuides[p.id]?'Hide care guide':'Show care guide')+'</button>';
+        inner += guideHTML(g, p);
+      } else {
+        inner += '<div class="no-guide">No care guide for this one yet.</div>';
+      }
+
+      li.innerHTML = inner;
+      li.querySelector('.name').textContent = p.name;
+      li.querySelector('.meta').textContent = p.type + ' \u00B7 ' + prettyFull(p.date) + (g ? '' : '');
+      if (p.note) li.querySelector('.note').textContent = p.note;
+
+      li.querySelector('.remove').addEventListener('click', function(){
+        plantings = plantings.filter(function(x){ return x.id !== p.id; });
+        delete openGuides[p.id]; save(); render();
+      });
+      const tog = li.querySelector('.guide-toggle');
+      if (tog){
+        tog.addEventListener('click', function(){
+          openGuides[p.id] = !openGuides[p.id];
+          render();
+        });
+      }
+      list.appendChild(li);
+    });
+  }
+
+  document.getElementById('add-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    const name = document.getElementById('name').value.trim();
+    const type = document.getElementById('type').value;
+    const date = document.getElementById('date').value;
+    const note = document.getElementById('plnote').value.trim();
+    if (!name || !date) return;
+    plantings.push({ id:Date.now().toString(), name:name, type:type, date:date, note:note });
+    save(); render();
+    e.target.reset();
+    document.getElementById('date').value = date;
+    document.getElementById('name').focus();
+  });
+
+  /* ---------- start up ---------- */
+  document.getElementById('date').value = new Date().toISOString().slice(0,10);
+  loadZone(); applyZoneToUI();
+  load(); render();
+</script>
+</body>
+</html>

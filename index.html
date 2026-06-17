@@ -24,7 +24,6 @@
     font-family: 'Inter', system-ui, sans-serif;
     color: var(--ink);
     background-color: var(--paper);
-    /* signature: faint grid paper, like a seed journal + a raised-bed grid */
     background-image:
       linear-gradient(var(--line) 1px, transparent 1px),
       linear-gradient(90deg, var(--line) 1px, transparent 1px);
@@ -38,122 +37,96 @@
 
   /* ---- header ---- */
   header { margin-bottom: clamp(2rem, 6vw, 3.5rem); }
-
-  .mark {
-    display: inline-flex; align-items: center; gap: 0.55rem;
-    margin-bottom: 0.9rem;
-  }
-  .mark .sprout {
-    width: 26px; height: 26px; flex: none;
-  }
+  .mark { display: inline-flex; align-items: center; gap: 0.55rem; margin-bottom: 0.9rem; }
+  .mark .sprout { width: 26px; height: 26px; flex: none; }
   .wordmark {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: clamp(2.2rem, 7vw, 3.1rem);
-    letter-spacing: -0.01em;
-    line-height: 1.05;
+    font-family: 'Fraunces', serif; font-weight: 600;
+    font-size: clamp(2.2rem, 7vw, 3.1rem); letter-spacing: -0.01em; line-height: 1.05;
   }
   .wordmark .leaf { color: var(--seedling); }
-
-  .tagline {
-    font-size: 1.05rem;
-    color: var(--soil);
-    max-width: 34ch;
-  }
-
+  .tagline { font-size: 1.05rem; color: var(--soil); max-width: 34ch; }
   .today {
-    margin-top: 1.1rem;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--seedling);
-    font-weight: 600;
+    margin-top: 1.1rem; font-size: 0.8rem; text-transform: uppercase;
+    letter-spacing: 0.14em; color: var(--seedling); font-weight: 600;
   }
 
-  /* ---- feature plots ---- */
-  .plots {
-    display: grid;
-    gap: 1rem;
-  }
-
+  /* ---- plots (cards) ---- */
+  .plots { display: grid; gap: 1rem; }
   .plot {
-    position: relative;
-    background: var(--plot);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 1.5rem 1.5rem 1.4rem;
-    /* the little "marker stake" tab */
-    overflow: hidden;
-    opacity: 0;
-    transform: translateY(10px);
-    animation: rise 0.6s ease forwards;
+    position: relative; background: var(--plot); border: 1px solid var(--line);
+    border-radius: 4px; padding: 1.5rem 1.5rem 1.4rem; overflow: hidden;
   }
-  .plot::before {
-    content: "";
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 4px;
-    background: var(--seedling);
-  }
-  .plot:nth-child(2)::before { background: var(--soil); }
-  .plot:nth-child(3)::before { background: var(--tomato); }
-
-  .plot:nth-child(1) { animation-delay: 0.05s; }
-  .plot:nth-child(2) { animation-delay: 0.15s; }
-  .plot:nth-child(3) { animation-delay: 0.25s; }
+  .plot::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--seedling); }
+  .plot.soil::before { background: var(--soil); }
+  .plot.tomato::before { background: var(--tomato); }
 
   .marker {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    font-weight: 600;
-    color: var(--soil);
-    margin-bottom: 0.5rem;
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.16em;
+    font-weight: 600; color: var(--soil); margin-bottom: 0.5rem;
   }
-  .plot h2 {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 1.4rem;
-    margin-bottom: 0.35rem;
-  }
-  .plot p {
-    color: var(--soil);
-    font-size: 0.97rem;
-    max-width: 46ch;
-  }
+  .plot h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 1.4rem; margin-bottom: 0.35rem; }
+  .plot p.lede { color: var(--soil); font-size: 0.97rem; max-width: 46ch; }
   .status {
-    margin-top: 1rem;
-    display: inline-block;
-    font-size: 0.74rem;
-    letter-spacing: 0.04em;
-    color: var(--seedling);
-    border: 1px dashed var(--seedling);
-    border-radius: 999px;
-    padding: 0.2rem 0.7rem;
+    margin-top: 1rem; display: inline-block; font-size: 0.74rem; letter-spacing: 0.04em;
+    color: var(--seedling); border: 1px dashed var(--seedling); border-radius: 999px; padding: 0.2rem 0.7rem;
   }
+
+  /* ---- planting form ---- */
+  .add-form { margin-top: 1.25rem; display: grid; gap: 0.75rem; }
+  .field { display: grid; gap: 0.3rem; }
+  .field label {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--soil); font-weight: 600;
+  }
+  .field input, .field select, .field textarea {
+    font-family: inherit; font-size: 0.95rem; color: var(--ink);
+    background: #fff; border: 1px solid var(--line); border-radius: 4px;
+    padding: 0.55rem 0.7rem; width: 100%;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: 2px solid var(--seedling); outline-offset: 1px; border-color: var(--seedling);
+  }
+  .field textarea { resize: vertical; min-height: 2.6rem; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  @media (max-width: 460px) { .row { grid-template-columns: 1fr; } }
+
+  .btn {
+    font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    background: var(--seedling); color: #fff; border: none; border-radius: 4px;
+    padding: 0.6rem 1.1rem; justify-self: start;
+  }
+  .btn:hover { background: #4f8059; }
+  .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  /* ---- plant list ---- */
+  .list { margin-top: 1.5rem; display: grid; gap: 0.6rem; list-style: none; }
+  .empty { margin-top: 1.4rem; color: var(--soil); font-size: 0.95rem; font-style: italic; }
+  .plant {
+    display: flex; align-items: flex-start; gap: 0.8rem;
+    border-top: 1px solid var(--line); padding-top: 0.8rem;
+  }
+  .plant .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--seedling); margin-top: 0.45rem; flex: none; }
+  .plant .body { flex: 1; min-width: 0; }
+  .plant .name { font-weight: 600; font-size: 1.02rem; }
+  .plant .meta { font-size: 0.82rem; color: var(--soil); margin-top: 0.1rem; }
+  .plant .note { font-size: 0.9rem; margin-top: 0.3rem; color: var(--ink); }
+  .age {
+    font-size: 0.72rem; letter-spacing: 0.04em; color: var(--seedling);
+    background: rgba(94,147,103,0.12); border-radius: 999px; padding: 0.15rem 0.6rem; white-space: nowrap; align-self: center;
+  }
+  .remove {
+    background: none; border: none; cursor: pointer; color: var(--soil);
+    font-size: 1.1rem; line-height: 1; padding: 0.2rem; opacity: 0.6; align-self: center;
+  }
+  .remove:hover { opacity: 1; color: var(--tomato); }
 
   /* ---- footer ---- */
   footer {
-    margin-top: clamp(2.5rem, 7vw, 4rem);
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--line);
-    font-size: 0.82rem;
-    color: var(--soil);
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    margin-top: clamp(2.5rem, 7vw, 4rem); padding-top: 1.25rem; border-top: 1px solid var(--line);
+    font-size: 0.82rem; color: var(--soil); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
   }
   footer a { color: var(--seedling); text-decoration: none; }
   footer a:hover { text-decoration: underline; }
-
-  @keyframes rise {
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .plot { animation: none; opacity: 1; transform: none; }
-  }
 </style>
 </head>
 <body>
@@ -172,46 +145,167 @@
     </header>
 
     <main class="plots">
+
+      <!-- PLANTINGS (now working) -->
       <section class="plot">
         <p class="marker">Plantings</p>
         <h2>What you planted, and when</h2>
-        <p>Log each seed and seedling with its date, then follow how it comes along over the weeks.</p>
-        <span class="status">Opening next</span>
+        <p class="lede">Add a seed or seedling with its date, and watch the days add up.</p>
+
+        <form class="add-form" id="add-form">
+          <div class="field">
+            <label for="name">Plant</label>
+            <input id="name" type="text" placeholder="Cherry tomatoes" required />
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="type">Started as</label>
+              <select id="type">
+                <option value="Seed">Seed</option>
+                <option value="Seedling">Seedling</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="date">Date planted</label>
+              <input id="date" type="date" required />
+            </div>
+          </div>
+          <div class="field">
+            <label for="note">Note (optional)</label>
+            <textarea id="note" placeholder="Back bed, by the fence"></textarea>
+          </div>
+          <button class="btn" type="submit">Add planting</button>
+        </form>
+
+        <ul class="list" id="list"></ul>
+        <p class="empty" id="empty">Nothing planted yet &mdash; add your first seed above.</p>
       </section>
 
-      <section class="plot">
+      <!-- BED PLANNER (coming soon) -->
+      <section class="plot soil">
         <p class="marker">Bed planner</p>
         <h2>Your beds, on a grid</h2>
-        <p>Lay out each bed square by square and see exactly what's growing where.</p>
+        <p class="lede">Lay out each bed square by square and see exactly what's growing where.</p>
         <span class="status">Coming soon</span>
       </section>
 
-      <section class="plot">
+      <!-- PLANT DOCTOR (coming soon) -->
+      <section class="plot tomato">
         <p class="marker">Plant doctor</p>
         <h2>A read on a struggling leaf</h2>
-        <p>Snap a photo of a plant that looks off and get a sense of what it might need.</p>
+        <p class="lede">Snap a photo of a plant that looks off and get a sense of what it might need.</p>
         <span class="status">Coming soon</span>
       </section>
+
     </main>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.1</span>
+      <span>Built by gigi-lang &middot; v0.2</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
 
 <script>
-  // tiny living touch: show today's date + a rough season
+  // ---- today's date + season in the header ----
   (function () {
     const now = new Date();
     const date = now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
     const m = now.getMonth();
-    const season = m <= 1 || m === 11 ? 'winter'
-                 : m <= 4 ? 'spring'
-                 : m <= 7 ? 'summer'
-                 : 'autumn';
+    const season = m <= 1 || m === 11 ? 'winter' : m <= 4 ? 'spring' : m <= 7 ? 'summer' : 'autumn';
     document.getElementById('today').textContent = date + ' \u00B7 ' + season;
   })();
+
+  // ---- Plantings: data + storage ----
+  const STORAGE_KEY = 'garden-tracker:plantings';
+  let plantings = [];
+
+  // Storage is wrapped so the page never crashes if a browser blocks it.
+  // On your live site it saves normally and remembers between visits.
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      plantings = raw ? JSON.parse(raw) : [];
+    } catch (e) { plantings = []; }
+  }
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(plantings)); } catch (e) {}
+  }
+
+  // ---- how long ago, in plain words ----
+  function daysSince(dateStr) {
+    const planted = new Date(dateStr + 'T00:00:00');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const diff = Math.round((today - planted) / 86400000);
+    if (diff < 0) return 'not yet';
+    if (diff === 0) return 'planted today';
+    if (diff === 1) return 'day 1';
+    return 'day ' + diff;
+  }
+
+  function prettyDate(dateStr) {
+    return new Date(dateStr + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  // ---- render the list ----
+  function render() {
+    const list = document.getElementById('list');
+    const empty = document.getElementById('empty');
+    list.innerHTML = '';
+
+    if (plantings.length === 0) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+
+    // newest first
+    [...plantings].reverse().forEach(function (p) {
+      const li = document.createElement('li');
+      li.className = 'plant';
+      li.innerHTML =
+        '<span class="dot"></span>' +
+        '<div class="body">' +
+          '<div class="name"></div>' +
+          '<div class="meta"></div>' +
+          (p.note ? '<div class="note"></div>' : '') +
+        '</div>' +
+        '<span class="age">' + daysSince(p.date) + '</span>' +
+        '<button class="remove" title="Remove" aria-label="Remove planting">&times;</button>';
+
+      // set text safely (handles quotes/symbols in names)
+      li.querySelector('.name').textContent = p.name;
+      li.querySelector('.meta').textContent = p.type + ' \u00B7 ' + prettyDate(p.date);
+      if (p.note) li.querySelector('.note').textContent = p.note;
+
+      li.querySelector('.remove').addEventListener('click', function () {
+        plantings = plantings.filter(function (x) { return x.id !== p.id; });
+        save(); render();
+      });
+
+      list.appendChild(li);
+    });
+  }
+
+  // ---- add a planting ----
+  document.getElementById('add-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const name = document.getElementById('name').value.trim();
+    const type = document.getElementById('type').value;
+    const date = document.getElementById('date').value;
+    const note = document.getElementById('note').value.trim();
+    if (!name || !date) return;
+
+    plantings.push({ id: Date.now().toString(), name: name, type: type, date: date, note: note });
+    save(); render();
+
+    // reset for the next entry, keep the date handy
+    e.target.reset();
+    document.getElementById('date').value = date;
+    document.getElementById('name').focus();
+  });
+
+  // ---- start up ----
+  document.getElementById('date').value = new Date().toISOString().slice(0, 10); // default to today
+  load();
+  render();
 </script>
 </body>
 </html>

@@ -18,7 +18,15 @@
     background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
     background-size:26px 26px; line-height:1.5; min-height:100vh; padding:clamp(1.5rem,5vw,4rem) 1.25rem;
   }
-  .wrap { max-width:720px; margin:0 auto; }
+  .wrap { max-width:1140px; margin:0 auto; }
+  .layout { display:flex; gap:1rem; align-items:flex-start; }
+  .plots { flex:1 1 auto; min-width:0; }
+  .sidebar { width:350px; flex:0 0 350px; position:sticky; top:1rem; }
+  @media (max-width:900px){
+    .wrap { max-width:720px; }
+    .layout { flex-direction:column; }
+    .sidebar { width:auto; flex:1 1 auto; position:static; }
+  }
 
   header { margin-bottom:clamp(1.5rem,5vw,2.5rem); }
   .mark { display:inline-flex; align-items:center; gap:0.55rem; margin-bottom:0.9rem; }
@@ -30,7 +38,7 @@
 
   /* zone bar */
   .zone {
-    margin:1.25rem 0 0; background:var(--plot); border:1px solid var(--line); border-radius:4px;
+    margin:1.25rem 0 0; max-width:760px; background:var(--plot); border:1px solid var(--line); border-radius:4px;
     padding:0.7rem 0.95rem; font-size:0.88rem;
   }
   .zone summary { cursor:pointer; color:var(--ink); list-style:none; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; }
@@ -180,7 +188,8 @@
       </details>
     </header>
 
-    <main class="plots">
+    <div class="layout">
+      <main class="plots">
 
       <section class="plot">
         <p class="marker">Plantings</p>
@@ -222,24 +231,6 @@
         <p style="margin-top:0.6rem;color:var(--soil);font-size:0.8rem;">Downloads a calendar file (.ics) &mdash; open it to drop these into Google or Apple Calendar, reminders and all. Re-export whenever you add plants.</p>
       </section>
 
-      <section class="plot">
-        <p class="marker">Calendar</p>
-        <h2>Your month at a glance</h2>
-        <p class="lede">The same dates, laid out on a calendar. Tap a highlighted day to see what's happening.</p>
-        <div class="cal-head">
-          <button class="cal-nav" id="cal-prev" aria-label="Previous month">&lsaquo;</button>
-          <span class="mlabel" id="cal-label"></span>
-          <button class="cal-nav" id="cal-next" aria-label="Next month">&rsaquo;</button>
-        </div>
-        <div class="cal-grid" id="cal-grid"></div>
-        <div class="cal-legend">
-          <span><i style="background:var(--soil)"></i>transplant</span>
-          <span><i style="background:var(--seedling)"></i>feed</span>
-          <span><i style="background:var(--tomato)"></i>harvest</span>
-        </div>
-        <div class="cal-day-detail" id="cal-detail"></div>
-      </section>
-
       <section class="plot soil">
         <p class="marker">Bed planner</p>
         <h2>Your beds, on a grid</h2>
@@ -254,10 +245,31 @@
         <span class="status">Coming soon</span>
       </section>
 
-    </main>
+      </main>
+
+      <aside class="sidebar">
+        <section class="plot">
+          <p class="marker">Calendar</p>
+          <h2>Your month at a glance</h2>
+          <p class="lede">The same dates, laid out on a calendar. Tap a highlighted day to see what's happening.</p>
+          <div class="cal-head">
+            <button class="cal-nav" id="cal-prev" aria-label="Previous month">&lsaquo;</button>
+            <span class="mlabel" id="cal-label"></span>
+            <button class="cal-nav" id="cal-next" aria-label="Next month">&rsaquo;</button>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <div class="cal-legend">
+            <span><i style="background:var(--soil)"></i>transplant</span>
+            <span><i style="background:var(--seedling)"></i>feed</span>
+            <span><i style="background:var(--tomato)"></i>harvest</span>
+          </div>
+          <div class="cal-day-detail" id="cal-detail"></div>
+        </section>
+      </aside>
+    </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.5</span>
+      <span>Built by gigi-lang &middot; v0.6</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>

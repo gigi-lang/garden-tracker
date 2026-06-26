@@ -34,6 +34,11 @@
   .wordmark { font-family:'Fraunces',serif; font-weight:600; font-size:clamp(2.2rem,7vw,3.1rem); letter-spacing:-0.01em; line-height:1.05; }
   .wordmark .leaf { color:var(--seedling); }
   .tagline { font-size:1.05rem; color:var(--soil); max-width:34ch; }
+  .menu { display:flex; flex-direction:column; gap:0.15rem; margin:0 0 1rem; }
+  .menu a { font-family:inherit; font-size:0.9rem; font-weight:600; color:var(--soil); text-decoration:none; padding:0.55rem 0.8rem; border-radius:4px; border-left:3px solid transparent; }
+  .menu a:hover { color:var(--ink); background:var(--plot); }
+  .menu a.active { color:var(--seedling); background:var(--plot); border-left-color:var(--seedling); }
+  .menu a:focus-visible { outline:2px solid var(--seedling); outline-offset:2px; }
   .today { margin-top:1.1rem; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--seedling); font-weight:600; }
 
   /* zone bar */
@@ -51,7 +56,8 @@
   .zone select, .zone input { width:100%; font-family:inherit; font-size:0.9rem; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:4px; padding:0.45rem 0.6rem; }
   .zone .hint { font-size:0.78rem; color:var(--soil); }
 
-  .plots { display:grid; gap:1rem; }
+  .view { display:none; }
+  .view.active { display:grid; gap:1rem; }
   .plot { position:relative; background:var(--plot); border:1px solid var(--line); border-radius:4px; padding:1.5rem 1.5rem 1.4rem; overflow:hidden; }
   .plot::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--seedling); }
   .plot.soil::before { background:var(--soil); }
@@ -80,6 +86,14 @@
 
   .list { margin-top:1.5rem; display:grid; gap:0.6rem; list-style:none; }
   .empty { margin-top:1.4rem; color:var(--soil); font-size:0.95rem; font-style:italic; }
+  .empty-state { margin-top:1.4rem; }
+  .es-card { border:1px dashed rgba(94,147,103,0.5); border-radius:4px; background:#fff; padding:1.6rem 1.4rem; text-align:center; }
+  .es-sprout { width:32px; height:32px; margin:0 auto 0.75rem; display:block; }
+  .es-title { font-family:'Fraunces',serif; font-weight:500; font-size:1.3rem; color:var(--ink); margin-bottom:0.45rem; }
+  .es-sub { color:var(--soil); font-size:0.93rem; max-width:44ch; margin:0 auto; line-height:1.55; }
+  .es-up { display:inline-block; margin-top:0.9rem; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--seedling); font-weight:600; }
+  .es-sample { margin-top:1.4rem; text-align:left; opacity:0.5; }
+  .es-cap { margin-top:0.55rem; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); }
   .plant { border-top:1px solid var(--line); padding-top:0.8rem; }
   .plant .head { display:flex; align-items:flex-start; gap:0.8rem; }
   .plant .dot { width:9px; height:9px; border-radius:50%; background:var(--seedling); margin-top:0.45rem; flex:none; }
@@ -196,6 +210,33 @@
     <div class="layout">
       <main class="plots">
 
+      <div class="view active" data-view="home">
+
+      <section class="plot">
+        <p class="marker">Schedule</p>
+        <h2>What's coming up</h2>
+        <p class="lede">Your watering, feeding, transplant, and harvest dates &mdash; pulled from your plantings and your zone. Send them to your phone's calendar and it does the reminding.</p>
+        <div id="sched-body"></div>
+        <button class="btn" id="export-btn" style="margin-top:1.2rem;">Add to my calendar</button>
+        <p style="margin-top:0.6rem;color:var(--soil);font-size:0.8rem;">Downloads a calendar file (.ics) &mdash; open it to drop these into Google or Apple Calendar, reminders and all. Re-export whenever you add plants.</p>
+      </section>
+
+      <section class="plot">
+        <p class="marker">Your data</p>
+        <h2>Back up your garden</h2>
+        <p class="lede">Everything lives in this browser only. Save a backup file to keep it safe &mdash; or load one back onto a new browser or device.</p>
+        <div class="data-actions">
+          <button class="btn" id="backup-export">Export backup</button>
+          <button class="btn ghost" id="backup-import">Import backup</button>
+          <input type="file" id="backup-file" accept="application/json,.json" hidden />
+        </div>
+        <p class="data-status" id="backup-status" role="status" aria-live="polite"></p>
+      </section>
+
+      </div>
+
+      <div class="view" data-view="plantings">
+
       <section class="plot">
         <p class="marker">Plantings</p>
         <h2>What you planted, and when</h2>
@@ -229,17 +270,34 @@
         </form>
 
         <ul class="list" id="list"></ul>
-        <p class="empty" id="empty">Nothing planted yet &mdash; add your first seed above.</p>
+        <div class="empty-state" id="empty">
+          <div class="es-card">
+            <svg class="es-sprout" viewBox="0 0 24 24" fill="none" stroke="#5e9367" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 22V11" /><path d="M12 11C12 7 9 5 4 5c0 4 3 6 8 6Z" /><path d="M12 13c0-3 2.5-5 7-5 0 3.5-2.5 5-7 5Z" />
+            </svg>
+            <p class="es-title">Your garden starts here</p>
+            <p class="es-sub">Add your first plant up above &mdash; give it a name, say how you planted it, and set the date. If it&rsquo;s one we know, a care guide and a harvest schedule come along with it.</p>
+            <span class="es-up">&uarr; Start with the form above</span>
+            <div class="es-sample" aria-hidden="true">
+              <p class="es-cap">For example &mdash; this is what a planting looks like</p>
+              <div class="plant">
+                <div class="head">
+                  <span class="dot"></span>
+                  <div class="body">
+                    <div class="name">Cherry tomatoes</div>
+                    <div class="meta">Seedling &middot; planted today</div>
+                  </div>
+                  <span class="age">just planted</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section class="plot">
-        <p class="marker">Schedule</p>
-        <h2>What's coming up</h2>
-        <p class="lede">Your watering, feeding, transplant, and harvest dates &mdash; pulled from your plantings and your zone. Send them to your phone's calendar and it does the reminding.</p>
-        <div id="sched-body"></div>
-        <button class="btn" id="export-btn" style="margin-top:1.2rem;">Add to my calendar</button>
-        <p style="margin-top:0.6rem;color:var(--soil);font-size:0.8rem;">Downloads a calendar file (.ics) &mdash; open it to drop these into Google or Apple Calendar, reminders and all. Re-export whenever you add plants.</p>
-      </section>
+      </div>
+
+      <div class="view" data-view="beds">
 
       <section class="plot soil">
         <p class="marker">Bed planner</p>
@@ -248,6 +306,10 @@
         <span class="status">Coming soon</span>
       </section>
 
+      </div>
+
+      <div class="view" data-view="doctor">
+
       <section class="plot tomato">
         <p class="marker">Plant doctor</p>
         <h2>A read on a struggling leaf</h2>
@@ -255,21 +317,18 @@
         <span class="status">Coming soon</span>
       </section>
 
-      <section class="plot">
-        <p class="marker">Your data</p>
-        <h2>Back up your garden</h2>
-        <p class="lede">Everything lives in this browser only. Save a backup file to keep it safe &mdash; or load one back onto a new browser or device.</p>
-        <div class="data-actions">
-          <button class="btn" id="backup-export">Export backup</button>
-          <button class="btn ghost" id="backup-import">Import backup</button>
-          <input type="file" id="backup-file" accept="application/json,.json" hidden />
-        </div>
-        <p class="data-status" id="backup-status" role="status" aria-live="polite"></p>
-      </section>
+      </div>
 
       </main>
 
       <aside class="sidebar">
+        <nav class="menu" id="menu" aria-label="Sections">
+          <a href="#home" data-route="home">Home</a>
+          <a href="#plantings" data-route="plantings">Plantings</a>
+          <a href="#beds" data-route="beds">Beds</a>
+          <a href="#doctor" data-route="doctor">Plant doctor</a>
+        </nav>
+
         <section class="plot">
           <p class="marker">Calendar</p>
           <h2>Your month at a glance</h2>
@@ -291,7 +350,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.12</span>
+      <span>Built by gigi-lang &middot; v0.13</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -1248,14 +1307,33 @@
     reader.readAsText(file);
   });
 
+  /* ---------- view router (v0.13) ---------- */
+  const VIEWS = ['home','plantings','beds','doctor'];
+  function showView(name){
+    if (VIEWS.indexOf(name) === -1) name = 'home';
+    document.querySelectorAll('.view').forEach(function(v){
+      v.classList.toggle('active', v.getAttribute('data-view') === name);
+    });
+    document.querySelectorAll('.menu a').forEach(function(a){
+      const on = a.getAttribute('data-route') === name;
+      a.classList.toggle('active', on);
+      if (on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
+    });
+  }
+  function routeFromHash(){
+    const h = (location.hash || '').replace(/^#\/?/, '');
+    showView(h || 'home');
+  }
+  window.addEventListener('hashchange', function(){ routeFromHash(); window.scrollTo(0,0); });
+  routeFromHash();
+
   /* ---------- start up ---------- */
   document.getElementById('date').value = new Date().toISOString().slice(0,10);
   loadZone(); applyZoneToUI();
   load();
   (function(){
-    const today = new Date(); today.setHours(0,0,0,0);
-    const up = buildTasks().filter(function(t){ return t.when >= today; }).sort(function(a,b){ return a.when - b.when; });
-    if (up.length){ calState.y = up[0].when.getFullYear(); calState.m = up[0].when.getMonth(); }
+    const today = new Date();
+    calState.y = today.getFullYear(); calState.m = today.getMonth();
   })();
   render();
 </script>

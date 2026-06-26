@@ -18,7 +18,7 @@
     background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
     background-size:26px 26px; line-height:1.5; min-height:100vh; padding:clamp(1.5rem,5vw,4rem) 1.25rem;
   }
-  .wrap { max-width:1140px; margin:0 auto; }
+  .wrap { max-width:1240px; margin:0 auto; }
   .layout { display:flex; gap:1rem; align-items:flex-start; }
   .plots { flex:1 1 auto; min-width:0; }
   .sidebar { width:350px; flex:0 0 350px; position:sticky; top:1rem; align-self:flex-start; max-height:calc(100vh - 2rem); overflow:auto; }
@@ -26,6 +26,7 @@
     .wrap { max-width:720px; }
     .layout { flex-direction:column; }
     .sidebar { width:auto; flex:1 1 auto; position:static; max-height:none; overflow:visible; }
+    .menu { position:static; flex:0 0 auto; width:100%; }
   }
 
   header { margin-bottom:clamp(1.5rem,5vw,2.5rem); }
@@ -34,7 +35,7 @@
   .wordmark { font-family:'Fraunces',serif; font-weight:600; font-size:clamp(2.2rem,7vw,3.1rem); letter-spacing:-0.01em; line-height:1.05; }
   .wordmark .leaf { color:var(--seedling); }
   .tagline { font-size:1.05rem; color:var(--soil); max-width:34ch; }
-  .menu { display:flex; flex-direction:column; gap:0.15rem; margin:0 0 1rem; }
+  .menu { display:flex; flex-direction:column; gap:0.15rem; flex:0 0 160px; position:sticky; top:1rem; align-self:flex-start; }
   .menu a { font-family:inherit; font-size:0.9rem; font-weight:600; color:var(--soil); text-decoration:none; padding:0.55rem 0.8rem; border-radius:4px; border-left:3px solid transparent; }
   .menu a:hover { color:var(--ink); background:var(--plot); }
   .menu a.active { color:var(--seedling); background:var(--plot); border-left-color:var(--seedling); }
@@ -208,6 +209,12 @@
     </header>
 
     <div class="layout">
+      <nav class="menu" id="menu" aria-label="Sections">
+        <a href="#home" data-route="home">Home</a>
+        <a href="#plantings" data-route="plantings">Plantings</a>
+        <a href="#beds" data-route="beds">Beds</a>
+        <a href="#doctor" data-route="doctor">Plant doctor</a>
+      </nav>
       <main class="plots">
 
       <div class="view active" data-view="home">
@@ -322,13 +329,6 @@
       </main>
 
       <aside class="sidebar">
-        <nav class="menu" id="menu" aria-label="Sections">
-          <a href="#home" data-route="home">Home</a>
-          <a href="#plantings" data-route="plantings">Plantings</a>
-          <a href="#beds" data-route="beds">Beds</a>
-          <a href="#doctor" data-route="doctor">Plant doctor</a>
-        </nav>
-
         <section class="plot">
           <p class="marker">Calendar</p>
           <h2>Your month at a glance</h2>
@@ -350,7 +350,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.13</span>
+      <span>Built by gigi-lang &middot; v0.14</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>

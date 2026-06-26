@@ -112,7 +112,7 @@
   .water-line { display:flex; gap:0.5rem; align-items:center; font-size:0.9rem; color:var(--ink); margin-top:0.5rem; }
   .sched-list { list-style:none; margin-top:0.9rem; display:grid; gap:0.5rem; }
   .task { display:flex; align-items:center; gap:0.7rem; border-top:1px solid var(--line); padding-top:0.5rem; font-size:0.92rem; }
-  .task .tdate { font-variant-numeric:tabular-nums; color:var(--soil); width:4.2rem; flex:none; }
+  .task .tdate { font-variant-numeric:tabular-nums; color:var(--soil); width:5.8rem; flex:none; white-space:nowrap; }
   .task .tkind { font-size:0.66rem; text-transform:uppercase; letter-spacing:0.08em; border-radius:999px; padding:0.1rem 0.5rem; flex:none; }
   .task-move .tkind { color:var(--soil); background:rgba(122,106,85,0.14); }
   .task-feed .tkind { color:var(--seedling); background:rgba(94,147,103,0.14); }
@@ -274,7 +274,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.10</span>
+      <span>Built by gigi-lang &middot; v0.11</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -682,6 +682,13 @@
   function asDate(str){ return new Date(str + 'T00:00:00'); }
   function addDays(d, n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
   function fmt(d){ const dd = (typeof d === 'string') ? asDate(d) : d; return dd.toLocaleDateString(undefined,{month:'short', day:'numeric'}); }
+  function fmtSched(d){
+    const dd = (typeof d === 'string') ? asDate(d) : d;
+    const opts = (dd.getFullYear() === new Date().getFullYear())
+      ? { month:'short', day:'numeric' }
+      : { month:'short', day:'numeric', year:'numeric' };
+    return dd.toLocaleDateString(undefined, opts);
+  }
   function daysSince(dateStr){
     const planted = asDate(dateStr); const today = new Date(); today.setHours(0,0,0,0);
     const diff = Math.round((today - planted)/86400000);
@@ -921,7 +928,12 @@
     }
     if (btn) btn.style.display = 'inline-block';
     const today = new Date(); today.setHours(0,0,0,0);
-    const upcoming = buildTasks().filter(function(t){ return t.when >= today; }).slice(0, 12);
+    // show only the NEXT occurrence of each plant + task (the full multi-year set stays in the calendar + .ics)
+    const seen = {};
+    const upcoming = buildTasks()
+      .filter(function(t){ return t.when >= today; })
+      .filter(function(t){ const k = t.id + '|' + t.kind; if (seen[k]) return false; seen[k] = true; return true; })
+      .slice(0, 12);
     const labels = { move:'transplant', feed:'feed', harvest:'harvest' };
     let h = '<div class="water-line"><span>\uD83D\uDCA7</span><span>Daily watering reminder at 7:00am while things are growing.</span></div>';
     if (upcoming.length === 0){
@@ -930,7 +942,7 @@
     }
     h += '<ul class="sched-list">';
     upcoming.forEach(function(t){
-      h += '<li class="task task-' + t.kind + '"><span class="tdate">' + fmt(t.when) + '</span><span class="tkind">' + labels[t.kind] + '</span><span class="ttitle"></span></li>';
+      h += '<li class="task task-' + t.kind + '"><span class="tdate">' + fmtSched(t.when) + '</span><span class="tkind">' + labels[t.kind] + '</span><span class="ttitle"></span></li>';
     });
     h += '</ul>';
     body.innerHTML = h;

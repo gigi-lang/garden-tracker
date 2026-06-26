@@ -269,7 +269,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.7</span>
+      <span>Built by gigi-lang &middot; v0.8</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -544,6 +544,42 @@
       companions:['Peppers','Eggplant','Basil','Melons'], avoid:[],
       pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Stink bug',d:'hand-pick; keep weeds down'}],
       note:'Thrives in the heat of high summer when other crops sulk. Pick the pods young (2-4 inches) every day or two, or they turn woody fast.' },
+
+    { match:['strawberry','strawberries'], name:'Strawberries', fam:'Berry \u00b7 perennial', season:'perennial', from:'transplant', indoors:null, dtm:[90,120],
+      sun:'Full sun', soil:'Rich, well-draining, slightly acidic', water:'Even - about an inch a week', feed:'Balanced in spring, again after fruiting',
+      companions:['Spinach','Lettuce','Beans','Borage','Onions'], avoid:['Brassicas','Tomatoes','Potatoes'],
+      pests:[{p:'Slugs',d:'mulch with straw to keep the fruit off the soil; set traps'},{p:'Birds',d:'drape netting once the berries start to color'}],
+      note:'Day-neutral types fruit their first summer; June-bearing types crop better if you pinch off the first-year flowers and let them establish for next spring. Plants slow down after 3-4 years - let a few runners root to replace them.' },
+
+    { match:['blueberry','blueberries'], name:'Blueberries', fam:'Berry \u00b7 perennial', season:'perennial', from:'transplant', indoors:null, dtm:[730,1095],
+      sun:'Full sun', soil:'Acidic (pH 4.5-5.5), rich in organic matter', water:'Even - shallow roots dislike drying out', feed:'Acid-loving (azalea-type) fertilizer in spring',
+      companions:['A second blueberry variety','Strawberries','Thyme'], avoid:['Anything needing limed / alkaline soil nearby'],
+      pests:[{p:'Birds',d:'net the bushes as fruit ripens - birds will clear them fast'},{p:'Spotted-wing drosophila',d:'pick ripe berries promptly and chill them'}],
+      note:'A long-term planting: pinch off flowers the first year, expect a light crop by year 2-3 and a full one after. Plant at least two different varieties for better pollination, and check your soil pH - acidity is the make-or-break.' },
+
+    { match:['raspberry','raspberries'], name:'Raspberries', fam:'Berry \u00b7 perennial (cane)', season:'perennial', from:'transplant', indoors:null, dtm:[365,400],
+      sun:'Full sun', soil:'Rich, well-draining', water:'Even, especially while fruiting', feed:'Balanced in early spring',
+      companions:['Garlic','Onions','Marigold','Nasturtium'], avoid:['Blackberries (share diseases)','Tomatoes','Potatoes'],
+      pests:[{p:'Spotted-wing drosophila',d:'pick ripe fruit fast and chill it; do not let berries overripen on the cane'},{p:'Japanese beetle',d:'hand-pick into soapy water in the morning'}],
+      note:'Summer-bearing types fruit on second-year canes, so the first real crop comes the next summer; everbearing (fall-bearing) types fruit on new canes their first autumn. Give them a trellis or wires, and cut out the old canes after they finish fruiting.' },
+
+    { match:['blackberry','blackberries'], name:'Blackberries', fam:'Berry \u00b7 perennial (cane)', season:'perennial', from:'transplant', indoors:null, dtm:[365,400],
+      sun:'Full sun', soil:'Rich, well-draining', water:'Even, especially while fruiting', feed:'Balanced in early spring',
+      companions:['Garlic','Onions','Marigold','Nasturtium'], avoid:['Raspberries (share diseases)','Tomatoes','Potatoes'],
+      pests:[{p:'Spotted-wing drosophila',d:'pick ripe fruit fast and chill it'},{p:'Japanese beetle',d:'hand-pick into soapy water in the morning'}],
+      note:'Like raspberries, most fruit on second-year canes - the first real crop is the next summer (thornless primocane types can fruit their first fall). Train them on wires and remove canes once they have fruited. Vigorous, so give them room and a hard prune.' },
+
+    { match:['gooseberry','gooseberries'], name:'Gooseberries', fam:'Berry \u00b7 perennial (shrub)', season:'perennial', from:'transplant', indoors:null, dtm:[365,730],
+      sun:'Full sun to part shade', soil:'Rich, well-draining', water:'Even', feed:'Balanced in spring',
+      companions:['Chives','Tomatoes','Beans'], avoid:[],
+      pests:[{p:'Gooseberry sawfly',d:'check leaf undersides - the caterpillars can strip a bush in days; pick them off'},{p:'Powdery mildew',d:'prune for an open shape and good airflow'}],
+      note:'A tough, cold-hardy bush that tolerates some shade. Light crop by year 2, full by year 3. Prune to an open goblet shape so air moves through and fruit ripens evenly (mind the thorns).' },
+
+    { match:['currant','blackcurrant','redcurrant'], name:'Currants', fam:'Berry \u00b7 perennial (shrub)', season:'perennial', from:'transplant', indoors:null, dtm:[365,730],
+      sun:'Full sun to part shade', soil:'Rich, moist, well-draining', water:'Even', feed:'Balanced in spring',
+      companions:['Chives','Tomatoes','Beans'], avoid:[],
+      pests:[{p:'Currant aphid',d:'puckered, reddish leaves; blast with water and encourage ladybugs'},{p:'Powdery mildew',d:'prune for airflow; avoid crowding'}],
+      note:'Very cold-hardy shrubs that crop even in part shade where few fruits will. Light crop by year 2, full by year 3. Black currants fruit on younger wood; red and white on older spurs - prune to match.' },
 
     { match:['tomato'], name:'Tomatoes', fam:'Nightshade family', season:'warm', from:'transplant', indoors:6, dtm:[60,85],
       sun:'Full sun (6-8 hrs)', soil:'Rich, well-draining, slightly acidic', water:'Deep and even', feed:'Balanced, then more potassium once fruiting',

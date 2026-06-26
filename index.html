@@ -203,8 +203,13 @@
           </div>
           <div class="row">
             <div class="field">
-              <label for="type">Started as</label>
-              <select id="type"><option value="Seed">Seed</option><option value="Seedling">Seedling</option></select>
+              <label for="type">Planted as</label>
+              <select id="type">
+                <option value="Seed">Seed</option>
+                <option value="Seedling">Seedling</option>
+                <option value="Nursery plant">Nursery plant (established)</option>
+                <option value="Mature plant">Mature / already producing</option>
+              </select>
             </div>
             <div class="field">
               <label for="date">Date planted</label>
@@ -269,7 +274,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.9</span>
+      <span>Built by gigi-lang &middot; v0.10</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -697,22 +702,43 @@
   /* ---------- perennial-fruit helpers (trees, canes, bushes; annual cycle, not days-from-planting) ---------- */
   const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const FORM_LEAD = { tree:'Young trees', bush:'Young bushes', cane:'New canes', plant:'Young plants' };
+
+  // Planting stage: how far along the plant already is when it goes in the ground. TWEAK HERE.
+  //   bearingCut  = years knocked off a perennial fruit's wait to first crop (99 = already bearing)
+  //   headStart   = days of a head start for annual veg ('ready' = treat as nearly mature)
+  //   indoorStart = whether the start-indoors / move-outdoors step applies (Seed only)
+  const STAGE = {
+    'Seed':          { bearingCut:0,  headStart:0,       indoorStart:true  },
+    'Seedling':      { bearingCut:0,  headStart:0,       indoorStart:false },
+    'Nursery plant': { bearingCut:1,  headStart:21,      indoorStart:false },
+    'Mature plant':  { bearingCut:99, headStart:'ready', indoorStart:false }
+  };
+  function stageOf(type){ return STAGE[type] || STAGE['Seed']; }
+  function effectiveBearing(g, type){
+    const cut = stageOf(type).bearingCut;
+    return [Math.max(0, g.bearing[0]-cut), Math.max(0, g.bearing[1]-cut)];
+  }
   function mdMonth(mmdd){ return MONTH_ABBR[parseInt(mmdd.split('-')[0],10)-1]; }
   function mdLabel(mmdd){ const p = mmdd.split('-'); return MONTH_ABBR[parseInt(p[0],10)-1] + ' ' + parseInt(p[1],10); }
   function mkDate(year, mmdd){ return asDate(year + '-' + mmdd); }
   // rough upper estimate of annual winter chill hours (<45F) by USDA zone
   function zoneChillHi(z){ const t = {'3':2000,'4':1800,'5':1500,'6':1200,'7':1000,'8':750,'9':450,'10':150,'11':50}; return t[z]; }
 
-  function perennialFruitRows(g, plantDateStr){
+  function perennialFruitRows(g, p){
     const rows = [];
+    const plantDateStr = p.date;
     const plantYear = asDate(plantDateStr).getFullYear();
-    const firstCrop = plantYear + g.bearing[0];
-    // years to bearing
-    if (g.bearing[0] === 0){
+    const st = stageOf(p.type);
+    const eb = effectiveBearing(g, p.type);
+    const firstCrop = plantYear + eb[0];
+    // years to bearing (shifted by the stage it was planted at)
+    if (st.bearingCut >= 99 || (st.bearingCut > 0 && eb[0] === 0 && g.bearing[0] > 0)){
+      rows.push({ ic:'\u2713', txt:'Planted at bearing age \u2014 expect fruit <b>this coming season</b>, then every year.' });
+    } else if (eb[0] === 0){
       rows.push({ ic:'\u2713', txt:'Often fruits its <b>first season</b>, then crops every year (some types crop better from their second year \u2014 see the note).' });
     } else {
       const lead = FORM_LEAD[g.form] || 'Young plants';
-      rows.push({ ic:'\u2713', txt:lead+' take about <b>'+g.bearing[0]+'\u2013'+g.bearing[1]+' years</b> to a full crop, so expect your first real harvest around <b>'+firstCrop+'</b>. After that it crops every year.' });
+      rows.push({ ic:'\u2713', txt:lead+' take about <b>'+eb[0]+'\u2013'+eb[1]+' years</b> to a full crop, so expect your first real harvest around <b>'+firstCrop+'</b>. After that it crops every year.' });
     }
     // annual bloom -> ripen rhythm
     if (g.noBloom){
@@ -745,23 +771,35 @@
   }
 
   /* ---------- timing text from a planting + the guide + the zone ---------- */
-  function timingRows(g, plantDateStr){
-    if (g.perennialFruit) return perennialFruitRows(g, plantDateStr);
+  function timingRows(g, p){
+    if (g.perennialFruit) return perennialFruitRows(g, p);
     const rows = [];
+    const plantDateStr = p.date;
+    const st = stageOf(p.type);
     const start = asDate(plantDateStr);
-    // harvest window from planting date
-    const h0 = fmt(addDays(start, g.dtm[0]));
-    const h1 = fmt(addDays(start, g.dtm[1]));
-    const basis = g.from === 'transplant' ? 'from transplant' : 'from sowing';
-    rows.push({ ic:'\u2713', txt:'Likely harvest around <b>'+h0+'\u2013'+h1+'</b> ('+g.dtm[0]+'\u2013'+g.dtm[1]+' days '+basis+').' });
+    // harvest window, shifted earlier for older nursery/mature stock
+    let d0 = g.dtm[0], d1 = g.dtm[1];
+    if (st.headStart === 'ready'){ d0 = 14; d1 = 14 + (g.dtm[1] - g.dtm[0]); }
+    else if (st.headStart > 0){ d0 = Math.max(14, g.dtm[0] - st.headStart); d1 = Math.max(d0 + 7, g.dtm[1] - st.headStart); }
+    const h0 = fmt(addDays(start, d0));
+    const h1 = fmt(addDays(start, d1));
+    const basis = (st.headStart === 0) ? (g.from === 'transplant' ? 'from transplant' : 'from sowing') : 'from planting out';
+    rows.push({ ic:'\u2713', txt:'Likely harvest around <b>'+h0+'\u2013'+h1+'</b> ('+d0+'\u2013'+d1+' days '+basis+').' });
 
     // sow / transplant guidance, tuned to zone if set
     const last = zoneCfg.last;
     if (g.season === 'perennial'){
       rows.push({ ic:'\u2740', txt:'Perennial \u2014 plant in spring after frost; it returns each year.' });
+    } else if (!st.indoorStart){
+      // already a plant - just set it out, no indoor sowing step
+      if (g.season === 'cool'){
+        rows.push({ ic:'\u2740', txt:'Plant out in early spring'+(last?' (around your last frost, '+fmt(last)+')':'')+', or again in late summer for a fall crop.' });
+      } else {
+        rows.push({ ic:'\u2740', txt:'Plant out after the last frost'+(last?' ('+fmt(last)+')':'')+', once the soil is warm.' });
+      }
     } else if (g.season === 'cool'){
       rows.push({ ic:'\u2740', txt:'Cool-season \u2014 best in early spring'+(last?' (around your last frost, '+fmt(last)+')':'')+' and again in late summer for a fall crop.' });
-    } else { // warm
+    } else { // warm, from seed
       if (g.indoors){
         const indoorTxt = last ? ' (around <b>'+fmt(addDays(asDate(last), -g.indoors*7))+'</b>)' : '';
         const outTxt = last ? ' (after <b>'+fmt(last)+'</b>)' : '';
@@ -805,7 +843,7 @@
     }
     // timing
     h += '<div class="timing">';
-    timingRows(g, p.date).forEach(function(r){ h += '<div class="t"><span class="ic">'+r.ic+'</span><span>'+r.txt+'</span></div>'; });
+    timingRows(g, p).forEach(function(r){ h += '<div class="t"><span class="ic">'+r.ic+'</span><span>'+r.txt+'</span></div>'; });
     h += '</div>';
     if (g.note) h += '<div class="gnote">'+g.note+'</div>';
     h += '</div>';
@@ -815,7 +853,8 @@
   /* ---------- schedule: tasks from plantings + guide + zone ---------- */
   function addPerennialFruitTasks(tasks, p, g, d){
     const plantYear = d.getFullYear();
-    const firstBearYear = plantYear + g.bearing[0];
+    const eb = effectiveBearing(g, p.type);
+    const firstBearYear = plantYear + eb[0];
     const today = new Date(); today.setHours(0,0,0,0);
     const startYear = today.getFullYear();
     const HORIZON = 5; // years of reminders to lay down
@@ -842,16 +881,19 @@
       if (!g) return;
       const d = asDate(p.date);
       if (g.perennialFruit){ addPerennialFruitTasks(tasks, p, g, d); return; }
+      const st = stageOf(p.type);
       // move outdoors (only for indoor-started seeds of non-perennials)
-      if (p.type === 'Seed' && g.indoors && g.season !== 'perennial'){
+      if (st.indoorStart && g.indoors && g.season !== 'perennial'){
         let t = addDays(d, g.indoors*7);
         if (zoneCfg.last){ const lf = asDate(zoneCfg.last); if (lf > t) t = lf; }
         tasks.push({ id:p.id, when:t, plant:p.name, kind:'move', title:'Move ' + p.name + ' outdoors' });
       }
       // feed a few weeks in
       tasks.push({ id:p.id, when:addDays(d, 21), plant:p.name, kind:'feed', title:'Feed ' + p.name });
-      // harvest window opens
-      tasks.push({ id:p.id, when:addDays(d, g.dtm[0]), plant:p.name, kind:'harvest', title:'Start harvesting ' + p.name });
+      // harvest window opens (sooner for older nursery / mature stock)
+      let hd = g.dtm[0];
+      if (st.headStart === 'ready') hd = 14; else if (st.headStart > 0) hd = Math.max(14, g.dtm[0] - st.headStart);
+      tasks.push({ id:p.id, when:addDays(d, hd), plant:p.name, kind:'harvest', title:'Start harvesting ' + p.name });
     });
     tasks.sort(function(a,b){ return a.when - b.when; });
     return tasks;

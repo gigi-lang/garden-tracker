@@ -21,11 +21,11 @@
   .wrap { max-width:1140px; margin:0 auto; }
   .layout { display:flex; gap:1rem; align-items:flex-start; }
   .plots { flex:1 1 auto; min-width:0; }
-  .sidebar { width:350px; flex:0 0 350px; position:sticky; top:1rem; }
+  .sidebar { width:350px; flex:0 0 350px; position:sticky; top:1rem; align-self:flex-start; max-height:calc(100vh - 2rem); overflow:auto; }
   @media (max-width:900px){
     .wrap { max-width:720px; }
     .layout { flex-direction:column; }
-    .sidebar { width:auto; flex:1 1 auto; position:static; }
+    .sidebar { width:auto; flex:1 1 auto; position:static; max-height:none; overflow:visible; }
   }
 
   header { margin-bottom:clamp(1.5rem,5vw,2.5rem); }
@@ -72,6 +72,11 @@
   .btn { font-family:inherit; font-size:0.9rem; font-weight:600; cursor:pointer; background:var(--seedling); color:#fff; border:none; border-radius:4px; padding:0.6rem 1.1rem; justify-self:start; }
   .btn:hover { background:#4f8059; }
   .btn:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+  .btn.ghost { background:#fff; color:var(--seedling); border:1px solid var(--seedling); }
+  .btn.ghost:hover { background:rgba(94,147,103,0.08); }
+  .data-actions { margin-top:1.1rem; display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .data-status { margin-top:0.7rem; font-size:0.82rem; color:var(--seedling); min-height:1.1rem; }
+  .data-status.err { color:var(--tomato); }
 
   .list { margin-top:1.5rem; display:grid; gap:0.6rem; list-style:none; }
   .empty { margin-top:1.4rem; color:var(--soil); font-size:0.95rem; font-style:italic; }
@@ -250,6 +255,18 @@
         <span class="status">Coming soon</span>
       </section>
 
+      <section class="plot">
+        <p class="marker">Your data</p>
+        <h2>Back up your garden</h2>
+        <p class="lede">Everything lives in this browser only. Save a backup file to keep it safe &mdash; or load one back onto a new browser or device.</p>
+        <div class="data-actions">
+          <button class="btn" id="backup-export">Export backup</button>
+          <button class="btn ghost" id="backup-import">Import backup</button>
+          <input type="file" id="backup-file" accept="application/json,.json" hidden />
+        </div>
+        <p class="data-status" id="backup-status" role="status" aria-live="polite"></p>
+      </section>
+
       </main>
 
       <aside class="sidebar">
@@ -274,7 +291,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.11</span>
+      <span>Built by gigi-lang &middot; v0.12</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -1140,6 +1157,96 @@
   });
 
   document.getElementById('export-btn').addEventListener('click', downloadICS);
+
+  /* ---------- backup: export / import (v0.12) ---------- */
+  const BACKUP_PREFIX = 'garden-tracker:';
+  function backupStatus(msg, isErr){
+    const el = document.getElementById('backup-status');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.classList.toggle('err', !!isErr);
+  }
+  function plural(n){ return n === 1 ? ' planting' : ' plantings'; }
+  function collectGardenData(){
+    const data = {};
+    for (let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if (k && k.indexOf(BACKUP_PREFIX) === 0){
+        const raw = localStorage.getItem(k);
+        try { data[k] = JSON.parse(raw); } catch(e){ data[k] = raw; }
+      }
+    }
+    return data;
+  }
+  function exportBackup(){
+    const data = collectGardenData();
+    const payload = {
+      app: 'garden-tracker',
+      type: 'garden-tracker-backup',
+      schema: 1,
+      version: 'v0.12',
+      exportedAt: new Date().toISOString(),
+      data: data
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'garden-tracker-backup-' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    const n = (data[KEY] && data[KEY].length) || 0;
+    backupStatus('Saved ' + a.download + ' \u00B7 ' + n + plural(n) + '.');
+  }
+  function applyBackup(parsed){
+    // accept the export format { data:{...} } or a bare { "garden-tracker:...": ... } map
+    let data = null;
+    if (parsed && typeof parsed === 'object' && parsed.data && typeof parsed.data === 'object'){
+      data = parsed.data;
+    } else if (parsed && typeof parsed === 'object'){
+      const keys = Object.keys(parsed).filter(function(k){ return k.indexOf(BACKUP_PREFIX) === 0; });
+      if (keys.length){ data = {}; keys.forEach(function(k){ data[k] = parsed[k]; }); }
+    }
+    if (!data || !Object.keys(data).length){
+      backupStatus("That file doesn't look like a garden backup.", true);
+      return;
+    }
+    const incoming = data[KEY];
+    const count = Array.isArray(incoming) ? incoming.length : 0;
+    const ok = window.confirm('Replace your current garden with this backup? It has ' + count + plural(count) + '. This overwrites what\u2019s here now.');
+    if (!ok){ backupStatus('Import cancelled \u2014 nothing changed.'); return; }
+    try {
+      Object.keys(data).forEach(function(k){
+        const v = data[k];
+        localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+      });
+    } catch(e){
+      backupStatus('Could not save the backup to this browser.', true);
+      return;
+    }
+    openGuides = {};
+    loadZone(); applyZoneToUI();
+    load(); render();
+    backupStatus('Imported ' + count + plural(count) + '. Your garden is restored.');
+  }
+  document.getElementById('backup-export').addEventListener('click', exportBackup);
+  document.getElementById('backup-import').addEventListener('click', function(){
+    document.getElementById('backup-file').click();
+  });
+  document.getElementById('backup-file').addEventListener('change', function(e){
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(){
+      let parsed = null;
+      try { parsed = JSON.parse(reader.result); }
+      catch(err){ backupStatus("That file isn't valid JSON.", true); e.target.value=''; return; }
+      applyBackup(parsed);
+      e.target.value = '';
+    };
+    reader.onerror = function(){ backupStatus("Couldn't read that file.", true); e.target.value=''; };
+    reader.readAsText(file);
+  });
 
   /* ---------- start up ---------- */
   document.getElementById('date').value = new Date().toISOString().slice(0,10);

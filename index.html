@@ -269,7 +269,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.8</span>
+      <span>Built by gigi-lang &middot; v0.9</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -545,41 +545,76 @@
       pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Stink bug',d:'hand-pick; keep weeds down'}],
       note:'Thrives in the heat of high summer when other crops sulk. Pick the pods young (2-4 inches) every day or two, or they turn woody fast.' },
 
-    { match:['strawberry','strawberries'], name:'Strawberries', fam:'Berry \u00b7 perennial', season:'perennial', from:'transplant', indoors:null, dtm:[90,120],
+    { match:['strawberry','strawberries'], name:'Strawberries', fam:'Berry \u00b7 perennial', season:'perennial', from:'transplant', indoors:null,
+      perennialFruit:true, form:'plant', bearing:[0,1], bloom:'03-25', ripen:['05-15','07-15'], chill:[0,0], tender:false,
       sun:'Full sun', soil:'Rich, well-draining, slightly acidic', water:'Even - about an inch a week', feed:'Balanced in spring, again after fruiting',
       companions:['Spinach','Lettuce','Beans','Borage','Onions'], avoid:['Brassicas','Tomatoes','Potatoes'],
       pests:[{p:'Slugs',d:'mulch with straw to keep the fruit off the soil; set traps'},{p:'Birds',d:'drape netting once the berries start to color'}],
       note:'Day-neutral types fruit their first summer; June-bearing types crop better if you pinch off the first-year flowers and let them establish for next spring. Plants slow down after 3-4 years - let a few runners root to replace them.' },
 
-    { match:['blueberry','blueberries'], name:'Blueberries', fam:'Berry \u00b7 perennial', season:'perennial', from:'transplant', indoors:null, dtm:[730,1095],
+    { match:['blueberry','blueberries'], name:'Blueberries', fam:'Berry \u00b7 perennial', season:'perennial', from:'transplant', indoors:null,
+      perennialFruit:true, form:'bush', bearing:[2,3], bloom:'03-20', ripen:['06-01','08-15'], chill:[200,800], tender:false, needsPartner:true,
       sun:'Full sun', soil:'Acidic (pH 4.5-5.5), rich in organic matter', water:'Even - shallow roots dislike drying out', feed:'Acid-loving (azalea-type) fertilizer in spring',
       companions:['A second blueberry variety','Strawberries','Thyme'], avoid:['Anything needing limed / alkaline soil nearby'],
       pests:[{p:'Birds',d:'net the bushes as fruit ripens - birds will clear them fast'},{p:'Spotted-wing drosophila',d:'pick ripe berries promptly and chill them'}],
       note:'A long-term planting: pinch off flowers the first year, expect a light crop by year 2-3 and a full one after. Plant at least two different varieties for better pollination, and check your soil pH - acidity is the make-or-break.' },
 
-    { match:['raspberry','raspberries'], name:'Raspberries', fam:'Berry \u00b7 perennial (cane)', season:'perennial', from:'transplant', indoors:null, dtm:[365,400],
+    { match:['raspberry','raspberries'], name:'Raspberries', fam:'Berry \u00b7 perennial (cane)', season:'perennial', from:'transplant', indoors:null,
+      perennialFruit:true, form:'cane', bearing:[1,2], bloom:'04-01', ripen:['06-20','08-31'], chill:[0,0], tender:false,
       sun:'Full sun', soil:'Rich, well-draining', water:'Even, especially while fruiting', feed:'Balanced in early spring',
       companions:['Garlic','Onions','Marigold','Nasturtium'], avoid:['Blackberries (share diseases)','Tomatoes','Potatoes'],
       pests:[{p:'Spotted-wing drosophila',d:'pick ripe fruit fast and chill it; do not let berries overripen on the cane'},{p:'Japanese beetle',d:'hand-pick into soapy water in the morning'}],
       note:'Summer-bearing types fruit on second-year canes, so the first real crop comes the next summer; everbearing (fall-bearing) types fruit on new canes their first autumn. Give them a trellis or wires, and cut out the old canes after they finish fruiting.' },
 
-    { match:['blackberry','blackberries'], name:'Blackberries', fam:'Berry \u00b7 perennial (cane)', season:'perennial', from:'transplant', indoors:null, dtm:[365,400],
+    { match:['blackberry','blackberries'], name:'Blackberries', fam:'Berry \u00b7 perennial (cane)', season:'perennial', from:'transplant', indoors:null,
+      perennialFruit:true, form:'cane', bearing:[1,2], bloom:'04-15', ripen:['07-01','08-31'], chill:[0,0], tender:false,
       sun:'Full sun', soil:'Rich, well-draining', water:'Even, especially while fruiting', feed:'Balanced in early spring',
       companions:['Garlic','Onions','Marigold','Nasturtium'], avoid:['Raspberries (share diseases)','Tomatoes','Potatoes'],
       pests:[{p:'Spotted-wing drosophila',d:'pick ripe fruit fast and chill it'},{p:'Japanese beetle',d:'hand-pick into soapy water in the morning'}],
       note:'Like raspberries, most fruit on second-year canes - the first real crop is the next summer (thornless primocane types can fruit their first fall). Train them on wires and remove canes once they have fruited. Vigorous, so give them room and a hard prune.' },
 
-    { match:['gooseberry','gooseberries'], name:'Gooseberries', fam:'Berry \u00b7 perennial (shrub)', season:'perennial', from:'transplant', indoors:null, dtm:[365,730],
+    { match:['gooseberry','gooseberries'], name:'Gooseberries', fam:'Berry \u00b7 perennial (shrub)', season:'perennial', from:'transplant', indoors:null,
+      perennialFruit:true, form:'bush', bearing:[2,3], bloom:'03-25', ripen:['06-15','07-31'], chill:[0,0], tender:false,
       sun:'Full sun to part shade', soil:'Rich, well-draining', water:'Even', feed:'Balanced in spring',
       companions:['Chives','Tomatoes','Beans'], avoid:[],
       pests:[{p:'Gooseberry sawfly',d:'check leaf undersides - the caterpillars can strip a bush in days; pick them off'},{p:'Powdery mildew',d:'prune for an open shape and good airflow'}],
       note:'A tough, cold-hardy bush that tolerates some shade. Light crop by year 2, full by year 3. Prune to an open goblet shape so air moves through and fruit ripens evenly (mind the thorns).' },
 
-    { match:['currant','blackcurrant','redcurrant'], name:'Currants', fam:'Berry \u00b7 perennial (shrub)', season:'perennial', from:'transplant', indoors:null, dtm:[365,730],
+    { match:['currant','blackcurrant','redcurrant'], name:'Currants', fam:'Berry \u00b7 perennial (shrub)', season:'perennial', from:'transplant', indoors:null,
+      perennialFruit:true, form:'bush', bearing:[2,3], bloom:'04-01', ripen:['06-20','07-31'], chill:[0,0], tender:false,
       sun:'Full sun to part shade', soil:'Rich, moist, well-draining', water:'Even', feed:'Balanced in spring',
       companions:['Chives','Tomatoes','Beans'], avoid:[],
       pests:[{p:'Currant aphid',d:'puckered, reddish leaves; blast with water and encourage ladybugs'},{p:'Powdery mildew',d:'prune for airflow; avoid crowding'}],
       note:'Very cold-hardy shrubs that crop even in part shade where few fruits will. Light crop by year 2, full by year 3. Black currants fruit on younger wood; red and white on older spurs - prune to match.' },
+
+    { match:['apple','apples'], name:'Apple', fam:'Tree fruit \u00b7 pome', season:'perennial', from:'transplant', indoors:null,
+      perennialFruit:true, form:'tree', bearing:[3,5], bloom:'04-05', ripen:['09-01','10-31'], chill:[500,1000], tender:false, needsPartner:true,
+      sun:'Full sun (6+ hrs)', soil:'Deep, well-draining, slightly acidic', water:'Deep and even, especially the first few years and while fruit sizes up', feed:'Balanced in late winter / early spring; go easy on nitrogen',
+      companions:['Chives','Garlic','Nasturtium','Comfrey','Marigold'], avoid:['Walnut (juglone)','Grass right up to the trunk'],
+      pests:[{p:'Codling moth',d:'the classic apple grub - hang pheromone traps and clear dropped fruit promptly'},{p:'Apple maggot',d:'hang red sphere traps through summer'},{p:'Aphids',d:'blast with water; encourage ladybugs'}],
+      note:'Rootstock decides size and speed - a dwarf tree fruits years sooner than a standard. Most apples need a second compatible variety nearby to pollinate well. Thin the young fruit so what is left grows larger.' },
+
+    { match:['peach','peaches','nectarine'], name:'Peach / nectarine', fam:'Tree fruit \u00b7 stone', season:'perennial', from:'transplant', indoors:null,
+      perennialFruit:true, form:'tree', bearing:[2,3], bloom:'03-10', ripen:['06-20','08-15'], chill:[600,900], tender:false,
+      sun:'Full sun', soil:'Light, well-draining', water:'Even; ease off as the fruit ripens', feed:'Balanced in early spring',
+      companions:['Garlic','Onions','Nasturtium','Marigold'], avoid:['Grass right up to the trunk'],
+      pests:[{p:'Peach leaf curl',d:'puckered red leaves - a dormant copper spray before bud-break is the main defense'},{p:'Peach tree borer',d:'check the trunk base for gummy sawdust; keep the tree vigorous'},{p:'Brown rot',d:'remove mummified fruit; prune for airflow'}],
+      note:'Usually self-fertile, so a single tree can crop. It blooms early, so a late frost can take a whole year of fruit - keep it out of low frost pockets. Low-chill varieties exist for mild-winter areas. Thin hard for bigger peaches.' },
+
+    { match:['fig','figs'], name:'Fig', fam:'Tree fruit \u00b7 fig', season:'perennial', from:'transplant', indoors:null,
+      perennialFruit:true, form:'tree', bearing:[1,2], bloom:'06-01', ripen:['08-01','10-15'], chill:[100,300], tender:false, noBloom:true,
+      rhythmText:'No showy bloom - the flower is hidden inside the fruit. The main crop ripens <b>Aug\u2013Oct</b>, and many figs also give an earlier \u201cbreba\u201d crop around <b>Jun</b> on last year\u2019s wood.',
+      sun:'Full sun', soil:'Well-draining; tolerates lean soil', water:'Moderate; a deep soak in dry spells (erratic water splits the fruit)', feed:'Light - too much nitrogen gives leaves instead of figs',
+      companions:['Rue','Marigold','Strawberries'], avoid:[],
+      pests:[{p:'Birds',d:'net the tree or pick promptly as the fruit softens'},{p:'Dried-fruit beetle',d:'harvest ripe figs quickly; clear any fallen fruit'}],
+      note:'One of the fastest fruits - often a small crop by year 1\u20132. Common types need no pollinator. Root-hardy in mild winters; where it freezes hard, mulch the roots or grow it in a pot and shelter it. A second \u201cbreba\u201d crop may ripen early on old wood.' },
+
+    { match:['lemon','lime','orange','citrus','mandarin','tangerine','grapefruit','kumquat'], name:'Citrus', fam:'Tree fruit \u00b7 citrus (evergreen)', season:'perennial', from:'transplant', indoors:null,
+      perennialFruit:true, form:'tree', bearing:[2,3], bloom:'03-20', ripen:['11-01','02-28'], chill:[0,0], tender:true,
+      sun:'Full sun (8+ hrs)', soil:'Well-draining; slightly acidic', water:'Deep, then let the top dry; never waterlogged', feed:'Citrus / acid fertilizer through the growing season',
+      companions:['Nasturtium','Marigold'], avoid:[],
+      pests:[{p:'Scale',d:'sticky leaves and sooty black mold are the tell; wipe off or use horticultural oil'},{p:'Aphids & ants',d:'blast the aphids; the ants farm them, so deal with both'},{p:'Citrus leaf miner',d:'squiggly trails on new leaves; usually tolerable on an established tree'}],
+      note:'Evergreen and tender - it needs no winter chill, but cold below about 28\u00b0F damages it. In a frost-prone zone, grow it in a large pot so you can move it under cover or indoors for winter. Fruit ripens slowly and can hang on the tree for months. Most are self-fertile.' },
 
     { match:['tomato'], name:'Tomatoes', fam:'Nightshade family', season:'warm', from:'transplant', indoors:6, dtm:[60,85],
       sun:'Full sun (6-8 hrs)', soil:'Rich, well-draining, slightly acidic', water:'Deep and even', feed:'Balanced, then more potassium once fruiting',
@@ -649,9 +684,69 @@
     if (diff === 1) return 'day 1'; return 'day ' + diff;
   }
   function prettyFull(dateStr){ return asDate(dateStr).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); }
+  function ageBadge(dateStr, g){
+    if (g && g.perennialFruit){
+      const planted = asDate(dateStr); const today = new Date(); today.setHours(0,0,0,0);
+      const diff = Math.round((today - planted)/86400000);
+      if (diff < 0) return 'not yet';
+      return 'year ' + (Math.floor(diff/365) + 1);
+    }
+    return daysSince(dateStr);
+  }
+
+  /* ---------- perennial-fruit helpers (trees, canes, bushes; annual cycle, not days-from-planting) ---------- */
+  const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const FORM_LEAD = { tree:'Young trees', bush:'Young bushes', cane:'New canes', plant:'Young plants' };
+  function mdMonth(mmdd){ return MONTH_ABBR[parseInt(mmdd.split('-')[0],10)-1]; }
+  function mdLabel(mmdd){ const p = mmdd.split('-'); return MONTH_ABBR[parseInt(p[0],10)-1] + ' ' + parseInt(p[1],10); }
+  function mkDate(year, mmdd){ return asDate(year + '-' + mmdd); }
+  // rough upper estimate of annual winter chill hours (<45F) by USDA zone
+  function zoneChillHi(z){ const t = {'3':2000,'4':1800,'5':1500,'6':1200,'7':1000,'8':750,'9':450,'10':150,'11':50}; return t[z]; }
+
+  function perennialFruitRows(g, plantDateStr){
+    const rows = [];
+    const plantYear = asDate(plantDateStr).getFullYear();
+    const firstCrop = plantYear + g.bearing[0];
+    // years to bearing
+    if (g.bearing[0] === 0){
+      rows.push({ ic:'\u2713', txt:'Often fruits its <b>first season</b>, then crops every year (some types crop better from their second year \u2014 see the note).' });
+    } else {
+      const lead = FORM_LEAD[g.form] || 'Young plants';
+      rows.push({ ic:'\u2713', txt:lead+' take about <b>'+g.bearing[0]+'\u2013'+g.bearing[1]+' years</b> to a full crop, so expect your first real harvest around <b>'+firstCrop+'</b>. After that it crops every year.' });
+    }
+    // annual bloom -> ripen rhythm
+    if (g.noBloom){
+      rows.push({ ic:'\u2740', txt:g.rhythmText });
+    } else {
+      rows.push({ ic:'\u2740', txt:'Blooms around <b>'+mdMonth(g.bloom)+'</b>; fruit ripens <b>'+mdLabel(g.ripen[0])+'\u2013'+mdLabel(g.ripen[1])+'</b>, and the same window returns each year (earlier in warmer zones, later in cooler).' });
+    }
+    // chill-hours fit vs zone
+    if (g.chill && g.chill[0] > 0){
+      const z = zoneCfg.zone, hi = zoneChillHi(z);
+      if (z && hi != null && hi < g.chill[0]){
+        rows.push({ ic:'\u2691', txt:'Needs about <b>'+g.chill[0]+'\u2013'+g.chill[1]+' chill hours</b> of winter cold. Zone '+z+' may run short \u2014 look for <b>low-chill varieties</b>.' });
+      } else if (z){
+        rows.push({ ic:'\u2713', txt:'Needs about <b>'+g.chill[0]+'\u2013'+g.chill[1]+' chill hours</b> of winter cold; zone '+z+' usually provides enough.' });
+      } else {
+        rows.push({ ic:'\u2691', txt:'Needs about <b>'+g.chill[0]+'\u2013'+g.chill[1]+' chill hours</b> of winter cold \u2014 check your area provides them, or choose low-chill types.' });
+      }
+    }
+    // tender / citrus
+    if (g.tender){
+      const fr = zoneCfg.first ? ' (your first fall frost is around <b>'+fmt(zoneCfg.first)+'</b>)' : '';
+      rows.push({ ic:'\u2740', txt:'Tender and evergreen \u2014 cold below about <b>28\u00b0F</b> damages it'+fr+'. In a frost-prone zone, grow it in a large pot and move it under cover when frost threatens.' });
+    }
+    // pollination partner
+    if (g.needsPartner){
+      rows.push({ ic:'\u2740', txt:'Most varieties need a <b>second compatible variety</b> nearby to set a good crop.' });
+    }
+    if (!zoneCfg.last){ rows.push({ ic:'\u2691', txt:'<i>Set your zone above to place these on your calendar.</i>' }); }
+    return rows;
+  }
 
   /* ---------- timing text from a planting + the guide + the zone ---------- */
   function timingRows(g, plantDateStr){
+    if (g.perennialFruit) return perennialFruitRows(g, plantDateStr);
     const rows = [];
     const start = asDate(plantDateStr);
     // harvest window from planting date
@@ -718,12 +813,35 @@
   }
 
   /* ---------- schedule: tasks from plantings + guide + zone ---------- */
+  function addPerennialFruitTasks(tasks, p, g, d){
+    const plantYear = d.getFullYear();
+    const firstBearYear = plantYear + g.bearing[0];
+    const today = new Date(); today.setHours(0,0,0,0);
+    const startYear = today.getFullYear();
+    const HORIZON = 5; // years of reminders to lay down
+    for (let y = startYear; y <= startYear + HORIZON; y++){
+      // annual early-spring feed/prune
+      const feedDate = mkDate(y, '02-20');
+      if (feedDate >= today){
+        tasks.push({ id:p.id, when:feedDate, plant:p.name, kind:'feed', title:'Feed ' + p.name + ' (early spring)', uidSuffix:'feed-'+y });
+      }
+      // annual harvest, only once the tree is old enough to bear
+      if (g.ripen && y >= firstBearYear){
+        const harvDate = mkDate(y, g.ripen[0]);
+        if (harvDate >= today){
+          tasks.push({ id:p.id, when:harvDate, plant:p.name, kind:'harvest', title:'Likely ' + p.name + ' harvest', uidSuffix:'harvest-'+y });
+        }
+      }
+    }
+  }
+
   function buildTasks(){
     const tasks = [];
     plantings.forEach(function(p){
       const g = matchGuide(p.name);
       if (!g) return;
       const d = asDate(p.date);
+      if (g.perennialFruit){ addPerennialFruitTasks(tasks, p, g, d); return; }
       // move outdoors (only for indoor-started seeds of non-perennials)
       if (p.type === 'Seed' && g.indoors && g.season !== 'perennial'){
         let t = addDays(d, g.indoors*7);
@@ -743,6 +861,7 @@
     let latest = null;
     plantings.forEach(function(p){
       const g = matchGuide(p.name); if (!g) return;
+      if (g.perennialFruit) return; // perennial trees don't bound the daily-watering window
       const e = addDays(asDate(p.date), g.dtm[1]);
       if (!latest || e > latest) latest = e;
     });
@@ -791,7 +910,7 @@
     let uid = 0;
     buildTasks().forEach(function(t){
       L.push('BEGIN:VEVENT');
-      L.push('UID:gt-' + t.id + '-' + t.kind + '@garden-tracker');
+      L.push('UID:gt-' + t.id + '-' + (t.uidSuffix || t.kind) + '@garden-tracker');
       L.push('DTSTAMP:' + stamp);
       L.push('DTSTART;VALUE=DATE:' + icsDate(t.when));
       L.push('DTEND;VALUE=DATE:' + icsDate(addDays(t.when, 1)));
@@ -921,7 +1040,7 @@
         + '<div class="body"><div class="name"></div><div class="meta"></div>'
         + (p.note ? '<div class="note"></div>' : '')
         + '</div>'
-        + '<span class="age">'+daysSince(p.date)+'</span>'
+        + '<span class="age">'+ageBadge(p.date, g)+'</span>'
         + '<button class="remove" title="Remove" aria-label="Remove planting">&times;</button>'
         + '</div>';
 

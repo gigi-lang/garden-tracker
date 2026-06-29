@@ -36,10 +36,17 @@
   .wordmark .leaf { color:var(--seedling); }
   .tagline { font-size:1.05rem; color:var(--soil); max-width:34ch; }
   .menu { display:flex; flex-direction:column; gap:0.15rem; flex:0 0 160px; position:sticky; top:1rem; align-self:flex-start; }
-  .menu a { font-family:inherit; font-size:0.9rem; font-weight:600; color:var(--soil); text-decoration:none; padding:0.55rem 0.8rem; border-radius:4px; border-left:3px solid transparent; }
+  .menu a { display:flex; align-items:center; gap:0.5rem; font-family:inherit; font-size:0.9rem; font-weight:600; color:var(--soil); text-decoration:none; padding:0.55rem 0.8rem; border-radius:4px; border-left:3px solid transparent; }
   .menu a:hover { color:var(--ink); background:var(--plot); }
   .menu a.active { color:var(--seedling); background:var(--plot); border-left-color:var(--seedling); }
   .menu a:focus-visible { outline:2px solid var(--seedling); outline-offset:2px; }
+  .mi { fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+  .menu a .mi { width:18px; height:18px; }
+  .marker .mi { width:15px; height:15px; }
+  .zone summary .z-lead { display:inline-flex; align-items:center; gap:0.45rem; }
+  .zone summary .z-lead .mi { width:15px; height:15px; }
+  .water-line .mi { width:20px; height:20px; color:var(--seedling); }
+  .task .tkind .mi { width:12px; height:12px; stroke-width:2; }
   .today { margin-top:1.1rem; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--seedling); font-weight:600; }
 
   /* zone bar */
@@ -59,11 +66,11 @@
 
   .view { display:none; }
   .view.active { display:grid; gap:1rem; }
-  .plot { position:relative; background:var(--plot); border:1px solid var(--line); border-radius:4px; padding:1.5rem 1.5rem 1.4rem; overflow:hidden; }
+  .plot { position:relative; background:var(--plot); border:1px solid rgba(122,106,85,0.22); border-radius:4px; padding:1.5rem 1.5rem 1.4rem; overflow:hidden; box-shadow:0 1px 2px rgba(32,57,43,0.05), 0 6px 16px -4px rgba(32,57,43,0.08); }
   .plot::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--seedling); }
   .plot.soil::before { background:var(--soil); }
   .plot.tomato::before { background:var(--tomato); }
-  .marker { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.16em; font-weight:600; color:var(--soil); margin-bottom:0.5rem; }
+  .marker { display:flex; align-items:center; gap:0.42rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.16em; font-weight:600; color:var(--soil); margin-bottom:0.5rem; }
   .plot h2 { font-family:'Fraunces',serif; font-weight:500; font-size:1.4rem; margin-bottom:0.35rem; }
   .plot p.lede { color:var(--soil); font-size:0.97rem; max-width:46ch; }
   .status { margin-top:1rem; display:inline-block; font-size:0.74rem; letter-spacing:0.04em; color:var(--seedling); border:1px dashed var(--seedling); border-radius:999px; padding:0.2rem 0.7rem; }
@@ -133,7 +140,7 @@
   .sched-list { list-style:none; margin-top:0.9rem; display:grid; gap:0.5rem; }
   .task { display:flex; align-items:center; gap:0.7rem; border-top:1px solid var(--line); padding-top:0.5rem; font-size:0.92rem; }
   .task .tdate { font-variant-numeric:tabular-nums; color:var(--soil); width:5.8rem; flex:none; white-space:nowrap; }
-  .task .tkind { font-size:0.66rem; text-transform:uppercase; letter-spacing:0.08em; border-radius:999px; padding:0.1rem 0.5rem; flex:none; }
+  .task .tkind { display:inline-flex; align-items:center; gap:0.28rem; font-size:0.66rem; text-transform:uppercase; letter-spacing:0.08em; border-radius:999px; padding:0.1rem 0.5rem; flex:none; }
   .task-move .tkind { color:var(--soil); background:rgba(122,106,85,0.14); }
   .task-feed .tkind { color:var(--seedling); background:rgba(94,147,103,0.14); }
   .task-harvest .tkind { color:var(--tomato); background:rgba(207,94,82,0.12); }
@@ -181,7 +188,7 @@
       <p class="today" id="today"></p>
 
       <details class="zone" id="zone">
-        <summary>Your zone &amp; frost dates: <span class="val" id="zone-val">not set yet</span></summary>
+        <summary><span class="z-lead">Your zone &amp; frost dates:</span><span class="val" id="zone-val">not set yet</span></summary>
         <div class="controls">
           <p class="hint">Set these once and your care cards will show the right sow, transplant, and harvest timing for where you garden. Pick a zone to fill in typical dates, then nudge them if you know your own.</p>
           <div class="row3">
@@ -220,7 +227,7 @@
       <div class="view active" data-view="home">
 
       <section class="plot">
-        <p class="marker">Schedule</p>
+        <p class="marker" data-ic="schedule">Schedule</p>
         <h2>What's coming up</h2>
         <p class="lede">Your watering, feeding, transplant, and harvest dates &mdash; pulled from your plantings and your zone. Send them to your phone's calendar and it does the reminding.</p>
         <div id="sched-body"></div>
@@ -229,7 +236,7 @@
       </section>
 
       <section class="plot">
-        <p class="marker">Your data</p>
+        <p class="marker" data-ic="yourdata">Your data</p>
         <h2>Back up your garden</h2>
         <p class="lede">Everything lives in this browser only. Save a backup file to keep it safe &mdash; or load one back onto a new browser or device.</p>
         <div class="data-actions">
@@ -245,7 +252,7 @@
       <div class="view" data-view="plantings">
 
       <section class="plot">
-        <p class="marker">Plantings</p>
+        <p class="marker" data-ic="plantings">Plantings</p>
         <h2>What you planted, and when</h2>
         <p class="lede">Add a seed or seedling. If it's one of the plants in the guide, a care card comes with it.</p>
 
@@ -307,7 +314,7 @@
       <div class="view" data-view="beds">
 
       <section class="plot soil">
-        <p class="marker">Bed planner</p>
+        <p class="marker" data-ic="beds">Bed planner</p>
         <h2>Your beds, on a grid</h2>
         <p class="lede">Lay out each bed square by square and see exactly what's growing where.</p>
         <span class="status">Coming soon</span>
@@ -318,7 +325,7 @@
       <div class="view" data-view="doctor">
 
       <section class="plot tomato">
-        <p class="marker">Plant doctor</p>
+        <p class="marker" data-ic="plantdoctor">Plant doctor</p>
         <h2>A read on a struggling leaf</h2>
         <p class="lede">Snap a photo of a plant that looks off and get a sense of what it might need.</p>
         <span class="status">Coming soon</span>
@@ -330,7 +337,7 @@
 
       <aside class="sidebar">
         <section class="plot">
-          <p class="marker">Calendar</p>
+          <p class="marker" data-ic="calendar">Calendar</p>
           <h2>Your month at a glance</h2>
           <p class="lede">The same dates, laid out on a calendar. Tap a highlighted day to see what's happening.</p>
           <div class="cal-head">
@@ -350,12 +357,41 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.14</span>
+      <span>Built by gigi-lang &middot; v0.15</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
 
 <script>
+  /* ---------- icon set (original line icons, currentColor) ---------- */
+  const ICONS = {
+    home:'<svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 L12 4.5 L20 11"/><path d="M6 10 V20 H18 V10"/><path d="M12 20 V14.6"/><path d="M12 16 C10.6 16 9.6 15 9.6 13.7 C11 13.8 12 14.8 12 16 Z"/><path d="M12 15.2 C13.4 15.2 14.4 14.2 14.4 12.9 C13 13 12 14 12 15.2 Z"/></svg>',
+    plantings:'<svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8 H16 V19 H8 Z"/><path d="M8 8 L12 5 L16 8"/><circle cx="17.8" cy="17" r="0.7"/><circle cx="19.2" cy="18.6" r="0.7"/><circle cx="17.4" cy="19.4" r="0.7"/></svg>',
+    beds:'<svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13.5 H20 V19.2 H4 Z"/><path d="M9.33 13.5 V19.2"/><path d="M14.66 13.5 V19.2"/><path d="M6.66 13.5 V10.6"/><path d="M6.66 11.9 C5.5 11.9 4.7 11.1 4.7 10 C5.9 10.1 6.66 10.8 6.66 11.9 Z"/><path d="M12 13.5 V10.1"/><path d="M12 11.4 C13.2 11.4 14 10.6 14 9.5 C12.8 9.6 12 10.3 12 11.4 Z"/><path d="M17.33 13.5 V10.6"/><path d="M17.33 11.9 C18.5 11.9 19.3 11.1 19.3 10 C18.1 10.1 17.33 10.8 17.33 11.9 Z"/></svg>',
+    plantdoctor:'<svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 20 V12"/><path d="M8 14.6 C6 14.6 4.5 13.1 4.5 11.1 C6.5 11.2 8 12.6 8 14.6 Z"/><circle cx="15.4" cy="11.2" r="3"/><path d="M15.4 8.2 V14.2"/><path d="M14.2 8.6 L13.4 7.6"/><path d="M16.6 8.6 L17.4 7.6"/></svg>',
+    schedule:'<svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><circle cx="13" cy="13.6" r="6.3"/><path d="M13 9.9 V13.6 L15.6 15.1"/><path d="M7.4 8.2 C5.9 8.2 4.7 7 4.7 5.4 C6.3 5.5 7.4 6.7 7.4 8.2 Z"/><path d="M7.4 8.2 L8.7 9.5"/></svg>',
+    calendar:'<svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="1.6"/><path d="M4 9.5 H20"/><path d="M8 3.8 V7"/><path d="M16 3.8 V7"/></svg>',
+    yourdata:'<svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 14.5 V19 H19.5 V14.5"/><path d="M12 4.5 V13.8"/><path d="M8.4 10.4 L12 14 L15.6 10.4"/></svg>',
+    zone:'<svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 V20.5"/><path d="M5.2 7.5 L18.8 16.5"/><path d="M18.8 7.5 L5.2 16.5"/><path d="M9.7 5.8 L12 3.5 L14.3 5.8"/><path d="M9.7 18.2 L12 20.5 L14.3 18.2"/></svg>',
+    watering:'<svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.8 11 H16.3 L15.3 18.4 C15.2 19.2 14.5 19.7 13.7 19.7 H9.6 C8.8 19.7 8.1 19.2 8 18.4 Z"/><path d="M6.2 11 H16.9"/><path d="M9.4 11 C9.4 8.7 13.8 8.7 13.8 11"/><path d="M16.3 13 L20 10.8"/><path d="M19.1 9.4 L21 11.3"/><circle cx="11.3" cy="15" r="0.7"/><path d="M11.3 13.4 V13.9"/><path d="M11.3 16.1 V16.6"/><path d="M9.7 15 H10.2"/><path d="M12.4 15 H12.9"/></svg>',
+    feed:'<svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 20 V15"/><path d="M6.5 16.6 C5 16.6 4 15.4 4 13.9 C5.5 14 6.5 15.1 6.5 16.6 Z"/><path d="M11.5 11 C13.5 10 17 9.8 19 11 C19.4 11.3 19.3 11.9 18.8 12 C16.8 12.6 13.5 12.8 11.5 11.8 Z"/><path d="M12.6 13 V13.9"/><path d="M14.1 13.7 V14.6"/><path d="M11 13.7 V14.6"/></svg>',
+    harvest:'<svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 V10"/><path d="M12 15 C9.6 15 8 13.2 8 11.2 C10.4 11.3 12 13 12 15 Z"/><path d="M12 13.5 C14.4 13.5 16 11.7 16 9.7 C13.6 9.8 12 11.5 12 13.5 Z"/><circle cx="9.9" cy="6.8" r="1.7"/><circle cx="14.1" cy="6.3" r="1.7"/><circle cx="12" cy="4.3" r="1.6"/></svg>',
+    transplant:'<svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5 V9"/><path d="M12 12 C10 12 8.5 10.6 8.5 8.7 C10.5 8.8 12 10.1 12 12 Z"/><path d="M12 11 C14 11 15.5 9.6 15.5 7.7 C13.5 7.8 12 9.1 12 11 Z"/><path d="M4.5 15.5 C4.5 18.5 8 20 12 20 C16 20 19.5 18.5 19.5 15.5"/><path d="M7 16.6 C8.6 17.7 15.4 17.7 17 16.6"/></svg>'
+  };
+  function injectIcons(){
+    const navMap = { home:'home', plantings:'plantings', beds:'beds', doctor:'plantdoctor' };
+    document.querySelectorAll('.menu a[data-route]').forEach(function(a){
+      const ic = ICONS[navMap[a.getAttribute('data-route')]];
+      if (ic && !a.querySelector('.mi')) a.insertAdjacentHTML('afterbegin', ic);
+    });
+    document.querySelectorAll('.marker[data-ic]').forEach(function(m){
+      const ic = ICONS[m.getAttribute('data-ic')];
+      if (ic && !m.querySelector('.mi')) m.insertAdjacentHTML('afterbegin', ic);
+    });
+    const zl = document.querySelector('.zone summary .z-lead');
+    if (zl && !zl.querySelector('.mi')) zl.insertAdjacentHTML('afterbegin', ICONS.zone);
+  }
+
   /* ---------- today + season ---------- */
   (function () {
     const now = new Date();
@@ -1011,14 +1047,15 @@
       .filter(function(t){ const k = t.id + '|' + t.kind; if (seen[k]) return false; seen[k] = true; return true; })
       .slice(0, 12);
     const labels = { move:'transplant', feed:'feed', harvest:'harvest' };
-    let h = '<div class="water-line"><span>\uD83D\uDCA7</span><span>Daily watering reminder at 7:00am while things are growing.</span></div>';
+    const TAGIC = { move:ICONS.transplant, feed:ICONS.feed, harvest:ICONS.harvest };
+    let h = '<div class="water-line">' + ICONS.watering + '<span>Daily watering reminder at 7:00am while things are growing.</span></div>';
     if (upcoming.length === 0){
       h += '<p class="empty" style="margin-top:0.8rem;">No dated tasks coming up right now.</p>';
       body.innerHTML = h; return;
     }
     h += '<ul class="sched-list">';
     upcoming.forEach(function(t){
-      h += '<li class="task task-' + t.kind + '"><span class="tdate">' + fmtSched(t.when) + '</span><span class="tkind">' + labels[t.kind] + '</span><span class="ttitle"></span></li>';
+      h += '<li class="task task-' + t.kind + '"><span class="tdate">' + fmtSched(t.when) + '</span><span class="tkind">' + TAGIC[t.kind] + labels[t.kind] + '</span><span class="ttitle"></span></li>';
     });
     h += '</ul>';
     body.innerHTML = h;
@@ -1335,6 +1372,7 @@
     const today = new Date();
     calState.y = today.getFullYear(); calState.m = today.getMonth();
   })();
+  injectIcons();
   render();
 </script>
 </body>

@@ -367,7 +367,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.23</span>
+      <span>Built by gigi-lang &middot; v0.24</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -900,9 +900,9 @@
   }
 
   /* ---------- timing text from a planting + the guide + the zone ---------- */
-  function fallSowBy(g){
-    if (g.noFall || g.season !== 'cool' || !zoneCfg.first) return null;
-    // last sow for a fall crop: first frost, minus full maturity, minus a ~2-week fall slowdown
+  function lastSowFor(g){
+    // latest you can plant and still mature before first frost (+~2wk fall slowdown)
+    if (!zoneCfg.first) return null;
     return addDays(asDate(zoneCfg.first), -(g.dtm[1] + 14));
   }
   function timingRows(g, p){
@@ -942,13 +942,23 @@
         rows.push({ ic:'\u2740', txt:'Direct-sow after the last frost'+(last?' ('+fmt(last)+')':'')+', once the soil is warm.' });
       }
     }
-    // fall crop: computed sow-by date off the first fall frost
-    if (g.season === 'cool'){
-      const fsb = fallSowBy(g);
-      if (fsb){
-        rows.push({ ic:'\u2740', txt:'For a <b>fall crop</b>, sow by about <b>'+fmt(fsb)+'</b> so it finishes before your first frost ('+fmt(zoneCfg.first)+').' });
-      } else if (!g.noFall && !zoneCfg.first){
-        rows.push({ ic:'\u2740', txt:'Sow again in late summer for a fall crop \u2014 set your <b>first fall frost</b> above to get the exact sow-by date.' });
+    // last safe planting before first frost: fall crop (cool) or end-of-season cutoff (warm)
+    if (g.season !== 'perennial' && !g.noFall){
+      const ls = lastSowFor(g);
+      if (ls){
+        const td = new Date(); td.setHours(0,0,0,0);
+        const fstr = fmt(zoneCfg.first);
+        const sowV = (g.from === 'transplant') ? 'set plants out' : 'sow';
+        if (g.season === 'cool'){
+          if (ls >= td) rows.push({ ic:'\u2740', txt:'For a <b>fall crop</b>, '+sowV+' by about <b>'+fmt(ls)+'</b> so it finishes before your first frost ('+fstr+').' });
+          else rows.push({ ic:'\u2691', txt:'<b>Too late for a fall crop</b> this year \u2014 planting now won\u2019t mature before your first frost ('+fstr+').' });
+        } else {
+          if (ls >= td) rows.push({ ic:'\u2740', txt:'<b>Frost deadline:</b> '+sowV+' by <b>'+fmt(ls)+'</b> at the latest, or it won\u2019t ripen before your first frost ('+fstr+').' });
+          else rows.push({ ic:'\u2691', txt:'<b>Too late to start this year</b> \u2014 it won\u2019t ripen before your first frost ('+fstr+'). Wait for spring.' });
+        }
+      } else {
+        if (g.season === 'cool') rows.push({ ic:'\u2740', txt:'Sow again in late summer for a fall crop \u2014 set your <b>first fall frost</b> above for the exact sow-by date.' });
+        else rows.push({ ic:'\u2740', txt:'Set your <b>first fall frost</b> above to see how late you can plant this and still beat frost.' });
       }
     }
     // succession: stagger quick crops for a steady supply

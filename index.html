@@ -367,7 +367,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.22</span>
+      <span>Built by gigi-lang &middot; v0.23</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -444,7 +444,7 @@
       pests:[{p:'Cucumber beetle',d:'row cover early; stay on top of them'},{p:'Squash bug',d:'check leaf undersides; remove egg clusters'}],
       note:'Ripe when it slips off the vine with a gentle tug and smells sweet at the stem end.' },
 
-    { match:['carrot'], name:'Carrots', fam:'Root \u00b7 umbellifer', season:'cool', from:'sow', indoors:null, dtm:[50,65],
+    { match:['carrot'], name:'Carrots', succ:[3,4], fam:'Root \u00b7 umbellifer', season:'cool', from:'sow', indoors:null, dtm:[50,65],
       sun:'Full sun to part shade', soil:'Loose, sandy, deep and stone-free \u2014 the key to straight roots', water:'Even moisture; never let it crust over seedlings', feed:'Go easy on nitrogen (it forks the roots); favor potassium',
       companions:['Onions','Leeks','Lettuce','Peas','Rosemary','Sage','Tomatoes'], avoid:['Dill','Fennel','Parsnip'],
       pests:[{p:'Carrot rust fly',d:'plant onions/sage nearby; use row cover'},{p:'Aphids',d:'encourage beneficials'}],
@@ -480,7 +480,7 @@
       pests:[{p:'Onion thrips',d:'hose off; encourage beneficials'},{p:'Onion maggot',d:'rotate; row cover'}],
       note:'Forgiving and quick \u2014 snip what you need and they keep coming. A good pest-deterrent neighbor for carrots and brassicas.' },
 
-    { match:['dill'], name:'Dill', fam:'Herb \u00b7 umbellifer', season:'warm', from:'sow', indoors:null, dtm:[40,60],
+    { match:['dill'], name:'Dill', succ:[3,4], fam:'Herb \u00b7 umbellifer', season:'warm', from:'sow', indoors:null, dtm:[40,60],
       sun:'Full sun', soil:'Well-draining', water:'Moderate', feed:'Light',
       companions:['Cucumbers','Broccoli/cauliflower','Onions','Lettuce'], avoid:['Carrots (can stunt them)','Mature tomatoes'],
       pests:[{p:'Aphids',d:'it actually attracts the beneficials that eat them'}],
@@ -546,7 +546,7 @@
       pests:[{p:'Cabbage worm',d:'row cover, or hand-pick; Bt if needed'},{p:'Aphids',d:'blast with water; ladybugs'}],
       note:'A long-season crop best for a fall harvest - the sprouts taste sweetest after a frost. Pick from the bottom of the stalk upward.' },
 
-    { match:['radish'], name:'Radish', fam:'Brassica family', season:'cool', from:'sow', indoors:null, dtm:[22,35],
+    { match:['radish'], name:'Radish', succ:[2,3], fam:'Brassica family', season:'cool', from:'sow', indoors:null, dtm:[22,35],
       sun:'Full sun to part shade', soil:'Loose, stone-free', water:'Even - steady moisture keeps them mild', feed:'Light',
       companions:['Carrots','Lettuce','Peas','Cucumbers','Spinach'], avoid:[],
       pests:[{p:'Flea beetle',d:'row cover; tiny shot-holes in the leaves'},{p:'Root maggot',d:'rotate; a floating row cover keeps the fly off'}],
@@ -558,7 +558,7 @@
       pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Bean beetle',d:'check leaf undersides; hand-pick'}],
       note:'Needs a trellis, poles, or netting to climb. Keep picking and the vines keep setting new pods all season.' },
 
-    { match:['green bean','bush bean','snap bean','string bean','bean'], name:'Bush (green) beans', fam:'Legume family', season:'warm', from:'sow', indoors:null, dtm:[50,60],
+    { match:['green bean','bush bean','snap bean','string bean','bean'], name:'Bush (green) beans', succ:[2,3], fam:'Legume family', season:'warm', from:'sow', indoors:null, dtm:[50,60],
       sun:'Full sun', soil:'Well-draining', water:'Even', feed:'Light - they fix their own nitrogen',
       companions:['Corn','Cucumbers','Radish','Marigold','Nasturtium'], avoid:['Onions','Garlic'],
       pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Mexican bean beetle',d:'check leaf undersides; hand-pick eggs and larvae'}],
@@ -570,37 +570,37 @@
       pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Powdery mildew',d:'airflow; water at the soil'}],
       note:'A cool-season crop - sow as early as the soil can be worked, and again in late summer for fall. Most types climb, so give them a short trellis.' },
 
-    { match:['onion'], name:'Onions (bulb)', fam:'Allium family', season:'cool', from:'sow', indoors:8, dtm:[90,120],
+    { match:['onion'], name:'Onions (bulb)', noFall:true, fam:'Allium family', season:'cool', from:'sow', indoors:8, dtm:[90,120],
       sun:'Full sun', soil:'Loose, rich, well-draining', water:'Even while bulbing', feed:'Moderate nitrogen early, then ease off',
       companions:['Carrots','Beets','Lettuce','Cabbage','Tomatoes'], avoid:['Beans','Peas'],
       pests:[{p:'Onion thrips',d:'silvery streaks on leaves; blast with water'},{p:'Onion maggot',d:'rotate; row cover keeps the fly off'}],
       note:'Day length decides bulbing, so pick a type suited to your latitude (long-day north, short-day south). Plant early; harvest once the tops flop and brown.' },
 
-    { match:['garlic'], name:'Garlic', fam:'Allium family', season:'cool', from:'sow', indoors:null, dtm:[240,270],
+    { match:['garlic'], name:'Garlic', noFall:true, fam:'Allium family', season:'cool', from:'sow', indoors:null, dtm:[240,270],
       sun:'Full sun', soil:'Loose, rich, well-draining', water:'Even in spring; dry it off before harvest', feed:'Moderate nitrogen in spring',
       companions:['Tomatoes','Carrots','Beets','Brassicas','Roses'], avoid:['Beans','Peas'],
       pests:[{p:'Onion maggot',d:'rotate; row cover early'},{p:'White rot',d:'rotate beds; do not replant alliums in the same spot'}],
       note:'Plant individual cloves in fall and harvest the next summer - almost hands-off over winter. Dig when the lower leaves brown but several green ones remain, then cure in a dry, airy spot.' },
 
-    { match:['leek'], name:'Leeks', fam:'Allium family', season:'cool', from:'transplant', indoors:8, dtm:[100,120],
+    { match:['leek'], name:'Leeks', noFall:true, fam:'Allium family', season:'cool', from:'transplant', indoors:8, dtm:[100,120],
       sun:'Full sun', soil:'Rich, deep, well-draining', water:'Even', feed:'Moderate nitrogen',
       companions:['Carrots','Celery','Onions','Beets'], avoid:['Beans','Peas'],
       pests:[{p:'Onion thrips',d:'blast with water'},{p:'Leek moth',d:'row cover; remove damaged leaves'}],
       note:'A long, easy season and very cold-hardy. Hill soil up around the stems (or plant in a deep hole) to grow more of the tender white shaft.' },
 
-    { match:['beet'], name:'Beets', fam:'Root vegetable', season:'cool', from:'sow', indoors:null, dtm:[50,65],
+    { match:['beet'], name:'Beets', succ:[3,4], fam:'Root vegetable', season:'cool', from:'sow', indoors:null, dtm:[50,65],
       sun:'Full sun to part shade', soil:'Loose, deep, stone-free', water:'Even - steady moisture keeps them tender', feed:'Moderate',
       companions:['Onions','Lettuce','Cabbage','Bush beans'], avoid:['Pole beans'],
       pests:[{p:'Leaf miner',d:'remove blistered leaves; row cover'},{p:'Flea beetle',d:'row-cover young plants'}],
       note:'Two crops in one - the greens are as good as the roots. Each wrinkly seed is a cluster, so thin the seedlings to give the roots room.' },
 
-    { match:['lettuce'], name:'Lettuce', fam:'Leafy green', season:'cool', from:'sow', indoors:4, dtm:[45,60],
+    { match:['lettuce'], name:'Lettuce', succ:[2,3], fam:'Leafy green', season:'cool', from:'sow', indoors:4, dtm:[45,60],
       sun:'Full sun to part shade', soil:'Rich, moist', water:'Frequent and shallow', feed:'Light nitrogen',
       companions:['Carrots','Radish','Onions','Cucumbers'], avoid:[],
       pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Slugs',d:'hand-pick at night; rough barriers'}],
       note:'Turns bitter and bolts in heat - grow it spring and fall, and give it afternoon shade in summer. Pick outer leaves for a cut-and-come-again harvest.' },
 
-    { match:['spinach'], name:'Spinach', fam:'Leafy green', season:'cool', from:'sow', indoors:null, dtm:[40,50],
+    { match:['spinach'], name:'Spinach', succ:[2,3], fam:'Leafy green', season:'cool', from:'sow', indoors:null, dtm:[40,50],
       sun:'Full sun to part shade', soil:'Rich, well-draining', water:'Even', feed:'Light nitrogen',
       companions:['Strawberries','Radish','Peas','Brassicas'], avoid:[],
       pests:[{p:'Leaf miner',d:'remove blistered leaves; row cover'},{p:'Aphids',d:'blast with water; ladybugs'}],
@@ -612,7 +612,7 @@
       pests:[{p:'Leaf miner',d:'remove blistered leaves; row cover'},{p:'Aphids',d:'blast with water; ladybugs'}],
       note:'One of the most forgiving greens - it shrugs off both heat and cold. Cut the outer stalks and it keeps going for months.' },
 
-    { match:['arugula','rocket'], name:'Arugula', fam:'Brassica family', season:'cool', from:'sow', indoors:null, dtm:[30,45],
+    { match:['arugula','rocket'], name:'Arugula', succ:[2,3], fam:'Brassica family', season:'cool', from:'sow', indoors:null, dtm:[30,45],
       sun:'Full sun to part shade', soil:'Rich, moist', water:'Even', feed:'Light',
       companions:['Lettuce','Carrots','Onions','Beans'], avoid:[],
       pests:[{p:'Flea beetle',d:'row cover; tiny shot-holes in the leaves'},{p:'Aphids',d:'blast with water; ladybugs'}],
@@ -624,7 +624,7 @@
       pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Swallowtail caterpillar',d:'often left be - they turn into butterflies'}],
       note:'Slow to germinate, so be patient (soaking the seed overnight helps). It is a biennial usually grown as an annual; let one plant flower to feed beneficial wasps.' },
 
-    { match:['cilantro','coriander'], name:'Cilantro / coriander', fam:'Herb \u00b7 umbellifer', season:'cool', from:'sow', indoors:null, dtm:[45,70],
+    { match:['cilantro','coriander'], name:'Cilantro / coriander', succ:[2,3], fam:'Herb \u00b7 umbellifer', season:'cool', from:'sow', indoors:null, dtm:[45,70],
       sun:'Full sun to part shade', soil:'Well-draining', water:'Even', feed:'Light',
       companions:['Tomatoes','Peppers','Spinach','Beans'], avoid:[],
       pests:[{p:'Aphids',d:'blast with water; ladybugs'},{p:'Powdery mildew',d:'airflow; do not overcrowd'}],
@@ -900,6 +900,11 @@
   }
 
   /* ---------- timing text from a planting + the guide + the zone ---------- */
+  function fallSowBy(g){
+    if (g.noFall || g.season !== 'cool' || !zoneCfg.first) return null;
+    // last sow for a fall crop: first frost, minus full maturity, minus a ~2-week fall slowdown
+    return addDays(asDate(zoneCfg.first), -(g.dtm[1] + 14));
+  }
   function timingRows(g, p){
     if (g.perennialFruit) return perennialFruitRows(g, p);
     const rows = [];
@@ -922,12 +927,12 @@
     } else if (!st.indoorStart){
       // already a plant - just set it out, no indoor sowing step
       if (g.season === 'cool'){
-        rows.push({ ic:'\u2740', txt:'Plant out in early spring'+(last?' (around your last frost, '+fmt(last)+')':'')+', or again in late summer for a fall crop.' });
+        rows.push({ ic:'\u2740', txt:'Plant out in early spring'+(last?' (around your last frost, '+fmt(last)+')':'')+'.' });
       } else {
         rows.push({ ic:'\u2740', txt:'Plant out after the last frost'+(last?' ('+fmt(last)+')':'')+', once the soil is warm.' });
       }
     } else if (g.season === 'cool'){
-      rows.push({ ic:'\u2740', txt:'Cool-season \u2014 best in early spring'+(last?' (around your last frost, '+fmt(last)+')':'')+' and again in late summer for a fall crop.' });
+      rows.push({ ic:'\u2740', txt:'Cool-season \u2014 best in early spring'+(last?' (around your last frost, '+fmt(last)+')':'')+'.' });
     } else { // warm, from seed
       if (g.indoors){
         const indoorTxt = last ? ' (around <b>'+fmt(addDays(asDate(last), -g.indoors*7))+'</b>)' : '';
@@ -936,6 +941,20 @@
       } else {
         rows.push({ ic:'\u2740', txt:'Direct-sow after the last frost'+(last?' ('+fmt(last)+')':'')+', once the soil is warm.' });
       }
+    }
+    // fall crop: computed sow-by date off the first fall frost
+    if (g.season === 'cool'){
+      const fsb = fallSowBy(g);
+      if (fsb){
+        rows.push({ ic:'\u2740', txt:'For a <b>fall crop</b>, sow by about <b>'+fmt(fsb)+'</b> so it finishes before your first frost ('+fmt(zoneCfg.first)+').' });
+      } else if (!g.noFall && !zoneCfg.first){
+        rows.push({ ic:'\u2740', txt:'Sow again in late summer for a fall crop \u2014 set your <b>first fall frost</b> above to get the exact sow-by date.' });
+      }
+    }
+    // succession: stagger quick crops for a steady supply
+    if (g.succ){
+      const through = (g.season === 'cool') ? ', pausing through the peak of summer heat,' : ' through midsummer';
+      rows.push({ ic:'\u2740', txt:'Quick to mature \u2014 sow a small batch every <b>'+g.succ[0]+'\u2013'+g.succ[1]+' weeks</b>'+through+' for a steady supply instead of one glut.' });
     }
     if (!last){ rows.push({ ic:'\u2691', txt:'<i>Set your zone above to turn these into calendar dates.</i>' }); }
     return rows;

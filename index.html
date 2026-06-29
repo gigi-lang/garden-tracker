@@ -206,9 +206,12 @@
   .sfg-chip .sw { width:11px; height:11px; border-radius:3px; flex:none; }
   .sfg-chip .perc { color:var(--soil); }
   .sfg-chip.active { border-color:var(--ink); box-shadow:0 0 0 2px var(--seedling); }
-  .sfg-grid { display:grid; gap:3px; background:var(--soil); padding:3px; border-radius:6px; }
-  .sfg-cell { aspect-ratio:1/1; background:var(--inset); border-radius:3px; display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:600; color:#fff; cursor:pointer; user-select:none; text-shadow:0 1px 1px rgba(0,0,0,0.4); transition:background .15s; }
-  .sfg-cell.empty { color:var(--line); font-weight:400; text-shadow:none; }
+  .sfg-gridwrap { overflow-x:auto; margin-top:0.25rem; }
+  .sfg-grid { display:grid; gap:4px; background:var(--soil); padding:4px; border-radius:6px; width:max-content; }
+  .sfg-cell { width:54px; height:54px; box-sizing:border-box; background:var(--inset); border-radius:3px; padding:5px; cursor:pointer; user-select:none; transition:background .15s; }
+  .sfg-cell.empty:hover { background:var(--wash); }
+  .sfg-holes { display:grid; gap:2px; width:100%; height:100%; }
+  .sfg-hole { border-radius:50%; background:rgba(122,106,85,0.16); }
   .sfg-hint { font-size:0.8rem; color:var(--soil); margin:0.5rem 0 0; }
   @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
 </style>
@@ -405,7 +408,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.25</span>
+      <span>Built by gigi-lang &middot; v0.26</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -1269,7 +1272,7 @@
   /* ---------- beds (v0.25) ---------- */
   const BEDS_KEY = 'garden-tracker:beds';
   let beds = [];
-  function loadBeds(){ try { const r=localStorage.getItem(BEDS_KEY); beds = r?JSON.parse(r):[]; } catch(e){ beds=[]; } beds.forEach(function(b){ if(!b.cols) b.cols=4; if(!b.rows) b.rows=4; if(!b.grid) b.grid={}; }); }
+  function loadBeds(){ try { const r=localStorage.getItem(BEDS_KEY); beds = r?JSON.parse(r):[]; } catch(e){ beds=[]; } beds.forEach(function(b){ if(!b.cols) b.cols=4; if(!b.rows) b.rows=4; if(!b.grid) b.grid={}; Object.keys(b.grid).forEach(function(k){ if (typeof b.grid[k] === 'string') b.grid[k] = { c:b.grid[k], n:sfgMax(b.grid[k]) }; }); }); }
   function saveBeds(){ try { localStorage.setItem(BEDS_KEY, JSON.stringify(beds)); } catch(e){} }
   function escBed(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   function bedName(id){ if(!id) return ''; const b = beds.find(function(x){ return x.id===id; }); return b ? b.name : ''; }
@@ -1299,6 +1302,8 @@
     return cropColors[k];
   }
   function guideByKey(k){ for (let i=0;i<GUIDE.length;i++){ if (GUIDE[i].name===k) return GUIDE[i]; } return null; }
+  function sfgMax(k){ const g=guideByKey(k); return (g&&g.sfg)?g.sfg:1; }
+  function holeCols(m){ return Math.ceil(Math.sqrt(m)); }
   let sfgBrush = null;
   function renderBeds(){
     const body = document.getElementById('beds-body'); if(!body) return;
@@ -1325,20 +1330,22 @@
       } else {
         h += '<p class="sfg-hint">Add a plant on the Plantings page and it\u2019ll show up here to lay out.</p>';
       }
-      h += '<div class="sfg-grid" style="grid-template-columns:repeat('+b.cols+',1fr);max-width:'+Math.min(360,b.cols*64)+'px;">';
+      h += '<div class="sfg-gridwrap"><div class="sfg-grid" style="grid-template-columns:repeat('+b.cols+',54px);">';
       for (let r=0;r<b.rows;r++){
         for (let c=0;c<b.cols;c++){
-          const key = r+'-'+c; const crop = b.grid[key];
-          if (crop){
-            const g = guideByKey(crop); const col = cropColors[crop] || 'var(--seedling)'; const num = (g&&g.sfg)?g.sfg:1;
-            h += '<div class="sfg-cell" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(crop)+'" style="background:'+col+'">'+num+'</div>';
+          const key = r+'-'+c; const cell = b.grid[key];
+          if (cell && cell.c){
+            const mx = sfgMax(cell.c); const col = cropColors[cell.c] || 'var(--seedling)'; const cols2 = holeCols(mx);
+            let dots = '';
+            for (let i=0;i<mx;i++){ dots += '<div class="sfg-hole"'+(i<cell.n?' style="background:'+col+'"':'')+'></div>'; }
+            h += '<div class="sfg-cell" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')"><div class="sfg-holes" style="grid-template-columns:repeat('+cols2+',1fr)">'+dots+'</div></div>';
           } else {
-            h += '<div class="sfg-cell empty" data-bed="'+b.id+'" data-key="'+key+'">\u00b7</div>';
+            h += '<div class="sfg-cell empty" data-bed="'+b.id+'" data-key="'+key+'"></div>';
           }
         }
       }
-      h += '</div>';
-      h += '<p class="sfg-hint">Pick a crop, then tap squares \u2014 each square holds its square-foot count.</p>';
+      h += '</div></div>';
+      h += '<p class="sfg-hint">Pick a crop, then tap a square to plant one \u2014 tap again to add more, up to the square\u2019s limit. Tap with nothing selected to clear.</p>';
       h += '</div>';
     });
     body.innerHTML = h;
@@ -1351,9 +1358,13 @@
     body.querySelectorAll('.sfg-cell').forEach(function(cell){
       cell.addEventListener('click', function(){
         const b = beds.find(function(x){ return x.id===cell.getAttribute('data-bed'); }); if(!b) return;
-        const key = cell.getAttribute('data-key');
+        const key = cell.getAttribute('data-key'); const cur = b.grid[key];
         if (sfgBrush === '__erase__'){ delete b.grid[key]; }
-        else if (sfgBrush){ b.grid[key] = sfgBrush; }
+        else if (sfgBrush){
+          const mx = sfgMax(sfgBrush);
+          if (cur && cur.c === sfgBrush){ cur.n = Math.min(mx, cur.n + 1); }
+          else { b.grid[key] = { c:sfgBrush, n:1 }; }
+        }
         else if (b.grid[key]){ delete b.grid[key]; }
         saveBeds(); render();
       });

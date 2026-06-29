@@ -38,12 +38,12 @@
   .wordmark .leaf { color:var(--seedling); }
   .tagline { font-size:1.05rem; color:var(--soil); max-width:34ch; }
   .menu { display:flex; flex-direction:column; gap:0.15rem; flex:0 0 160px; position:sticky; top:1rem; align-self:flex-start; }
-  .menu a { display:flex; align-items:center; gap:0.5rem; font-family:inherit; font-size:0.9rem; font-weight:600; color:var(--soil); text-decoration:none; padding:0.5rem 0.75rem; border-radius:4px; border-left:3px solid transparent; }
+  .menu a { display:flex; align-items:center; gap:0.5rem; font-family:inherit; font-size:1rem; font-weight:600; color:var(--soil); text-decoration:none; padding:0.75rem; border-radius:4px; border-left:3px solid transparent; white-space:nowrap; }
   .menu a:hover { color:var(--ink); background:rgba(94,147,103,0.07); }
   .menu a.active { color:var(--seedling); background:rgba(94,147,103,0.14); border-left-color:var(--seedling); }
   .menu a:focus-visible { outline:2px solid var(--seedling); outline-offset:2px; }
   .mi { fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex:none; }
-  .menu a .mi { width:18px; height:18px; }
+  .menu a .mi { width:20px; height:20px; }
   .marker .mi { width:15px; height:15px; }
   .zone summary .z-lead { display:inline-flex; align-items:center; gap:0.5rem; }
   .zone summary .z-lead .mi { width:15px; height:15px; }
@@ -53,7 +53,7 @@
 
   /* zone bar */
   .zone {
-    position:relative; overflow:hidden; margin:1.25rem 0 0; max-width:760px; background:var(--plot); border:1px solid rgba(122,106,85,0.22); border-radius:4px;
+    position:relative; overflow:hidden; margin:1.25rem 0 0; max-width:760px; background:var(--plot); border:1px solid rgba(122,106,85,0.22); border-left:none; border-radius:4px;
     padding:0.75rem 1rem; font-size:0.88rem; box-shadow:0 1px 2px rgba(32,57,43,0.06), 0 6px 16px -4px rgba(32,57,43,0.11);
   }
   .zone::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--seedling); }
@@ -69,7 +69,7 @@
 
   .view { display:none; }
   .view.active { display:grid; gap:1rem; }
-  .plot { position:relative; background:var(--plot); border:1px solid rgba(122,106,85,0.22); border-radius:4px; padding:1.5rem; overflow:hidden; box-shadow:0 1px 2px rgba(32,57,43,0.06), 0 6px 16px -4px rgba(32,57,43,0.11); }
+  .plot { position:relative; background:var(--plot); border:1px solid rgba(122,106,85,0.22); border-left:none; border-radius:4px; padding:1.5rem; overflow:hidden; box-shadow:0 1px 2px rgba(32,57,43,0.06), 0 6px 16px -4px rgba(32,57,43,0.11); }
   .plot::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--seedling); }
   .plot.soil::before { background:var(--soil); }
   .plot.tomato::before { background:var(--tomato); }
@@ -160,7 +160,7 @@
   .cal-dow { text-align:center; font-size:0.66rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--soil); padding-bottom:0.2rem; }
   .cal-cell { position:relative; min-height:2.6rem; border:1px solid var(--line); border-radius:3px; background:#fff; padding:0.2rem 0.3rem; font-size:0.78rem; color:var(--ink); }
   .cal-cell.empty { background:transparent; border-color:transparent; }
-  .cal-cell.today { border-color:var(--seedling); box-shadow:inset 0 0 0 1px var(--seedling); font-weight:600; }
+  .cal-cell.today { border:2px solid var(--seedling); font-weight:600; }
   .cal-cell.has { cursor:pointer; }
   .cal-cell.has:hover { background:#f3f5ec; }
   .cal-dots { position:absolute; left:0.3rem; right:0.3rem; bottom:0.25rem; display:flex; gap:2px; flex-wrap:wrap; }
@@ -362,7 +362,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.19</span>
+      <span>Built by gigi-lang &middot; v0.20</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>

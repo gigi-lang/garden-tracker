@@ -10,10 +10,11 @@
 <style>
   :root {
     --ink:#20392b; --paper:#eef0e4; --plot:#f7f8f1; --seedling:#5e9367;
-    --tomato:#cf5e52; --soil:#7a6a55; --line:rgba(122,106,85,0.16);
+    --tomato:#cf5e52; --soil:#7a6a55; --line:rgba(122,106,85,0.16); --evergreen:#3f6f4d;
   }
   /* spacing scale: 0.25 / 0.5 / 0.75 / 1 / 1.25 / 1.5 / 2 rem (4-32px) */
   /* type scale: 3.1 display · 1.9 lead · 1.4 card · 1.05 tagline · 1 body · 0.7 eyebrow */
+  /* small-text ramp: 0.7 / 0.8 / 0.875 / 0.95 / 1 rem */
   * { box-sizing:border-box; margin:0; padding:0; }
   body {
     font-family:'Inter',system-ui,sans-serif; color:var(--ink); background-color:var(--paper);
@@ -40,7 +41,7 @@
   .menu { display:flex; flex-direction:column; gap:0.15rem; flex:0 0 160px; position:sticky; top:1rem; align-self:flex-start; }
   .menu a { display:flex; align-items:center; gap:0.5rem; font-family:inherit; font-size:1rem; font-weight:600; color:var(--soil); text-decoration:none; padding:0.75rem; border-radius:4px; border-left:3px solid transparent; white-space:nowrap; }
   .menu a:hover { color:var(--ink); background:rgba(94,147,103,0.07); }
-  .menu a.active { color:var(--seedling); background:rgba(94,147,103,0.14); border-left-color:var(--seedling); }
+  .menu a.active { color:var(--evergreen); background:rgba(94,147,103,0.14); border-left-color:var(--seedling); }
   .menu a:focus-visible { outline:2px solid var(--seedling); outline-offset:2px; }
   .mi { fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex:none; }
   .menu a .mi { width:20px; height:20px; }
@@ -49,23 +50,23 @@
   .zone summary .z-lead .mi { width:15px; height:15px; }
   .water-line .mi { width:20px; height:20px; color:var(--seedling); }
   .task .tkind .mi { width:12px; height:12px; stroke-width:2; }
-  .today { margin-top:1rem; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--seedling); font-weight:600; }
+  .today { margin-top:1rem; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--evergreen); font-weight:600; }
 
   /* zone bar */
   .zone {
     position:relative; overflow:hidden; margin:1.25rem 0 0; max-width:760px; background:var(--plot); border:1px solid rgba(122,106,85,0.22); border-left:none; border-radius:4px;
-    padding:0.75rem 1rem; font-size:0.88rem; box-shadow:0 1px 2px rgba(32,57,43,0.06), 0 6px 16px -4px rgba(32,57,43,0.11);
+    padding:0.75rem 1rem; font-size:0.875rem; box-shadow:0 1px 2px rgba(32,57,43,0.06), 0 6px 16px -4px rgba(32,57,43,0.11);
   }
   .zone::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--seedling); }
   .zone summary { cursor:pointer; color:var(--ink); list-style:none; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; }
   .zone summary::-webkit-details-marker { display:none; }
-  .zone summary .val { color:var(--seedling); font-weight:600; }
+  .zone summary .val { color:var(--evergreen); font-weight:600; }
   .zone .controls { margin-top:0.75rem; display:grid; gap:0.75rem; }
   .zone .controls .row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem; }
   @media (max-width:520px){ .zone .controls .row3 { grid-template-columns:1fr; } }
-  .zone label { display:block; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; margin-bottom:0.25rem; }
-  .zone select, .zone input { width:100%; font-family:inherit; font-size:0.9rem; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:4px; padding:0.5rem 0.75rem; }
-  .zone .hint { font-size:0.78rem; color:var(--soil); }
+  .zone label { display:block; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; margin-bottom:0.25rem; }
+  .zone select, .zone input { width:100%; font-family:inherit; font-size:0.875rem; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:4px; padding:0.5rem 0.75rem; }
+  .zone .hint { font-size:0.8rem; color:var(--soil); }
 
   .view { display:none; }
   .view.active { display:grid; gap:1rem; }
@@ -77,24 +78,24 @@
   .marker { display:flex; align-items:center; gap:0.5rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.16em; font-weight:600; color:var(--soil); margin-bottom:0.5rem; }
   .plot h2 { font-family:'Fraunces',serif; font-weight:500; font-size:1.4rem; margin-bottom:0.5rem; }
   .plot.lead h2 { font-size:1.9rem; line-height:1.15; }
-  .plot p.lede { color:var(--soil); font-size:0.97rem; max-width:46ch; }
-  .status { margin-top:1rem; display:inline-block; font-size:0.74rem; letter-spacing:0.04em; color:var(--seedling); border:1px dashed var(--seedling); border-radius:999px; padding:0.2rem 0.7rem; }
+  .plot p.lede { color:var(--soil); font-size:0.95rem; max-width:46ch; }
+  .status { margin-top:1rem; display:inline-block; font-size:0.7rem; letter-spacing:0.04em; color:var(--evergreen); border:1px dashed var(--seedling); border-radius:999px; padding:0.2rem 0.7rem; }
 
   .add-form { margin-top:1.25rem; display:grid; gap:0.75rem; }
   .field { display:grid; gap:0.25rem; }
-  .field label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; }
+  .field label { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; }
   .field input, .field select, .field textarea { font-family:inherit; font-size:0.95rem; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:4px; padding:0.5rem 0.75rem; width:100%; }
   .field input:focus, .field select:focus, .field textarea:focus { outline:2px solid var(--seedling); outline-offset:1px; border-color:var(--seedling); }
   .field textarea { resize:vertical; min-height:2.6rem; }
   .row { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
   @media (max-width:460px){ .row { grid-template-columns:1fr; } }
-  .btn { font-family:inherit; font-size:0.9rem; font-weight:600; cursor:pointer; background:var(--seedling); color:#fff; border:none; border-radius:4px; padding:0.6rem 1.1rem; justify-self:start; }
-  .btn:hover { background:#4f8059; }
+  .btn { font-family:inherit; font-size:0.875rem; font-weight:600; cursor:pointer; background:var(--evergreen); color:#fff; border:none; border-radius:4px; padding:0.6rem 1.1rem; justify-self:start; }
+  .btn:hover { background:#345d40; }
   .btn:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
-  .btn.ghost { background:#fff; color:var(--seedling); border:1px solid var(--seedling); }
+  .btn.ghost { background:#fff; color:var(--evergreen); border:1px solid var(--seedling); }
   .btn.ghost:hover { background:rgba(94,147,103,0.08); }
   .data-actions { margin-top:1rem; display:flex; flex-wrap:wrap; gap:0.5rem; }
-  .data-status { margin-top:0.75rem; font-size:0.82rem; color:var(--seedling); min-height:1.1rem; }
+  .data-status { margin-top:0.75rem; font-size:0.8rem; color:var(--evergreen); min-height:1.1rem; }
   .data-status.err { color:var(--tomato); }
 
   .list { margin-top:1.5rem; display:grid; gap:0.5rem; list-style:none; }
@@ -103,21 +104,21 @@
   .es-card { border:1px dashed rgba(94,147,103,0.5); border-radius:4px; background:#fff; padding:1.6rem 1.4rem; text-align:center; }
   .es-sprout { width:32px; height:32px; margin:0 auto 0.75rem; display:block; }
   .es-title { font-family:'Fraunces',serif; font-weight:500; font-size:1.3rem; color:var(--ink); margin-bottom:0.5rem; }
-  .es-sub { color:var(--soil); font-size:0.93rem; max-width:44ch; margin:0 auto; line-height:1.55; }
-  .es-up { display:inline-block; margin-top:1rem; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--seedling); font-weight:600; }
+  .es-sub { color:var(--soil); font-size:0.95rem; max-width:44ch; margin:0 auto; line-height:1.55; }
+  .es-up { display:inline-block; margin-top:1rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--evergreen); font-weight:600; }
   .es-sample { margin-top:1.5rem; text-align:left; opacity:0.5; }
-  .es-cap { margin-top:0.5rem; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); }
+  .es-cap { margin-top:0.5rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); }
   .plant { border-top:1px solid var(--line); padding-top:0.75rem; }
   .plant .head { display:flex; align-items:flex-start; gap:0.75rem; }
   .plant .dot { width:9px; height:9px; border-radius:50%; background:var(--seedling); margin-top:0.5rem; flex:none; }
   .plant .body { flex:1; min-width:0; }
-  .plant .name { font-weight:600; font-size:1.02rem; }
-  .plant .meta { font-size:0.82rem; color:var(--soil); margin-top:0.1rem; }
-  .plant .note { font-size:0.9rem; margin-top:0.25rem; color:var(--ink); }
-  .age { font-size:0.72rem; letter-spacing:0.04em; color:var(--seedling); background:rgba(94,147,103,0.12); border-radius:999px; padding:0.15rem 0.6rem; white-space:nowrap; align-self:center; }
+  .plant .name { font-weight:600; font-size:1rem; }
+  .plant .meta { font-size:0.8rem; color:var(--soil); margin-top:0.1rem; }
+  .plant .note { font-size:0.875rem; margin-top:0.25rem; color:var(--ink); }
+  .age { font-size:0.7rem; letter-spacing:0.04em; color:var(--evergreen); background:rgba(94,147,103,0.12); border-radius:999px; padding:0.15rem 0.6rem; white-space:nowrap; align-self:center; }
   .remove { background:none; border:none; cursor:pointer; color:var(--soil); font-size:1.1rem; line-height:1; padding:0.2rem; opacity:0.6; align-self:center; }
   .remove:hover { opacity:1; color:var(--tomato); }
-  .guide-toggle { margin-top:0.5rem; margin-left:1.7rem; background:none; border:none; cursor:pointer; color:var(--seedling); font-family:inherit; font-size:0.8rem; font-weight:600; padding:0; }
+  .guide-toggle { margin-top:0.5rem; margin-left:1.7rem; background:none; border:none; cursor:pointer; color:var(--evergreen); font-family:inherit; font-size:0.8rem; font-weight:600; padding:0; }
   .guide-toggle:hover { text-decoration:underline; }
   .no-guide { margin-top:0.5rem; margin-left:1.7rem; font-size:0.8rem; color:var(--soil); font-style:italic; }
 
@@ -125,29 +126,29 @@
   .guide { margin:0.7rem 0 0.2rem 1.7rem; background:#fff; border:1px solid var(--line); border-radius:4px; padding:1rem 1.1rem; display:none; }
   .guide.open { display:block; }
   .guide .gfam { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--soil); font-weight:600; margin-bottom:0.5rem; }
-  .guide .grow { display:grid; grid-template-columns:90px 1fr; gap:0.25rem 0.75rem; font-size:0.88rem; margin-bottom:0.25rem; }
+  .guide .grow { display:grid; grid-template-columns:90px 1fr; gap:0.25rem 0.75rem; font-size:0.875rem; margin-bottom:0.25rem; }
   .guide .grow .k { color:var(--soil); font-weight:600; }
-  .guide .timing { margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid var(--line); font-size:0.88rem; display:grid; gap:0.5rem; }
+  .guide .timing { margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid var(--line); font-size:0.875rem; display:grid; gap:0.5rem; }
   .guide .timing .t { display:flex; gap:0.5rem; }
   .guide .timing .t .ic { color:var(--seedling); flex:none; }
   .chips { display:flex; flex-wrap:wrap; gap:0.25rem; margin-top:0.75rem; }
-  .chip { font-size:0.76rem; border-radius:999px; padding:0.12rem 0.55rem; border:1px solid var(--line); }
-  .chip.good { color:var(--seedling); border-color:rgba(94,147,103,0.4); background:rgba(94,147,103,0.08); }
+  .chip { font-size:0.8rem; border-radius:999px; padding:0.12rem 0.55rem; border:1px solid var(--line); }
+  .chip.good { color:var(--evergreen); border-color:rgba(94,147,103,0.4); background:rgba(94,147,103,0.08); }
   .chip.bad { color:var(--tomato); border-color:rgba(207,94,82,0.4); background:rgba(207,94,82,0.07); }
   .clabel { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; margin-top:0.75rem; }
-  .pests { margin-top:0.5rem; display:grid; gap:0.25rem; font-size:0.84rem; }
+  .pests { margin-top:0.5rem; display:grid; gap:0.25rem; font-size:0.875rem; }
   .pests .pest b { color:var(--ink); }
   .pests .pest span { color:var(--soil); }
-  .gnote { margin-top:0.75rem; font-size:0.84rem; color:var(--soil); font-style:italic; }
+  .gnote { margin-top:0.75rem; font-size:0.875rem; color:var(--soil); font-style:italic; }
 
   /* schedule */
-  .water-line { display:flex; gap:0.5rem; align-items:center; font-size:0.9rem; color:var(--ink); margin-top:0.5rem; }
+  .water-line { display:flex; gap:0.5rem; align-items:center; font-size:0.875rem; color:var(--ink); margin-top:0.5rem; }
   .sched-list { list-style:none; margin-top:1rem; display:grid; gap:0.5rem; }
-  .task { display:flex; align-items:center; gap:0.75rem; border-top:1px solid var(--line); padding-top:0.5rem; font-size:0.92rem; }
+  .task { display:flex; align-items:center; gap:0.75rem; border-top:1px solid var(--line); padding-top:0.5rem; font-size:0.95rem; }
   .task .tdate { font-variant-numeric:tabular-nums; color:var(--soil); width:5.8rem; flex:none; white-space:nowrap; }
-  .task .tkind { display:inline-flex; align-items:center; gap:0.25rem; font-size:0.66rem; text-transform:uppercase; letter-spacing:0.08em; border-radius:999px; padding:0.1rem 0.5rem; flex:none; }
+  .task .tkind { display:inline-flex; align-items:center; gap:0.25rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; border-radius:999px; padding:0.1rem 0.5rem; flex:none; }
   .task-move .tkind { color:var(--soil); background:rgba(122,106,85,0.14); }
-  .task-feed .tkind { color:var(--seedling); background:rgba(94,147,103,0.14); }
+  .task-feed .tkind { color:var(--evergreen); background:rgba(94,147,103,0.14); }
   .task-harvest .tkind { color:var(--tomato); background:rgba(207,94,82,0.12); }
   .task .ttitle { flex:1; }
 
@@ -155,10 +156,10 @@
   .cal-head { display:flex; align-items:center; justify-content:space-between; margin-top:0.5rem; }
   .cal-head .mlabel { font-family:'Fraunces',serif; font-size:1.15rem; }
   .cal-nav { background:none; border:1px solid var(--line); border-radius:4px; cursor:pointer; color:var(--ink); font-size:1.1rem; line-height:1; padding:0.25rem 0.7rem; }
-  .cal-nav:hover { background:#fff; border-color:var(--seedling); color:var(--seedling); }
+  .cal-nav:hover { background:#fff; border-color:var(--seedling); color:var(--evergreen); }
   .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-top:1rem; }
-  .cal-dow { text-align:center; font-size:0.66rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--soil); padding-bottom:0.2rem; }
-  .cal-cell { position:relative; min-height:2.6rem; border:1px solid var(--line); border-radius:3px; background:#fff; padding:0.2rem 0.3rem; font-size:0.78rem; color:var(--ink); }
+  .cal-dow { text-align:center; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--soil); padding-bottom:0.2rem; }
+  .cal-cell { position:relative; min-height:2.6rem; border:1px solid var(--line); border-radius:3px; background:#fff; padding:0.2rem 0.3rem; font-size:0.8rem; color:var(--ink); }
   .cal-cell.empty { background:transparent; border-color:transparent; }
   .cal-cell.today { border:2px solid var(--seedling); font-weight:600; }
   .cal-cell.has { cursor:pointer; }
@@ -168,15 +169,15 @@
   .cal-dot.move { background:var(--soil); }
   .cal-dot.feed { background:var(--seedling); }
   .cal-dot.harvest { background:var(--tomato); }
-  .cal-legend { display:flex; flex-wrap:wrap; gap:1rem; margin-top:0.75rem; font-size:0.74rem; color:var(--soil); }
+  .cal-legend { display:flex; flex-wrap:wrap; gap:1rem; margin-top:0.75rem; font-size:0.7rem; color:var(--soil); }
   .cal-legend span { display:inline-flex; align-items:center; gap:0.25rem; }
   .cal-legend i { width:8px; height:8px; border-radius:50%; display:inline-block; }
-  .cal-day-detail { margin-top:1rem; font-size:0.88rem; }
+  .cal-day-detail { margin-top:1rem; font-size:0.875rem; }
   .cal-day-detail .d-title { font-weight:600; margin-bottom:0.25rem; }
   .cal-day-detail .d-task { color:var(--ink); padding:0.15rem 0; }
 
-  footer { margin-top:clamp(2.5rem,7vw,4rem); padding-top:1.25rem; border-top:1px solid var(--line); font-size:0.82rem; color:var(--soil); display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; }
-  footer a { color:var(--seedling); text-decoration:none; }
+  footer { margin-top:clamp(2.5rem,7vw,4rem); padding-top:1.25rem; border-top:1px solid var(--line); font-size:0.8rem; color:var(--soil); display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; }
+  footer a { color:var(--evergreen); text-decoration:none; }
   footer a:hover { text-decoration:underline; }
 </style>
 </head>
@@ -362,7 +363,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.20</span>
+      <span>Built by gigi-lang &middot; v0.21</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>

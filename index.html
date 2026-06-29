@@ -9,8 +9,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --ink:#20392b; --paper:#eef0e4; --plot:#f7f8f1; --seedling:#5e9367;
-    --tomato:#cf5e52; --soil:#7a6a55; --line:rgba(122,106,85,0.16); --evergreen:#3f6f4d;
+    /* surfaces, page->card->inset: --paper page bg, --plot card face, --inset pure-white inputs/cells/inner-cards, --wash faint hover */
+    --ink:#20392b; --paper:#eef0e4; --plot:#f7f8f1; --inset:#fff; --wash:#f3f5ec;
+    --seedling:#5e9367; --evergreen:#3f6f4d; --evergreen-dk:#345d40;
+    --tomato:#cf5e52; --soil:#7a6a55; --line:rgba(122,106,85,0.16);
   }
   /* spacing scale: 0.25 / 0.5 / 0.75 / 1 / 1.25 / 1.5 / 2 rem (4-32px) */
   /* type scale: 3.1 display · 1.9 lead · 1.4 card · 1.05 tagline · 1 body · 0.7 eyebrow */
@@ -39,7 +41,7 @@
   .wordmark .leaf { color:var(--seedling); }
   .tagline { font-size:1.05rem; color:var(--soil); max-width:34ch; }
   .menu { display:flex; flex-direction:column; gap:0.15rem; flex:0 0 160px; position:sticky; top:1rem; align-self:flex-start; }
-  .menu a { display:flex; align-items:center; gap:0.5rem; font-family:inherit; font-size:1rem; font-weight:600; color:var(--soil); text-decoration:none; padding:0.75rem; border-radius:4px; border-left:3px solid transparent; white-space:nowrap; }
+  .menu a { display:flex; align-items:center; gap:0.5rem; font-family:inherit; font-size:1rem; font-weight:600; color:var(--soil); text-decoration:none; padding:0.75rem; border-radius:4px; border-left:3px solid transparent; white-space:nowrap; transition:background .15s, color .15s, border-color .15s; }
   .menu a:hover { color:var(--ink); background:rgba(94,147,103,0.07); }
   .menu a.active { color:var(--evergreen); background:rgba(94,147,103,0.14); border-left-color:var(--seedling); }
   .menu a:focus-visible { outline:2px solid var(--seedling); outline-offset:2px; }
@@ -50,7 +52,7 @@
   .zone summary .z-lead .mi { width:15px; height:15px; }
   .water-line .mi { width:20px; height:20px; color:var(--seedling); }
   .task .tkind .mi { width:12px; height:12px; stroke-width:2; }
-  .today { margin-top:1rem; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--evergreen); font-weight:600; }
+  .today { margin-top:1rem; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--evergreen); font-weight:600; }
 
   /* zone bar */
   .zone {
@@ -65,7 +67,7 @@
   .zone .controls .row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem; }
   @media (max-width:520px){ .zone .controls .row3 { grid-template-columns:1fr; } }
   .zone label { display:block; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; margin-bottom:0.25rem; }
-  .zone select, .zone input { width:100%; font-family:inherit; font-size:0.875rem; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:4px; padding:0.5rem 0.75rem; }
+  .zone select, .zone input { width:100%; font-family:inherit; font-size:0.875rem; color:var(--ink); background:var(--inset); border:1px solid var(--line); border-radius:4px; padding:0.5rem 0.75rem; }
   .zone .hint { font-size:0.8rem; color:var(--soil); }
 
   .view { display:none; }
@@ -75,8 +77,8 @@
   .plot.soil::before { background:var(--soil); }
   .plot.tomato::before { background:var(--tomato); }
   .grid-bg { background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px); background-size:26px 26px; }
-  .marker { display:flex; align-items:center; gap:0.5rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.16em; font-weight:600; color:var(--soil); margin-bottom:0.5rem; }
-  .plot h2 { font-family:'Fraunces',serif; font-weight:500; font-size:1.4rem; margin-bottom:0.5rem; }
+  .marker { display:flex; align-items:center; gap:0.5rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; font-weight:600; color:var(--soil); margin-bottom:0.5rem; }
+  .plot h2 { font-family:'Fraunces',serif; font-weight:500; font-size:1.4rem; line-height:1.2; margin-bottom:0.5rem; }
   .plot.lead h2 { font-size:1.9rem; line-height:1.15; }
   .plot p.lede { color:var(--soil); font-size:0.95rem; max-width:46ch; }
   .status { margin-top:1rem; display:inline-block; font-size:0.7rem; letter-spacing:0.04em; color:var(--evergreen); border:1px dashed var(--seedling); border-radius:999px; padding:0.2rem 0.7rem; }
@@ -84,15 +86,15 @@
   .add-form { margin-top:1.25rem; display:grid; gap:0.75rem; }
   .field { display:grid; gap:0.25rem; }
   .field label { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; }
-  .field input, .field select, .field textarea { font-family:inherit; font-size:0.95rem; color:var(--ink); background:#fff; border:1px solid var(--line); border-radius:4px; padding:0.5rem 0.75rem; width:100%; }
+  .field input, .field select, .field textarea { font-family:inherit; font-size:0.95rem; color:var(--ink); background:var(--inset); border:1px solid var(--line); border-radius:4px; padding:0.5rem 0.75rem; width:100%; }
   .field input:focus, .field select:focus, .field textarea:focus { outline:2px solid var(--seedling); outline-offset:1px; border-color:var(--seedling); }
   .field textarea { resize:vertical; min-height:2.6rem; }
   .row { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
   @media (max-width:460px){ .row { grid-template-columns:1fr; } }
-  .btn { font-family:inherit; font-size:0.875rem; font-weight:600; cursor:pointer; background:var(--evergreen); color:#fff; border:none; border-radius:4px; padding:0.6rem 1.1rem; justify-self:start; }
-  .btn:hover { background:#345d40; }
+  .btn { font-family:inherit; font-size:0.875rem; font-weight:600; cursor:pointer; background:var(--evergreen); color:var(--inset); border:none; border-radius:4px; padding:0.6rem 1.1rem; justify-self:start; transition:background .15s, color .15s, border-color .15s; }
+  .btn:hover { background:var(--evergreen-dk); }
   .btn:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
-  .btn.ghost { background:#fff; color:var(--evergreen); border:1px solid var(--seedling); }
+  .btn.ghost { background:var(--inset); color:var(--evergreen); border:1px solid var(--seedling); }
   .btn.ghost:hover { background:rgba(94,147,103,0.08); }
   .data-actions { margin-top:1rem; display:flex; flex-wrap:wrap; gap:0.5rem; }
   .data-status { margin-top:0.75rem; font-size:0.8rem; color:var(--evergreen); min-height:1.1rem; }
@@ -101,11 +103,12 @@
   .list { margin-top:1.5rem; display:grid; gap:0.5rem; list-style:none; }
   .empty { margin-top:1.5rem; color:var(--soil); font-size:0.95rem; font-style:italic; }
   .empty-state { margin-top:1.5rem; }
-  .es-card { border:1px dashed rgba(94,147,103,0.5); border-radius:4px; background:#fff; padding:1.6rem 1.4rem; text-align:center; }
+  .es-card { border:1px dashed rgba(94,147,103,0.5); border-radius:4px; background:var(--inset); padding:1.6rem 1.4rem; text-align:center; }
   .es-sprout { width:32px; height:32px; margin:0 auto 0.75rem; display:block; }
+  .sprout, .es-sprout { stroke:var(--seedling); }
   .es-title { font-family:'Fraunces',serif; font-weight:500; font-size:1.3rem; color:var(--ink); margin-bottom:0.5rem; }
   .es-sub { color:var(--soil); font-size:0.95rem; max-width:44ch; margin:0 auto; line-height:1.55; }
-  .es-up { display:inline-block; margin-top:1rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--evergreen); font-weight:600; }
+  .es-up { display:inline-block; margin-top:1rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--evergreen); font-weight:600; }
   .es-sample { margin-top:1.5rem; text-align:left; opacity:0.5; }
   .es-cap { margin-top:0.5rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); }
   .plant { border-top:1px solid var(--line); padding-top:0.75rem; }
@@ -123,9 +126,9 @@
   .no-guide { margin-top:0.5rem; margin-left:1.7rem; font-size:0.8rem; color:var(--soil); font-style:italic; }
 
   /* care guide card */
-  .guide { margin:0.7rem 0 0.2rem 1.7rem; background:#fff; border:1px solid var(--line); border-radius:4px; padding:1rem 1.1rem; display:none; }
+  .guide { margin:0.7rem 0 0.2rem 1.7rem; background:var(--inset); border:1px solid var(--line); border-radius:4px; padding:1rem 1.1rem; display:none; }
   .guide.open { display:block; }
-  .guide .gfam { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--soil); font-weight:600; margin-bottom:0.5rem; }
+  .guide .gfam { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; margin-bottom:0.5rem; }
   .guide .grow { display:grid; grid-template-columns:90px 1fr; gap:0.25rem 0.75rem; font-size:0.875rem; margin-bottom:0.25rem; }
   .guide .grow .k { color:var(--soil); font-weight:600; }
   .guide .timing { margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid var(--line); font-size:0.875rem; display:grid; gap:0.5rem; }
@@ -146,7 +149,7 @@
   .sched-list { list-style:none; margin-top:1rem; display:grid; gap:0.5rem; }
   .task { display:flex; align-items:center; gap:0.75rem; border-top:1px solid var(--line); padding-top:0.5rem; font-size:0.95rem; }
   .task .tdate { font-variant-numeric:tabular-nums; color:var(--soil); width:5.8rem; flex:none; white-space:nowrap; }
-  .task .tkind { display:inline-flex; align-items:center; gap:0.25rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; border-radius:999px; padding:0.1rem 0.5rem; flex:none; }
+  .task .tkind { display:inline-flex; align-items:center; gap:0.25rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; border-radius:999px; padding:0.1rem 0.5rem; flex:none; }
   .task-move .tkind { color:var(--soil); background:rgba(122,106,85,0.14); }
   .task-feed .tkind { color:var(--evergreen); background:rgba(94,147,103,0.14); }
   .task-harvest .tkind { color:var(--tomato); background:rgba(207,94,82,0.12); }
@@ -155,15 +158,15 @@
   /* calendar */
   .cal-head { display:flex; align-items:center; justify-content:space-between; margin-top:0.5rem; }
   .cal-head .mlabel { font-family:'Fraunces',serif; font-size:1.15rem; }
-  .cal-nav { background:none; border:1px solid var(--line); border-radius:4px; cursor:pointer; color:var(--ink); font-size:1.1rem; line-height:1; padding:0.25rem 0.7rem; }
-  .cal-nav:hover { background:#fff; border-color:var(--seedling); color:var(--evergreen); }
+  .cal-nav { background:none; border:1px solid var(--line); border-radius:4px; cursor:pointer; color:var(--ink); font-size:1.1rem; line-height:1; padding:0.25rem 0.7rem; transition:background .15s, color .15s, border-color .15s; }
+  .cal-nav:hover { background:var(--inset); border-color:var(--seedling); color:var(--evergreen); }
   .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-top:1rem; }
-  .cal-dow { text-align:center; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--soil); padding-bottom:0.2rem; }
-  .cal-cell { position:relative; min-height:2.6rem; border:1px solid var(--line); border-radius:3px; background:#fff; padding:0.2rem 0.3rem; font-size:0.8rem; color:var(--ink); }
+  .cal-dow { text-align:center; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); padding-bottom:0.2rem; }
+  .cal-cell { position:relative; min-height:2.6rem; border:1px solid var(--line); border-radius:3px; background:var(--inset); padding:0.2rem 0.3rem; font-size:0.8rem; color:var(--ink); }
   .cal-cell.empty { background:transparent; border-color:transparent; }
   .cal-cell.today { border:2px solid var(--seedling); font-weight:600; }
   .cal-cell.has { cursor:pointer; }
-  .cal-cell.has:hover { background:#f3f5ec; }
+  .cal-cell.has:hover { background:var(--wash); }
   .cal-dots { position:absolute; left:0.3rem; right:0.3rem; bottom:0.25rem; display:flex; gap:2px; flex-wrap:wrap; }
   .cal-dot { width:6px; height:6px; border-radius:50%; }
   .cal-dot.move { background:var(--soil); }
@@ -179,13 +182,14 @@
   footer { margin-top:clamp(2.5rem,7vw,4rem); padding-top:1.25rem; border-top:1px solid var(--line); font-size:0.8rem; color:var(--soil); display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; }
   footer a { color:var(--evergreen); text-decoration:none; }
   footer a:hover { text-decoration:underline; }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <div class="mark">
-        <svg class="sprout" viewBox="0 0 24 24" fill="none" stroke="#5e9367" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <svg class="sprout" viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M12 22V11" /><path d="M12 11C12 7 9 5 4 5c0 4 3 6 8 6Z" /><path d="M12 13c0-3 2.5-5 7-5 0 3.5-2.5 5-7 5Z" />
         </svg>
         <span class="wordmark">Garden <span class="leaf">Tracker</span></span>
@@ -292,7 +296,7 @@
         <ul class="list" id="list"></ul>
         <div class="empty-state" id="empty">
           <div class="es-card">
-            <svg class="es-sprout" viewBox="0 0 24 24" fill="none" stroke="#5e9367" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg class="es-sprout" viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M12 22V11" /><path d="M12 11C12 7 9 5 4 5c0 4 3 6 8 6Z" /><path d="M12 13c0-3 2.5-5 7-5 0 3.5-2.5 5-7 5Z" />
             </svg>
             <p class="es-title">Your garden starts here</p>
@@ -363,7 +367,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.21</span>
+      <span>Built by gigi-lang &middot; v0.22</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>

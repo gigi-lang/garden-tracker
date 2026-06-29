@@ -13,6 +13,7 @@
     --tomato:#cf5e52; --soil:#7a6a55; --line:rgba(122,106,85,0.16);
   }
   /* spacing scale: 0.25 / 0.5 / 0.75 / 1 / 1.25 / 1.5 / 2 rem (4-32px) */
+  /* type scale: 3.1 display · 1.9 lead · 1.4 card · 1.05 tagline · 1 body · 0.7 eyebrow */
   * { box-sizing:border-box; margin:0; padding:0; }
   body {
     font-family:'Inter',system-ui,sans-serif; color:var(--ink); background-color:var(--paper);
@@ -75,6 +76,7 @@
   .grid-bg { background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px); background-size:26px 26px; }
   .marker { display:flex; align-items:center; gap:0.5rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.16em; font-weight:600; color:var(--soil); margin-bottom:0.5rem; }
   .plot h2 { font-family:'Fraunces',serif; font-weight:500; font-size:1.4rem; margin-bottom:0.5rem; }
+  .plot.lead h2 { font-size:1.9rem; line-height:1.15; }
   .plot p.lede { color:var(--soil); font-size:0.97rem; max-width:46ch; }
   .status { margin-top:1rem; display:inline-block; font-size:0.74rem; letter-spacing:0.04em; color:var(--seedling); border:1px dashed var(--seedling); border-radius:999px; padding:0.2rem 0.7rem; }
 
@@ -229,7 +231,7 @@
 
       <div class="view active" data-view="home">
 
-      <section class="plot">
+      <section class="plot lead">
         <p class="marker" data-ic="schedule">Schedule</p>
         <h2>What's coming up</h2>
         <p class="lede">Your watering, feeding, transplant, and harvest dates &mdash; pulled from your plantings and your zone. Send them to your phone's calendar and it does the reminding.</p>
@@ -254,7 +256,7 @@
 
       <div class="view" data-view="plantings">
 
-      <section class="plot">
+      <section class="plot lead">
         <p class="marker" data-ic="plantings">Plantings</p>
         <h2>What you planted, and when</h2>
         <p class="lede">Add a seed or seedling. If it's one of the plants in the guide, a care card comes with it.</p>
@@ -316,7 +318,7 @@
 
       <div class="view" data-view="beds">
 
-      <section class="plot soil grid-bg">
+      <section class="plot soil grid-bg lead">
         <p class="marker" data-ic="beds">Bed planner</p>
         <h2>Your beds, on a grid</h2>
         <p class="lede">Lay out each bed square by square and see exactly what's growing where.</p>
@@ -327,7 +329,7 @@
 
       <div class="view" data-view="doctor">
 
-      <section class="plot tomato">
+      <section class="plot tomato lead">
         <p class="marker" data-ic="plantdoctor">Plant doctor</p>
         <h2>A read on a struggling leaf</h2>
         <p class="lede">Snap a photo of a plant that looks off and get a sense of what it might need.</p>
@@ -360,7 +362,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.18</span>
+      <span>Built by gigi-lang &middot; v0.19</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>

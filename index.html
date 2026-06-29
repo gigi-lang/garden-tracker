@@ -16,8 +16,8 @@
   * { box-sizing:border-box; margin:0; padding:0; }
   body {
     font-family:'Inter',system-ui,sans-serif; color:var(--ink); background-color:var(--paper);
-    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
-    background-size:26px 26px; line-height:1.5; min-height:100vh; padding:clamp(1.5rem,5vw,4rem) 1.25rem;
+    background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2796%27%20height%3D%2796%27%20viewBox%3D%270%200%2096%2096%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%237a6a55%27%20stroke-opacity%3D%270.13%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cg%20transform%3D%27translate%2820%2018%29%20rotate%28-22%29%27%3E%3Cpath%20d%3D%27M0%200%20C5%20-5%2013%20-5%2018%200%20C13%205%205%205%200%200%20Z%27%2F%3E%3Cpath%20d%3D%27M3%200%20H15%27%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%2864%2030%29%20rotate%2818%29%27%3E%3Cpath%20d%3D%27M0%2011%20V0%27%2F%3E%3Cpath%20d%3D%27M0%205%20C-5%203%20-7%20-2%20-7%20-6%20C-2%20-5%200%200%200%205%20Z%27%2F%3E%3Cpath%20d%3D%27M0%207%20C5%205%207%200%207%20-4%20C2%20-3%200%203%200%207%20Z%27%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%2854%2064%29%20rotate%2844%29%27%3E%3Cpath%20d%3D%27M0%200%20C4%20-4%2011%20-4%2015%200%20C11%204%204%204%200%200%20Z%27%2F%3E%3Cpath%20d%3D%27M3%200%20H12%27%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%2815%2062%29%20rotate%288%29%27%3E%3Cpath%20d%3D%27M0%200%20C3%20-3%209%20-3%2012%200%20C9%203%203%203%200%200%20Z%27%2F%3E%3Cpath%20d%3D%27M2%200%20H10%27%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2740%27%20cy%3D%2744%27%20r%3D%271.3%27%2F%3E%3Ccircle%20cx%3D%2745%27%20cy%3D%2748%27%20r%3D%271.3%27%2F%3E%3Ccircle%20cx%3D%2782%27%20cy%3D%2774%27%20r%3D%271.3%27%2F%3E%3Ccircle%20cx%3D%2780%27%20cy%3D%2713%27%20r%3D%271.3%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+    background-size:96px 96px; line-height:1.5; min-height:100vh; padding:clamp(1.5rem,5vw,4rem) 1.25rem;
   }
   .wrap { max-width:1240px; margin:0 auto; }
   .layout { display:flex; gap:1rem; align-items:flex-start; }
@@ -38,8 +38,8 @@
   .tagline { font-size:1.05rem; color:var(--soil); max-width:34ch; }
   .menu { display:flex; flex-direction:column; gap:0.15rem; flex:0 0 160px; position:sticky; top:1rem; align-self:flex-start; }
   .menu a { display:flex; align-items:center; gap:0.5rem; font-family:inherit; font-size:0.9rem; font-weight:600; color:var(--soil); text-decoration:none; padding:0.5rem 0.75rem; border-radius:4px; border-left:3px solid transparent; }
-  .menu a:hover { color:var(--ink); background:var(--plot); }
-  .menu a.active { color:var(--seedling); background:var(--plot); border-left-color:var(--seedling); }
+  .menu a:hover { color:var(--ink); background:rgba(94,147,103,0.07); }
+  .menu a.active { color:var(--seedling); background:rgba(94,147,103,0.14); border-left-color:var(--seedling); }
   .menu a:focus-visible { outline:2px solid var(--seedling); outline-offset:2px; }
   .mi { fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex:none; }
   .menu a .mi { width:18px; height:18px; }
@@ -52,9 +52,10 @@
 
   /* zone bar */
   .zone {
-    margin:1.25rem 0 0; max-width:760px; background:var(--plot); border:1px solid rgba(122,106,85,0.22); border-radius:4px;
+    position:relative; overflow:hidden; margin:1.25rem 0 0; max-width:760px; background:var(--plot); border:1px solid rgba(122,106,85,0.22); border-radius:4px;
     padding:0.75rem 1rem; font-size:0.88rem; box-shadow:0 1px 2px rgba(32,57,43,0.06), 0 6px 16px -4px rgba(32,57,43,0.11);
   }
+  .zone::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--seedling); }
   .zone summary { cursor:pointer; color:var(--ink); list-style:none; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; }
   .zone summary::-webkit-details-marker { display:none; }
   .zone summary .val { color:var(--seedling); font-weight:600; }
@@ -71,6 +72,7 @@
   .plot::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--seedling); }
   .plot.soil::before { background:var(--soil); }
   .plot.tomato::before { background:var(--tomato); }
+  .grid-bg { background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px); background-size:26px 26px; }
   .marker { display:flex; align-items:center; gap:0.5rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.16em; font-weight:600; color:var(--soil); margin-bottom:0.5rem; }
   .plot h2 { font-family:'Fraunces',serif; font-weight:500; font-size:1.4rem; margin-bottom:0.5rem; }
   .plot p.lede { color:var(--soil); font-size:0.97rem; max-width:46ch; }
@@ -314,7 +316,7 @@
 
       <div class="view" data-view="beds">
 
-      <section class="plot soil">
+      <section class="plot soil grid-bg">
         <p class="marker" data-ic="beds">Bed planner</p>
         <h2>Your beds, on a grid</h2>
         <p class="lede">Lay out each bed square by square and see exactly what's growing where.</p>
@@ -358,7 +360,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.17</span>
+      <span>Built by gigi-lang &middot; v0.18</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>

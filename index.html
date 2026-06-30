@@ -419,7 +419,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.29</span>
+      <span>Built by gigi-lang &middot; v0.30</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -514,7 +514,7 @@
       pests:[{p:'Cabbage worm/looper',d:'row cover; Bt; nasturtium as a trap'},{p:'Aphids',d:'water blast; beneficials'}],
       note:'For white heads, blanch them: tie the outer leaves over the curd once it\u2019s egg-sized (unless yours is self-blanching).' },
 
-    { match:['basil'], name:'Basil', ht:2, sfg:4, fam:'Herb \u00b7 annual', season:'warm', from:'sow', indoors:5, dtm:[50,70],
+    { match:['basil'], name:'Basil', ht:2, sfg:1, fam:'Herb \u00b7 annual', season:'warm', from:'sow', indoors:5, dtm:[50,70],
       sun:'Full sun', soil:'Rich, moist, well-draining', water:'Regular \u2014 keep it from wilting', feed:'Light; too much makes it leafy but bland',
       companions:['Tomatoes','Peppers'], avoid:['Rue'],
       pests:[{p:'Aphids',d:'water blast; beneficials'},{p:'Slugs',d:'remove hiding spots; traps'}],
@@ -574,7 +574,7 @@
       pests:[{p:'Flea beetle',d:'row-cover young plants; they riddle leaves with tiny holes'},{p:'Aphids',d:'blast with water; ladybugs'}],
       note:'A heat lover - do not rush it outside. Harvest when the skin is glossy; dull skin means it is past its best.' },
 
-    { match:['potato'], name:'Potatoes', ht:2, sfg:1, fam:'Nightshade family', season:'cool', from:'sow', indoors:null, dtm:[70,120],
+    { match:['potato'], name:'Potatoes', deep:true, ht:2, sfg:1, fam:'Nightshade family', season:'cool', from:'sow', indoors:null, dtm:[70,120],
       sun:'Full sun', soil:'Loose, slightly acidic', water:'Even while tubers form', feed:'Moderate; avoid high nitrogen',
       companions:['Beans','Corn','Marigold','Horseradish'], avoid:['Tomatoes','Squash family','Sunflower'],
       pests:[{p:'Colorado potato beetle',d:'hand-pick the adults and the orange egg clusters'},{p:'Aphids',d:'blast with water; ladybugs'}],
@@ -712,7 +712,7 @@
       pests:[{p:'Aphids',d:'rare - chives actually help repel them'},{p:'Thrips',d:'blast with water'}],
       note:'A tidy little perennial that comes back every spring. The purple flowers are edible, and it helps keep aphids and carrot fly away. Snip as needed.' },
 
-    { match:['corn','sweet corn','maize'], name:'Sweet corn', ht:3, sfg:1, fam:'Grass family', season:'warm', from:'sow', indoors:null, dtm:[60,90],
+    { match:['corn','sweet corn','maize'], name:'Sweet corn', block:true, ht:3, sfg:1, fam:'Grass family', season:'warm', from:'sow', indoors:null, dtm:[60,90],
       sun:'Full sun', soil:'Rich, well-draining', water:'Consistent, especially at tasseling', feed:'High nitrogen - it is a hungry crop',
       companions:['Beans','Squash','Cucumbers','Peas'], avoid:['Tomatoes'],
       pests:[{p:'Corn earworm',d:'a few drops of oil on the silk; accept some tip damage'},{p:'Aphids',d:'blast with water; ladybugs'}],
@@ -971,7 +971,13 @@
     const h1 = fmt(addDays(start, d1));
     const basis = (st.headStart === 0) ? (g.from === 'transplant' ? 'from transplant' : 'from sowing') : 'from planting out';
     rows.push({ ic:'\u2713', txt:'Likely harvest around <b>'+h0+'\u2013'+h1+'</b> ('+d0+'\u2013'+d1+' days '+basis+').' });
-    if (g.sfg){ rows.push({ ic:'\u25a6', txt:'Square-foot spacing: <b>'+g.sfg+' per square</b>'+(g.sprawl?' \u2014 but it sprawls, so give it extra room':'')+'.' }); }
+    if (g.sfg){
+      let sfgEx = '';
+      if (g.sprawl) sfgEx = ' \u2014 but it sprawls, so give it extra room';
+      else if (g.block) sfgEx = ' \u2014 plant several squares together as a block so it pollinates well';
+      else if (g.deep) sfgEx = ' \u2014 but it wants deep, hilled soil, so a shallow box caps the yield';
+      rows.push({ ic:'\u25a6', txt:'Square-foot spacing: <b>'+g.sfg+' per square</b>'+sfgEx+'.' });
+    }
 
     // sow / transplant guidance, tuned to zone if set
     const last = zoneCfg.last;

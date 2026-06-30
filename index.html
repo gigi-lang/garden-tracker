@@ -218,6 +218,12 @@
   .bed-warn .bw-ic { font-weight:700; margin-right:0.3rem; }
   .bed-shade { margin-top:0.5rem; font-size:0.82rem; line-height:1.4; color:var(--soil); background:rgba(122,106,85,0.08); border:1px solid rgba(122,106,85,0.25); border-radius:6px; padding:0.5rem 0.7rem; }
   .bed-shade .bw-ic { font-weight:700; margin-right:0.3rem; }
+  .sfg-cell.rot { outline:2px dashed #9b6a9e; outline-offset:1px; }
+  .bed-rot { margin-top:0.5rem; font-size:0.82rem; line-height:1.4; color:#7a4f7e; background:rgba(155,106,158,0.10); border:1px solid rgba(155,106,158,0.30); border-radius:6px; padding:0.5rem 0.7rem; }
+  .bed-rot .bw-ic { font-weight:700; margin-right:0.3rem; }
+  .bed-hist { font-size:0.78rem; color:var(--soil); margin:0.5rem 0 0; }
+  .bed-season { margin-top:0.6rem; font-size:0.8rem; font-family:inherit; color:var(--evergreen); background:none; border:1px solid var(--line); border-radius:6px; padding:0.35rem 0.75rem; cursor:pointer; transition:background .15s, border-color .15s; }
+  .bed-season:hover { background:var(--wash); border-color:var(--evergreen); }
   @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
 </style>
 </head>
@@ -413,7 +419,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.28</span>
+      <span>Built by gigi-lang &middot; v0.29</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -1277,7 +1283,7 @@
   /* ---------- beds (v0.25) ---------- */
   const BEDS_KEY = 'garden-tracker:beds';
   let beds = [];
-  function loadBeds(){ try { const r=localStorage.getItem(BEDS_KEY); beds = r?JSON.parse(r):[]; } catch(e){ beds=[]; } beds.forEach(function(b){ if(!b.cols) b.cols=4; if(!b.rows) b.rows=4; if(!b.grid) b.grid={}; Object.keys(b.grid).forEach(function(k){ if (typeof b.grid[k] === 'string') b.grid[k] = { c:b.grid[k], n:sfgMax(b.grid[k]) }; }); }); }
+  function loadBeds(){ try { const r=localStorage.getItem(BEDS_KEY); beds = r?JSON.parse(r):[]; } catch(e){ beds=[]; } beds.forEach(function(b){ if(!b.cols) b.cols=4; if(!b.rows) b.rows=4; if(!b.grid) b.grid={}; if(!b.history) b.history=[]; Object.keys(b.grid).forEach(function(k){ if (typeof b.grid[k] === 'string') b.grid[k] = { c:b.grid[k], n:sfgMax(b.grid[k]) }; }); }); }
   function saveBeds(){ try { localStorage.setItem(BEDS_KEY, JSON.stringify(beds)); } catch(e){} }
   function escBed(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   function bedName(id){ if(!id) return ''; const b = beds.find(function(x){ return x.id===id; }); return b ? b.name : ''; }
@@ -1371,6 +1377,39 @@
     }
     return { shaded:Object.keys(shaded), tall:Object.keys(tall) };
   }
+  function famKey(k){
+    const g = guideByKey(k); if (!g || !g.fam) return '';
+    const f = normalize(g.fam);
+    if (f.indexOf('nightshade') >= 0) return 'nightshade';
+    if (f.indexOf('brassica') >= 0) return 'brassica';
+    if (f.indexOf('cucurbit') >= 0) return 'cucurbit';
+    if (f.indexOf('allium') >= 0) return 'allium';
+    if (f.indexOf('legume') >= 0) return 'legume';
+    if (f.indexOf('umbellifer') >= 0) return 'umbellifer';
+    if (f.indexOf('mallow') >= 0) return 'mallow';
+    if (f.indexOf('grass') >= 0) return 'grass';
+    if (f.indexOf('leafy') >= 0) return 'leafy';
+    if (f.indexOf('root vegetable') >= 0) return 'chenopod';
+    return '';
+  }
+  function famLabel(fk){
+    return ({nightshade:'nightshades', brassica:'brassicas', cucurbit:'the squash family', allium:'alliums', legume:'legumes', umbellifer:'the carrot family', mallow:'mallows', grass:'grasses', leafy:'leafy greens', chenopod:'beets'})[fk] || fk;
+  }
+  function bedRotation(b){
+    const cells = {}; const noteSet = {};
+    const recent = (b.history || []).slice(-2);
+    if (!recent.length) return { cells:cells, notes:[] };
+    Object.keys(b.grid).forEach(function(key){
+      const v = b.grid[key]; if (!v || !v.c) return;
+      const fk = famKey(v.c); if (!fk) return;
+      for (let i=recent.length-1;i>=0;i--){
+        const pc = recent[i].cells ? recent[i].cells[key] : null;
+        if (pc && famKey(pc) === fk){ cells[key] = true; noteSet[escBed(v.c)+'|'+fk] = { crop:escBed(v.c), fam:famLabel(fk) }; break; }
+      }
+    });
+    const notes = Object.keys(noteSet).map(function(k){ const o=noteSet[k]; return o.crop+' \u2014 '+o.fam+' grew here last season'; });
+    return { cells:cells, notes:notes };
+  }
   let sfgBrush = null;
   function renderBeds(){
     const body = document.getElementById('beds-body'); if(!body) return;
@@ -1388,6 +1427,7 @@
     beds.forEach(function(b){
       const cl = bedClashes(b);
       const sh = bedShade(b);
+      const rot = bedRotation(b);
       h += '<div class="bed-card"><button class="bed-remove" data-bed="'+b.id+'" title="Remove bed" aria-label="Remove bed">\u00d7</button><h3></h3>';
       if (palette.length){
         h += '<div class="sfg-palette">';
@@ -1407,7 +1447,7 @@
             const mx = sfgMax(cell.c); const col = cropColors[cell.c] || 'var(--seedling)'; const cols2 = holeCols(mx);
             let dots = '';
             for (let i=0;i<mx;i++){ dots += '<div class="sfg-hole"'+(i<cell.n?' style="background:'+col+'"':'')+'></div>'; }
-            h += '<div class="sfg-cell'+(cl.cells[key]?' clash':'')+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')"><div class="sfg-holes" style="grid-template-columns:repeat('+cols2+',1fr)">'+dots+'</div></div>';
+            h += '<div class="sfg-cell'+(cl.cells[key]?' clash':'')+(rot.cells[key]?' rot':'')+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')"><div class="sfg-holes" style="grid-template-columns:repeat('+cols2+',1fr)">'+dots+'</div></div>';
           } else {
             h += '<div class="sfg-cell empty" data-bed="'+b.id+'" data-key="'+key+'"></div>';
           }
@@ -1416,7 +1456,10 @@
       h += '</div></div>';
       if (cl.pairs.length){ h += '<div class="bed-warn"><span class="bw-ic">\u26a0</span>Keep apart \u2014 ' + cl.pairs.map(function(p){ const ab=p.split('|'); return escBed(ab[0])+' &amp; '+escBed(ab[1]); }).join('; ') + '</div>'; }
       if (sh.shaded.length){ h += '<div class="bed-shade"><span class="bw-ic">\u263c</span>Shade risk \u2014 move taller crops (' + sh.tall.map(escBed).join(', ') + ') to the north (top) edge so they don\u2019t shade ' + sh.shaded.map(escBed).join(', ') + '.</div>'; }
+      if (rot.notes.length){ h += '<div class="bed-rot"><span class="bw-ic">\u21bb</span>Rotation \u2014 ' + rot.notes.join('; ') + '. Try a different square.</div>'; }
       h += '<p class="sfg-hint">Pick a crop, then tap a square to plant one \u2014 tap again to add more, up to the square\u2019s limit. Tap with nothing selected to clear.</p>';
+      if (b.history && b.history.length){ h += '<p class="bed-hist">Remembered: ' + b.history.map(function(s){ return escBed(s.label); }).join(', ') + '</p>'; }
+      h += '<button class="bed-season" data-bed="'+b.id+'">\u21bb Start next season</button>';
       h += '</div>';
     });
     body.innerHTML = h;
@@ -1447,6 +1490,22 @@
         beds = beds.filter(function(x){ return x.id !== id; });
         plantings.forEach(function(p){ if (p.bed === id) p.bed = ''; });
         saveBeds(); save(); render();
+      });
+    });
+    body.querySelectorAll('.bed-season').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        const b = beds.find(function(x){ return x.id===btn.getAttribute('data-bed'); }); if(!b) return;
+        const filled = Object.keys(b.grid).filter(function(k){ return b.grid[k] && b.grid[k].c; });
+        if (!filled.length){ window.alert('Plant something first \u2014 there is nothing to save to this bed\u2019s history yet.'); return; }
+        if (!window.confirm('Start next season? This layout is saved to the bed\u2019s history and the grid clears for fresh planning. Rotation warnings will then flag any family you replant where it just grew.')) return;
+        const cells = {}; filled.forEach(function(k){ cells[k] = b.grid[k].c; });
+        let label = String(new Date().getFullYear());
+        const used = b.history.map(function(s){ return s.label; });
+        if (used.indexOf(label) >= 0){ let nn=2; while(used.indexOf(label+' \u00b7'+nn)>=0) nn++; label = label+' \u00b7'+nn; }
+        b.history.push({ label:label, cells:cells });
+        if (b.history.length > 4) b.history = b.history.slice(-4);
+        b.grid = {};
+        saveBeds(); render();
       });
     });
   }

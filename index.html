@@ -419,7 +419,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.30</span>
+      <span>Built by gigi-lang &middot; v0.31</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -1024,6 +1024,10 @@
     if (g.succ){
       const through = (g.season === 'cool') ? ', pausing through the peak of summer heat,' : ' through midsummer';
       rows.push({ ic:'\u2740', txt:'Quick to mature \u2014 sow a small batch every <b>'+g.succ[0]+'\u2013'+g.succ[1]+' weeks</b>'+through+' for a steady supply instead of one glut.' });
+    }
+    // heat gap: cool-season crops bolt or stall in peak summer
+    if (g.season === 'cool'){
+      rows.push({ ic:'\u2600', txt:'<b>Heat gap</b> \u2014 it bolts or stalls in the peak of summer, so skip a midsummer sowing and grow it in spring and again for fall.' });
     }
     if (!last){ rows.push({ ic:'\u2691', txt:'<i>Set your zone above to turn these into calendar dates.</i>' }); }
     return rows;

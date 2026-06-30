@@ -213,6 +213,9 @@
   .sfg-holes { display:grid; gap:2px; width:100%; height:100%; }
   .sfg-hole { border-radius:50%; background:rgba(122,106,85,0.16); }
   .sfg-hint { font-size:0.8rem; color:var(--soil); margin:0.5rem 0 0; }
+  .sfg-cell.clash { box-shadow:0 0 0 2px var(--tomato); position:relative; z-index:1; }
+  .bed-warn { margin-top:0.6rem; font-size:0.82rem; line-height:1.4; color:var(--tomato); background:rgba(207,94,82,0.08); border:1px solid rgba(207,94,82,0.25); border-radius:6px; padding:0.5rem 0.7rem; }
+  .bed-warn .bw-ic { font-weight:700; margin-right:0.3rem; }
   @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
 </style>
 </head>
@@ -408,7 +411,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.26</span>
+      <span>Built by gigi-lang &middot; v0.27</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -1304,6 +1307,53 @@
   function guideByKey(k){ for (let i=0;i<GUIDE.length;i++){ if (GUIDE[i].name===k) return GUIDE[i]; } return null; }
   function sfgMax(k){ const g=guideByKey(k); return (g&&g.sfg)?g.sfg:1; }
   function holeCols(m){ return Math.ceil(Math.sqrt(m)); }
+  /* companion adjacency (v0.27) */
+  const ADJ_GROUPS = [
+    { re:/squash|cucurbit|gourd|melon/, fam:'cucurbit' },
+    { re:/brassica|cole/, fam:'brassica' },
+    { re:/allium/, fam:'allium' },
+    { re:/nightshade/, fam:'nightshade' },
+    { re:/legume/, fam:'legume' }
+  ];
+  function adjStem(s){ return normalize(s).split(/\s+/).map(function(w){ return w.replace(/(es|s)$/,''); }).join(' ').trim(); }
+  function adjTokens(entry){ return entry.replace(/\([^)]*\)/g,'').split(/[\/&,]/).map(function(x){ return x.trim(); }).filter(Boolean); }
+  function adjWordHit(cand, tok){
+    const c = adjStem(cand), t = adjStem(tok); if (!t || !c) return false;
+    const esc = function(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); };
+    return new RegExp('\\b'+esc(t)+'\\b').test(c) || new RegExp('\\b'+esc(c)+'\\b').test(t);
+  }
+  function entryHitsCrop(entry, g){
+    if (!g) return false;
+    const cands = [g.name].concat(g.match || []);
+    const fam = normalize(g.fam || '');
+    return adjTokens(entry).some(function(tok){
+      if (cands.some(function(c){ return adjWordHit(c, tok); })) return true;
+      const grp = ADJ_GROUPS.find(function(G){ return G.re.test(normalize(tok)); });
+      return grp ? fam.indexOf(grp.fam) >= 0 : false;
+    });
+  }
+  function clashBetween(aKey, bKey){
+    const ga = guideByKey(aKey), gb = guideByKey(bKey); if (!ga || !gb) return false;
+    return (ga.avoid || []).some(function(e){ return entryHitsCrop(e, gb); })
+        || (gb.avoid || []).some(function(e){ return entryHitsCrop(e, ga); });
+  }
+  function bedClashes(b){
+    const pairs = {}; const cells = {};
+    function cr(r, c){ const v = b.grid[r+'-'+c]; return (v && v.c) ? v.c : null; }
+    for (let r=0;r<b.rows;r++){
+      for (let c=0;c<b.cols;c++){
+        const a = cr(r,c); if (!a) continue;
+        [[r,c+1],[r+1,c]].forEach(function(nb){
+          const o = cr(nb[0], nb[1]); if (!o || o === a) return;
+          if (clashBetween(a, o)){
+            pairs[[a,o].sort().join('|')] = true;
+            cells[r+'-'+c] = true; cells[nb[0]+'-'+nb[1]] = true;
+          }
+        });
+      }
+    }
+    return { pairs:Object.keys(pairs), cells:cells };
+  }
   let sfgBrush = null;
   function renderBeds(){
     const body = document.getElementById('beds-body'); if(!body) return;
@@ -1319,6 +1369,7 @@
     });
     let h = '';
     beds.forEach(function(b){
+      const cl = bedClashes(b);
       h += '<div class="bed-card"><button class="bed-remove" data-bed="'+b.id+'" title="Remove bed" aria-label="Remove bed">\u00d7</button><h3></h3>';
       if (palette.length){
         h += '<div class="sfg-palette">';
@@ -1338,13 +1389,14 @@
             const mx = sfgMax(cell.c); const col = cropColors[cell.c] || 'var(--seedling)'; const cols2 = holeCols(mx);
             let dots = '';
             for (let i=0;i<mx;i++){ dots += '<div class="sfg-hole"'+(i<cell.n?' style="background:'+col+'"':'')+'></div>'; }
-            h += '<div class="sfg-cell" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')"><div class="sfg-holes" style="grid-template-columns:repeat('+cols2+',1fr)">'+dots+'</div></div>';
+            h += '<div class="sfg-cell'+(cl.cells[key]?' clash':'')+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')"><div class="sfg-holes" style="grid-template-columns:repeat('+cols2+',1fr)">'+dots+'</div></div>';
           } else {
             h += '<div class="sfg-cell empty" data-bed="'+b.id+'" data-key="'+key+'"></div>';
           }
         }
       }
       h += '</div></div>';
+      if (cl.pairs.length){ h += '<div class="bed-warn"><span class="bw-ic">\u26a0</span>Keep apart \u2014 ' + cl.pairs.map(function(p){ const ab=p.split('|'); return escBed(ab[0])+' &amp; '+escBed(ab[1]); }).join('; ') + '</div>'; }
       h += '<p class="sfg-hint">Pick a crop, then tap a square to plant one \u2014 tap again to add more, up to the square\u2019s limit. Tap with nothing selected to clear.</p>';
       h += '</div>';
     });

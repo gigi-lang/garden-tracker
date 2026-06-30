@@ -224,6 +224,10 @@
   .bed-hist { font-size:0.78rem; color:var(--soil); margin:0.5rem 0 0; }
   .bed-season { margin-top:0.6rem; font-size:0.8rem; font-family:inherit; color:var(--evergreen); background:none; border:1px solid var(--line); border-radius:6px; padding:0.35rem 0.75rem; cursor:pointer; transition:background .15s, border-color .15s; }
   .bed-season:hover { background:var(--wash); border-color:var(--evergreen); }
+  .sfg-cell.spread { position:relative; }
+  .sfg-cell.spread::after { content:"\2922"; position:absolute; right:2px; bottom:0; font-size:10px; line-height:1; color:var(--soil); opacity:0.75; pointer-events:none; }
+  .bed-spread { margin-top:0.5rem; font-size:0.82rem; line-height:1.4; color:var(--soil); background:rgba(122,106,85,0.06); border:1px solid rgba(122,106,85,0.22); border-radius:6px; padding:0.5rem 0.7rem; }
+  .bed-spread .bw-ic { font-weight:700; margin-right:0.3rem; }
   @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
 </style>
 </head>
@@ -419,7 +423,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.31</span>
+      <span>Built by gigi-lang &middot; v0.32</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -1457,7 +1461,7 @@
             const mx = sfgMax(cell.c); const col = cropColors[cell.c] || 'var(--seedling)'; const cols2 = holeCols(mx);
             let dots = '';
             for (let i=0;i<mx;i++){ dots += '<div class="sfg-hole"'+(i<cell.n?' style="background:'+col+'"':'')+'></div>'; }
-            h += '<div class="sfg-cell'+(cl.cells[key]?' clash':'')+(rot.cells[key]?' rot':'')+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')"><div class="sfg-holes" style="grid-template-columns:repeat('+cols2+',1fr)">'+dots+'</div></div>';
+            h += '<div class="sfg-cell'+(cl.cells[key]?' clash':'')+(rot.cells[key]?' rot':'')+((guideByKey(cell.c)||{}).sprawl?' spread':'')+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')"><div class="sfg-holes" style="grid-template-columns:repeat('+cols2+',1fr)">'+dots+'</div></div>';
           } else {
             h += '<div class="sfg-cell empty" data-bed="'+b.id+'" data-key="'+key+'"></div>';
           }
@@ -1467,6 +1471,8 @@
       if (cl.pairs.length){ h += '<div class="bed-warn"><span class="bw-ic">\u26a0</span>Keep apart \u2014 ' + cl.pairs.map(function(p){ const ab=p.split('|'); return escBed(ab[0])+' &amp; '+escBed(ab[1]); }).join('; ') + '</div>'; }
       if (sh.shaded.length){ h += '<div class="bed-shade"><span class="bw-ic">\u263c</span>Shade risk \u2014 move taller crops (' + sh.tall.map(escBed).join(', ') + ') to the north (top) edge so they don\u2019t shade ' + sh.shaded.map(escBed).join(', ') + '.</div>'; }
       if (rot.notes.length){ h += '<div class="bed-rot"><span class="bw-ic">\u21bb</span>Rotation \u2014 ' + rot.notes.join('; ') + '. Try a different square.</div>'; }
+      var spreads = {}; Object.keys(b.grid).forEach(function(k){ var vv=b.grid[k]; if (vv && vv.c){ var gg=guideByKey(vv.c); if (gg && gg.sprawl) spreads[vv.c]=true; } });
+      if (Object.keys(spreads).length){ h += '<div class="bed-spread"><span class="bw-ic">\u2922</span>Give room \u2014 ' + Object.keys(spreads).map(escBed).join(', ') + ' sprawl, so leave a square or two open around each.</div>'; }
       h += '<p class="sfg-hint">Pick a crop, then tap a square to plant one \u2014 tap again to add more, up to the square\u2019s limit. Tap with nothing selected to clear.</p>';
       if (b.history && b.history.length){ h += '<p class="bed-hist">Remembered: ' + b.history.map(function(s){ return escBed(s.label); }).join(', ') + '</p>'; }
       h += '<button class="bed-season" data-bed="'+b.id+'">\u21bb Start next season</button>';

@@ -13,6 +13,7 @@
     --ink:#20392b; --paper:#eef0e4; --plot:#f7f8f1; --inset:#fff; --wash:#f3f5ec;
     --seedling:#5e9367; --evergreen:#3f6f4d; --evergreen-dk:#345d40;
     --tomato:#cf5e52; --soil:#7a6a55; --line:rgba(122,106,85,0.16);
+    --rotation:#7a4f7e; --rotation-ring:#9b6a9e;
   }
   /* spacing scale: 0.25 / 0.5 / 0.75 / 1 / 1.25 / 1.5 / 2 rem (4-32px) */
   /* type scale: 3.1 display · 1.9 lead · 1.4 card · 1.05 tagline · 1 body · 0.7 eyebrow */
@@ -195,9 +196,6 @@
   .bed-card h3 { font-family:'Fraunces',serif; font-weight:500; font-size:1.15rem; line-height:1.2; margin:0 0 0.6rem; color:var(--ink); }
   .bed-card .bed-remove { position:absolute; top:0.75rem; right:0.9rem; background:none; border:none; cursor:pointer; color:var(--soil); font-size:1.2rem; line-height:1; transition:color .15s; }
   .bed-card .bed-remove:hover { color:var(--tomato); }
-  .bed-rows { display:grid; gap:0.45rem; }
-  .bed-row { display:flex; justify-content:space-between; align-items:baseline; gap:0.75rem; font-size:0.875rem; color:var(--ink); }
-  .bed-row .bp-fam { color:var(--soil); font-size:0.8rem; white-space:nowrap; }
   .bed-empty { color:var(--soil); font-size:0.875rem; font-style:italic; }
   /* sfg planner (v0.25) */
   .bed-add { flex-wrap:wrap; }
@@ -222,8 +220,8 @@
   .bed-warn .bw-ic { font-weight:700; margin-right:0.3rem; }
   .bed-shade { margin-top:0.5rem; font-size:0.82rem; line-height:1.4; color:var(--soil); background:rgba(122,106,85,0.08); border:1px solid rgba(122,106,85,0.25); border-radius:6px; padding:0.5rem 0.7rem; }
   .bed-shade .bw-ic { font-weight:700; margin-right:0.3rem; }
-  .sfg-cell.rot { outline:2px dashed #9b6a9e; outline-offset:1px; }
-  .bed-rot { margin-top:0.5rem; font-size:0.82rem; line-height:1.4; color:#7a4f7e; background:rgba(155,106,158,0.10); border:1px solid rgba(155,106,158,0.30); border-radius:6px; padding:0.5rem 0.7rem; }
+  .sfg-cell.rot { outline:2px dashed var(--rotation-ring); outline-offset:1px; }
+  .bed-rot { margin-top:0.5rem; font-size:0.82rem; line-height:1.4; color:var(--rotation); background:rgba(155,106,158,0.10); border:1px solid rgba(155,106,158,0.30); border-radius:6px; padding:0.5rem 0.7rem; }
   .bed-rot .bw-ic { font-weight:700; margin-right:0.3rem; }
   .bed-hist { font-size:0.78rem; color:var(--soil); margin:0.5rem 0 0; }
   .bed-season { margin-top:0.6rem; font-size:0.8rem; font-family:inherit; color:var(--evergreen); background:none; border:1px solid var(--line); border-radius:6px; padding:0.35rem 0.75rem; cursor:pointer; transition:background .15s, border-color .15s; }
@@ -428,7 +426,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.35</span>
+      <span>Built by gigi-lang &middot; v0.36</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>

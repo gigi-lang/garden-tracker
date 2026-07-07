@@ -315,7 +315,8 @@
         <form class="add-form" id="add-form">
           <div class="field">
             <label for="name">Plant</label>
-            <input id="name" type="text" placeholder="Cherry tomatoes" required autocomplete="off" />
+            <input id="name" type="text" placeholder="Cherry tomatoes" required autocomplete="off" list="plant-options" />
+            <datalist id="plant-options"></datalist>
           </div>
           <div class="row">
             <div class="field">
@@ -423,7 +424,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.33</span>
+      <span>Built by gigi-lang &middot; v0.34</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -974,7 +975,7 @@
     const h0 = fmt(addDays(start, d0));
     const h1 = fmt(addDays(start, d1));
     const basis = (st.headStart === 0) ? (g.from === 'transplant' ? 'from transplant' : 'from sowing') : 'from planting out';
-    rows.push({ ic:'\u2713', txt:'Likely harvest around <b>'+h0+'\u2013'+h1+'</b> ('+d0+'\u2013'+d1+' days '+basis+').' });
+    rows.push({ ic:'\u2713', txt:'Likely harvest around <b>~'+h0+'\u2013'+h1+'</b> ('+d0+'\u2013'+d1+' days '+basis+').' });
     if (g.sfg){
       let sfgEx = '';
       if (g.sprawl) sfgEx = ' \u2014 but it sprawls, so give it extra room';
@@ -998,7 +999,7 @@
       rows.push({ ic:'\u2740', txt:'Cool-season \u2014 best in early spring'+(last?' (around your last frost, '+fmt(last)+')':'')+'.' });
     } else { // warm, from seed
       if (g.indoors){
-        const indoorTxt = last ? ' (around <b>'+fmt(addDays(asDate(last), -g.indoors*7))+'</b>)' : '';
+        const indoorTxt = last ? ' (~<b>'+fmt(addDays(asDate(last), -g.indoors*7))+'</b>)' : '';
         const outTxt = last ? ' (after <b>'+fmt(last)+'</b>)' : '';
         rows.push({ ic:'\u2740', txt:'Start indoors ~'+g.indoors+' weeks before last frost'+indoorTxt+', then move outside once frost has passed'+outTxt+'.' });
       } else {
@@ -1026,7 +1027,7 @@
     }
     // succession: stagger quick crops for a steady supply
     if (g.succ){
-      const through = (g.season === 'cool') ? ', pausing through the peak of summer heat,' : ' through midsummer';
+      const through = (g.season === 'cool') ? '' : ' through midsummer';
       rows.push({ ic:'\u2740', txt:'Quick to mature \u2014 sow a small batch every <b>'+g.succ[0]+'\u2013'+g.succ[1]+' weeks</b>'+through+' for a steady supply instead of one glut.' });
     }
     // heat gap: cool-season crops bolt or stall in peak summer
@@ -1301,6 +1302,11 @@
   function saveBeds(){ try { localStorage.setItem(BEDS_KEY, JSON.stringify(beds)); } catch(e){} }
   function escBed(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   function bedName(id){ if(!id) return ''; const b = beds.find(function(x){ return x.id===id; }); return b ? b.name : ''; }
+  function populatePlantList(){
+    const dl = document.getElementById('plant-options'); if(!dl) return;
+    const names = GUIDE.map(function(g){ return g.name; }).sort(function(a,b){ return a.localeCompare(b); });
+    dl.innerHTML = names.map(function(n){ return '<option value="'+n.replace(/"/g,'&quot;')+'"></option>'; }).join('');
+  }
   function populateBedSelect(){
     const sel = document.getElementById('plbed'); if(!sel) return;
     const cur = sel.value;
@@ -1728,6 +1734,7 @@
     calState.y = today.getFullYear(); calState.m = today.getMonth();
   })();
   injectIcons();
+  populatePlantList();
   render();
 </script>
 </body>

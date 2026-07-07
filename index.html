@@ -118,6 +118,10 @@
   .plant .name { font-weight:600; font-size:1rem; }
   .plant .meta { font-size:0.8rem; color:var(--soil); margin-top:0.1rem; }
   .plant .note { font-size:0.875rem; margin-top:0.25rem; color:var(--ink); }
+  .plant .pl-bed { display:flex; align-items:center; gap:0.5rem; margin-top:0.4rem; }
+  .plant .pl-bed label { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; }
+  .plant .pl-bed select { font-family:inherit; font-size:0.8rem; color:var(--ink); background:var(--inset); border:1px solid var(--line); border-radius:4px; padding:0.25rem 0.5rem; transition:border-color .15s; }
+  .plant .pl-bed select:focus { outline:2px solid var(--seedling); outline-offset:1px; border-color:var(--seedling); }
   .age { font-size:0.7rem; letter-spacing:0.04em; color:var(--evergreen); background:rgba(94,147,103,0.12); border-radius:999px; padding:0.15rem 0.6rem; white-space:nowrap; align-self:center; }
   .remove { background:none; border:none; cursor:pointer; color:var(--soil); font-size:1.1rem; line-height:1; padding:0.2rem; opacity:0.6; align-self:center; }
   .remove:hover { opacity:1; color:var(--tomato); }
@@ -424,7 +428,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.34</span>
+      <span>Built by gigi-lang &middot; v0.35</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -1365,6 +1369,14 @@
     return (ga.avoid || []).some(function(e){ return entryHitsCrop(e, gb); })
         || (gb.avoid || []).some(function(e){ return entryHitsCrop(e, ga); });
   }
+  function bedClashCrops(b, cropName, selfId){
+    const set = {};
+    Object.keys(b.grid).forEach(function(k){ const v=b.grid[k]; if (v && v.c) set[v.c]=true; });
+    plantings.forEach(function(pp){ if (pp.bed===b.id && pp.id!==selfId){ const gg=matchGuide(pp.name); if (gg) set[gg.name]=true; } });
+    const out = [];
+    Object.keys(set).forEach(function(cn){ if (cn!==cropName && clashBetween(cropName, cn)) out.push(cn); });
+    return out;
+  }
   function bedClashes(b){
     const pairs = {}; const cells = {};
     function cr(r, c){ const v = b.grid[r+'-'+c]; return (v && v.c) ? v.c : null; }
@@ -1437,17 +1449,15 @@
       body.innerHTML = '<p class="bed-empty" style="margin-top:1rem;">No beds yet. Add one above with its size in feet, then lay out what grows where.</p>';
       return;
     }
-    const palette = []; const seen = {};
-    plantings.forEach(function(p){
-      const g = matchGuide(p.name); if (!g || !g.sfg) return;
-      if (seen[g.name]) return; seen[g.name]=true;
-      palette.push({ key:g.name, sfg:g.sfg, color:cropColor(p.name) });
-    });
     let h = '';
     beds.forEach(function(b){
       const cl = bedClashes(b);
       const sh = bedShade(b);
       const rot = bedRotation(b);
+      const palette = []; const seen = {};
+      function addBrush(nm){ const g = matchGuide(nm); if (!g || !g.sfg) return; if (seen[g.name]) return; seen[g.name]=true; palette.push({ key:g.name, sfg:g.sfg, color:cropColor(nm) }); }
+      plantings.forEach(function(p){ if (p.bed === b.id) addBrush(p.name); });
+      Object.keys(b.grid).forEach(function(k){ const v=b.grid[k]; if (v && v.c) addBrush(v.c); });
       h += '<div class="bed-card"><button class="bed-remove" data-bed="'+b.id+'" title="Remove bed" aria-label="Remove bed">\u00d7</button><h3></h3>';
       if (palette.length){
         h += '<div class="sfg-palette">';
@@ -1457,7 +1467,7 @@
         h += '<button class="sfg-chip'+(sfgBrush==='__erase__'?' active':'')+'" data-crop="__erase__">\u232b Erase</button>';
         h += '</div>';
       } else {
-        h += '<p class="sfg-hint">Add a plant on the Plantings page and it\u2019ll show up here to lay out.</p>';
+        h += '<p class="sfg-hint">Assign a plant to this bed on the Plantings page (its Bed field), and it will show up here to lay out.</p>';
       }
       h += '<div class="sfg-gridwrap"><div class="sfg-grid" style="grid-template-columns:repeat('+b.cols+',54px);">';
       for (let r=0;r<b.rows;r++){
@@ -1551,6 +1561,7 @@
         + '<span class="dot"></span>'
         + '<div class="body"><div class="name"></div><div class="meta"></div>'
         + (p.note ? '<div class="note"></div>' : '')
+        + (beds.length ? '<div class="pl-bed"><label for="plbed-'+p.id+'">Bed</label><select class="pl-bed-sel" id="plbed-'+p.id+'" data-id="'+p.id+'"><option value="">\u2014 No bed \u2014</option>'+beds.map(function(b){ const isSel=(p.bed===b.id); const cl=g?bedClashCrops(b,g.name,p.id):[]; const bad=cl.length>0; const lab=escBed(b.name)+(bad?' \u2715 '+cl.map(escBed).join(', '):''); return '<option value="'+b.id+'"'+(isSel?' selected':'')+((bad&&!isSel)?' disabled':'')+'>'+lab+'</option>'; }).join('')+'</select></div>' : '')
         + '</div>'
         + '<span class="age">'+ageBadge(p.date, g)+'</span>'
         + '<button class="remove" title="Remove" aria-label="Remove planting">&times;</button>'
@@ -1566,7 +1577,7 @@
       li.innerHTML = inner;
       li.querySelector('.name').textContent = p.name;
       const _dot = li.querySelector('.dot'); if(_dot) _dot.style.background = cropColor(p.name);
-      li.querySelector('.meta').textContent = p.type + ' \u00B7 ' + prettyFull(p.date) + (bedName(p.bed) ? ' \u00B7 ' + bedName(p.bed) : '') + (g ? '' : '');
+      li.querySelector('.meta').textContent = p.type + ' \u00B7 ' + prettyFull(p.date);
       if (p.note) li.querySelector('.note').textContent = p.note;
 
       li.querySelector('.remove').addEventListener('click', function(){
@@ -1580,6 +1591,8 @@
           render();
         });
       }
+      const bedSel = li.querySelector('.pl-bed-sel');
+      if (bedSel){ bedSel.addEventListener('change', function(){ p.bed = bedSel.value; save(); render(); }); }
       list.appendChild(li);
     });
   }

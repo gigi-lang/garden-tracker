@@ -231,7 +231,7 @@
   .sfg-cell.spread { position:relative; }
   .sfg-cell.spread::after { content:""; position:absolute; right:3px; bottom:3px; width:7px; height:7px; border-right:1.5px solid var(--soil); border-bottom:1.5px solid var(--soil); border-bottom-right-radius:1px; opacity:0.8; pointer-events:none; }
   /* full-screen bed layout (v0.40) */
-  :root { --fs-cell:64px; }
+  :root { --fs-cell:64px; --fs-soil:#d3c3a4; }
   #fs-root:empty { display:none; }
   .bed-expand { display:inline-flex; align-items:center; gap:0.3rem; margin:0 0 0.85rem; background:var(--plot); border:1px solid var(--line); border-radius:var(--r-pill); padding:0.25rem 0.7rem; font-size:0.75rem; font-family:inherit; color:var(--evergreen); cursor:pointer; transition:background .15s, color .15s, border-color .15s; }
   .bed-expand:hover { background:var(--wash); color:var(--evergreen-dk); border-color:var(--soil); }
@@ -250,9 +250,12 @@
   .bed-fs-main { min-width:0; }
   .fs-gridwrap { overflow:auto; }
   .fs-grid { display:grid; gap:5px; background:var(--soil); padding:5px; border-radius:var(--r); width:max-content; }
-  .fs-cell { width:var(--fs-cell); height:var(--fs-cell); box-sizing:border-box; background:var(--inset); border-radius:var(--r-cell); display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none; transition:background .15s; }
+  .fs-cell { position:relative; width:var(--fs-cell); height:var(--fs-cell); box-sizing:border-box; background:var(--fs-soil); border-radius:var(--r-cell); cursor:pointer; user-select:none; transition:background .15s; }
+  .fs-cell.filled { background:var(--soil); }
   .fs-cell.empty:hover { background:var(--wash); }
-  .fs-cell .fs-letter { font-family:'Fraunces',serif; font-weight:600; font-size:1.5rem; line-height:1; }
+  .fs-sub { display:grid; gap:2px; width:100%; height:100%; }
+  .fs-slot { background:var(--fs-soil); border-radius:1px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .fs-slot .lt { font-family:'Fraunces',serif; font-weight:600; line-height:1; font-size:calc(var(--fs-cell) / var(--sc) * 0.58); }
   .fs-cell.clash { box-shadow:0 0 0 2px var(--tomato); position:relative; z-index:1; }
   .fs-cell.rot { outline:2px dashed var(--rotation-ring); outline-offset:1px; }
   .fs-cell.spread { position:relative; }
@@ -261,12 +264,12 @@
   .rail-title { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); margin-bottom:0.25rem; }
   .fs-plant { display:flex; align-items:center; gap:0.5rem; text-align:left; background:var(--plot); border:1px solid var(--line); border-radius:var(--r-lg); padding:0.4rem 0.55rem; cursor:pointer; font-family:inherit; transition:border-color .15s, box-shadow .15s; }
   .fs-plant.active { border-color:var(--ink); box-shadow:0 0 0 2px var(--seedling); }
-  .fs-plant-badge { flex:none; width:26px; height:26px; border-radius:var(--r-cell); display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-weight:600; font-size:0.95rem; }
+  .fs-plant-badge { flex:none; width:26px; height:26px; border-radius:var(--r-cell); background:var(--fs-soil); display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-weight:600; font-size:0.95rem; }
   .fs-plant-badge.erase { background:var(--wash); color:var(--soil); font-family:inherit; font-size:0.85rem; }
   .fs-plant-nm { flex:1; font-size:0.875rem; color:var(--ink); }
   .fs-plant-sq { font-size:0.7rem; color:var(--soil); flex:none; }
   .rail-hint { font-size:0.8rem; color:var(--soil); line-height:1.45; margin:0.6rem 0 0; }
-  @media (max-width:640px){ :root { --fs-cell:46px; } .bed-fs-body { flex-direction:column; } .bed-fs-rail { width:auto; border-left:none; border-top:1px solid var(--line); padding-left:0; padding-top:1rem; flex-direction:row; flex-wrap:wrap; } .fs-cell .fs-letter { font-size:1.05rem; } }
+  @media (max-width:640px){ :root { --fs-cell:46px; } .bed-fs-body { flex-direction:column; } .bed-fs-rail { width:auto; border-left:none; border-top:1px solid var(--line); padding-left:0; padding-top:1rem; flex-direction:row; flex-wrap:wrap; } }
   .bed-spread { margin-top:0.5rem; font-size:0.82rem; line-height:1.4; color:var(--soil); background:rgba(122,106,85,0.06); border:1px solid rgba(122,106,85,0.22); border-radius:var(--r); padding:0.5rem 0.7rem; }
   .bed-spread .bw-ic { font-weight:700; margin-right:0.3rem; }
   @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
@@ -467,7 +470,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.40</span>
+      <span>Built by gigi-lang &middot; v0.41</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -1607,60 +1610,68 @@
     });
     renderBedFs();
   }
-  function fsTint(hex, a){
-    let x = String(hex).replace('#','');
-    if (x.length === 3) x = x[0]+x[0]+x[1]+x[1]+x[2]+x[2];
-    const n = parseInt(x,16);
-    if (isNaN(n)) return hex;
-    return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';
-  }
   function fsLetter(name){ return (String(name).trim().charAt(0) || '?').toUpperCase(); }
-  function renderBedFs(){
-    const root = document.getElementById('fs-root'); if(!root) return;
-    const b = fsBed ? beds.find(function(x){ return x.id===fsBed; }) : null;
-    if (!b){ root.innerHTML=''; document.body.style.overflow=''; return; }
-    document.body.style.overflow='hidden';
-    const cl = bedClashes(b); const sh = bedShade(b); const rot = bedRotation(b);
-    const palette = bedPalette(b);
-    let cells = '';
+  function fsCellsHTML(b, cl, rot){
+    let out = '';
     for (let r=0;r<b.rows;r++){
       for (let c=0;c<b.cols;c++){
         const key = r+'-'+c; const cell = b.grid[key];
         if (cell && cell.c){
-          const col = cropColor(cell.c); const mx = sfgMax(cell.c);
+          const col = cropColor(cell.c); const mx = sfgMax(cell.c); const cols2 = holeCols(mx);
           const extra = (cl.cells[key]?' clash':'')+(rot.cells[key]?' rot':'')+((guideByKey(cell.c)||{}).sprawl?' spread':'');
-          cells += '<div class="fs-cell filled'+extra+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')" style="background:'+fsTint(col,0.14)+'"><span class="fs-letter" style="color:'+col+'">'+escBed(fsLetter(cell.c))+'</span></div>';
+          let slots = '';
+          for (let i=0;i<mx;i++){ slots += (i<cell.n) ? '<div class="fs-slot on"><span class="lt" style="color:'+col+'">'+escBed(fsLetter(cell.c))+'</span></div>' : '<div class="fs-slot"></div>'; }
+          out += '<div class="fs-cell filled'+extra+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')"><div class="fs-sub" style="--sc:'+cols2+';grid-template-columns:repeat('+cols2+',1fr)">'+slots+'</div></div>';
         } else {
-          cells += '<div class="fs-cell empty" data-bed="'+b.id+'" data-key="'+key+'"></div>';
+          out += '<div class="fs-cell empty" data-bed="'+b.id+'" data-key="'+key+'"></div>';
         }
       }
     }
-    let rail = '';
-    if (palette.length){
-      palette.forEach(function(p){
-        rail += '<button class="fs-plant'+(sfgBrush===p.key?' active':'')+'" data-crop="'+p.key+'"><span class="fs-plant-badge" style="background:'+fsTint(p.color,0.16)+';color:'+p.color+'">'+escBed(fsLetter(p.key))+'</span><span class="fs-plant-nm">'+escBed(p.key)+'</span><span class="fs-plant-sq">'+p.sfg+'/sq</span></button>';
-      });
-      rail += '<button class="fs-plant erase'+(sfgBrush==='__erase__'?' active':'')+'" data-crop="__erase__"><span class="fs-plant-badge erase">⌫</span><span class="fs-plant-nm">Erase</span></button>';
-    } else {
-      rail += '<p class="rail-hint">No plants assigned to this bed yet. Add one on the Plantings page (its Bed field) and it’ll show up here.</p>';
-    }
+    return out;
+  }
+  function fsRailHTML(b){
+    const palette = bedPalette(b);
+    if (!palette.length) return '<p class="rail-hint">No plants assigned to this bed yet. Add one on the Plantings page (its Bed field) and it’ll show up here.</p>';
+    let out = '';
+    palette.forEach(function(p){
+      out += '<button class="fs-plant'+(sfgBrush===p.key?' active':'')+'" data-crop="'+p.key+'"><span class="fs-plant-badge"><span class="lt" style="color:'+p.color+'">'+escBed(fsLetter(p.key))+'</span></span><span class="fs-plant-nm">'+escBed(p.key)+'</span><span class="fs-plant-sq">'+p.sfg+'/sq</span></button>';
+    });
+    out += '<button class="fs-plant erase'+(sfgBrush==='__erase__'?' active':'')+'" data-crop="__erase__"><span class="fs-plant-badge erase">⌫</span><span class="fs-plant-nm">Erase</span></button>';
+    return out;
+  }
+  function fsPanelsHTML(b, cl, sh, rot){
     let panels = '';
     if (cl.pairs.length){ panels += '<div class="bed-warn"><span class="bw-ic">⚠</span>Keep apart — ' + cl.pairs.map(function(p){ const ab=p.split('|'); return escBed(ab[0])+' &amp; '+escBed(ab[1]); }).join('; ') + '</div>'; }
     if (sh.shaded.length){ panels += '<div class="bed-shade"><span class="bw-ic">☼</span>Shade risk — move taller crops (' + sh.tall.map(escBed).join(', ') + ') to the north (top) edge so they don’t shade ' + sh.shaded.map(escBed).join(', ') + '.</div>'; }
     if (rot.notes.length){ panels += '<div class="bed-rot"><span class="bw-ic">↻</span>Rotation — ' + rot.notes.join('; ') + '. Try a different square.</div>'; }
     var spreads={}; Object.keys(b.grid).forEach(function(k){ var vv=b.grid[k]; if (vv&&vv.c){ var gg=guideByKey(vv.c); if (gg&&gg.sprawl) spreads[vv.c]=true; } });
     if (Object.keys(spreads).length){ panels += '<div class="bed-spread"><span class="bw-ic">⤢</span>Give room — ' + Object.keys(spreads).map(escBed).join(', ') + ' sprawl, so leave a square or two open around each.</div>'; }
-    root.innerHTML =
-      '<div class="bed-fs" role="dialog" aria-modal="true" aria-label="Bed layout: '+escBed(b.name)+'">'
-      + '<div class="bed-fs-backdrop" data-fsclose></div>'
-      + '<div class="bed-fs-panel">'
-      +   '<div class="bed-fs-head"><h3>'+escBed(b.name)+' <span class="bed-sub">'+b.cols+'×'+b.rows+' ft</span></h3><button class="bed-fs-close" data-fsclose aria-label="Close full screen">Close ✕</button></div>'
-      +   '<div class="bed-fs-body"><div class="bed-fs-main"><div class="fs-gridwrap"><div class="fs-grid" style="grid-template-columns:repeat('+b.cols+',var(--fs-cell));">'+cells+'</div></div>'+panels+'<p class="rail-hint">North is the top edge. Tap a square to mark the selected plant; tap again to add more up to its limit; erase or tap empty-handed to clear.</p></div>'
-      +   '<aside class="bed-fs-rail"><div class="rail-title">Assigned plants</div>'+rail+'</aside></div>'
-      + '</div></div>';
-    root.querySelectorAll('[data-fsclose]').forEach(function(el){ el.addEventListener('click', function(){ fsBed=null; renderBedFs(); }); });
-    root.querySelectorAll('.fs-plant').forEach(function(ch){ ch.addEventListener('click', function(){ const k=ch.getAttribute('data-crop'); sfgBrush=(sfgBrush===k)?null:k; render(); }); });
-    root.querySelectorAll('.fs-cell').forEach(function(cell){
+    return panels;
+  }
+  function renderBedFs(){
+    const root = document.getElementById('fs-root'); if(!root) return;
+    const b = fsBed ? beds.find(function(x){ return x.id===fsBed; }) : null;
+    if (!b){ root.innerHTML=''; document.body.style.overflow=''; return; }
+    document.body.style.overflow='hidden';
+    const cl = bedClashes(b); const sh = bedShade(b); const rot = bedRotation(b);
+    let panel = root.querySelector('.bed-fs');
+    if (!panel || panel.getAttribute('data-bed') !== b.id){
+      root.innerHTML =
+        '<div class="bed-fs" data-bed="'+b.id+'" role="dialog" aria-modal="true" aria-label="Bed layout: '+escBed(b.name)+'">'
+        + '<div class="bed-fs-backdrop" data-fsclose></div>'
+        + '<div class="bed-fs-panel">'
+        +   '<div class="bed-fs-head"><h3>'+escBed(b.name)+' <span class="bed-sub">'+b.cols+'×'+b.rows+' ft</span></h3><button class="bed-fs-close" data-fsclose aria-label="Close full screen">Close ✕</button></div>'
+        +   '<div class="bed-fs-body"><div class="bed-fs-main"><div class="fs-gridwrap"><div class="fs-grid"></div></div><div class="fs-panels"></div><p class="rail-hint">North is the top edge. Pick a plant, then tap a square to fill one of its spots; tap again to add more up to the square’s limit. Erase or tap empty-handed to clear.</p></div>'
+        +   '<aside class="bed-fs-rail"><div class="rail-title">Assigned plants</div><div class="fs-rail-list"></div></aside></div>'
+        + '</div></div>';
+      root.querySelectorAll('[data-fsclose]').forEach(function(el){ el.addEventListener('click', function(){ fsBed=null; renderBedFs(); }); });
+    }
+    const grid = root.querySelector('.fs-grid');
+    grid.style.gridTemplateColumns = 'repeat('+b.cols+',var(--fs-cell))';
+    grid.innerHTML = fsCellsHTML(b, cl, rot);
+    root.querySelector('.fs-panels').innerHTML = fsPanelsHTML(b, cl, sh, rot);
+    root.querySelector('.fs-rail-list').innerHTML = fsRailHTML(b);
+    grid.querySelectorAll('.fs-cell').forEach(function(cell){
       cell.addEventListener('click', function(){
         const bb = beds.find(function(x){ return x.id===cell.getAttribute('data-bed'); }); if(!bb) return;
         const key = cell.getAttribute('data-key'); const cur = bb.grid[key];
@@ -1670,6 +1681,7 @@
         saveBeds(); render();
       });
     });
+    root.querySelectorAll('.fs-plant').forEach(function(ch){ ch.addEventListener('click', function(){ const k=ch.getAttribute('data-crop'); sfgBrush=(sfgBrush===k)?null:k; render(); }); });
   }
   function render(){
     renderSchedule();

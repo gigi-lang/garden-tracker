@@ -231,7 +231,7 @@
   .sfg-cell.spread { position:relative; }
   .sfg-cell.spread::after { content:""; position:absolute; right:3px; bottom:3px; width:7px; height:7px; border-right:1.5px solid var(--soil); border-bottom:1.5px solid var(--soil); border-bottom-right-radius:1px; opacity:0.8; pointer-events:none; }
   /* full-screen bed layout (v0.40) */
-  :root { --fs-cell:64px; --fs-soil:#d3c3a4; }
+  :root { --fs-cell:96px; --fs-soil:#d3c3a4; }
   #fs-root:empty { display:none; }
   .bed-expand { display:inline-flex; align-items:center; gap:0.3rem; margin:0 0 0.85rem; background:var(--plot); border:1px solid var(--line); border-radius:var(--r-pill); padding:0.25rem 0.7rem; font-size:0.75rem; font-family:inherit; color:var(--evergreen); cursor:pointer; transition:background .15s, color .15s, border-color .15s; }
   .bed-expand:hover { background:var(--wash); color:var(--evergreen-dk); border-color:var(--soil); }
@@ -240,7 +240,7 @@
   .bed-fs { position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; padding:2vmin; animation:fsIn .16s ease; }
   @keyframes fsIn { from { opacity:0; transform:scale(0.99); } to { opacity:1; transform:none; } }
   .bed-fs-backdrop { position:absolute; inset:0; background:rgba(32,57,43,0.34); }
-  .bed-fs-panel { position:relative; z-index:1; background:var(--paper); border:1px solid var(--line); border-radius:var(--r-lg); box-shadow:0 14px 44px rgba(32,57,43,0.24); width:min(1100px,96vw); max-height:94vh; display:flex; flex-direction:column; overflow:hidden; }
+  .bed-fs-panel { position:relative; z-index:1; background:var(--paper); border:1px solid var(--line); border-radius:var(--r-lg); box-shadow:0 14px 44px rgba(32,57,43,0.24); width:fit-content; max-width:96vw; max-height:94vh; display:flex; flex-direction:column; overflow:hidden; }
   .bed-fs-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:0.9rem 1.25rem; border-bottom:1px solid var(--line); }
   .bed-fs-head h3 { font-family:'Fraunces',serif; font-weight:500; font-size:1.4rem; line-height:1.2; margin:0; color:var(--ink); }
   .bed-fs-head .bed-sub { font-family:'Inter',sans-serif; font-size:0.8rem; color:var(--soil); font-weight:400; margin-left:0.4rem; }
@@ -254,7 +254,11 @@
   .fs-cell.filled { background:var(--soil); }
   .fs-cell.empty:hover { background:var(--wash); }
   .fs-sub { display:grid; gap:2px; width:100%; height:100%; }
-  .fs-slot { background:var(--fs-soil); border-radius:1px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .fs-slot { background:var(--fs-soil); border-radius:1px; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; transition:box-shadow .1s; }
+  .fs-slot:hover { box-shadow:inset 0 0 0 2px var(--seedling); }
+  .fs-cell.preview { background:var(--soil); }
+  .fs-cell.preview .fs-slot { opacity:0.5; }
+  .fs-cell.preview .fs-slot:hover { opacity:1; }
   .fs-slot .lt { font-family:'Fraunces',serif; font-weight:600; line-height:1; font-size:calc(var(--fs-cell) / var(--sc) * 0.58); }
   .fs-cell.clash { box-shadow:0 0 0 2px var(--tomato); position:relative; z-index:1; }
   .fs-cell.rot { outline:2px dashed var(--rotation-ring); outline-offset:1px; }
@@ -269,7 +273,7 @@
   .fs-plant-nm { flex:1; font-size:0.875rem; color:var(--ink); }
   .fs-plant-sq { font-size:0.7rem; color:var(--soil); flex:none; }
   .rail-hint { font-size:0.8rem; color:var(--soil); line-height:1.45; margin:0.6rem 0 0; }
-  @media (max-width:640px){ :root { --fs-cell:46px; } .bed-fs-body { flex-direction:column; } .bed-fs-rail { width:auto; border-left:none; border-top:1px solid var(--line); padding-left:0; padding-top:1rem; flex-direction:row; flex-wrap:wrap; } }
+  @media (max-width:640px){ :root { --fs-cell:60px; } .bed-fs-body { flex-direction:column; } .bed-fs-rail { width:auto; border-left:none; border-top:1px solid var(--line); padding-left:0; padding-top:1rem; flex-direction:row; flex-wrap:wrap; } }
   .bed-spread { margin-top:0.5rem; font-size:0.82rem; line-height:1.4; color:var(--soil); background:rgba(122,106,85,0.06); border:1px solid rgba(122,106,85,0.22); border-radius:var(--r); padding:0.5rem 0.7rem; }
   .bed-spread .bw-ic { font-weight:700; margin-right:0.3rem; }
   @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
@@ -470,7 +474,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.41</span>
+      <span>Built by gigi-lang &middot; v0.42</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -1344,7 +1348,7 @@
   /* ---------- beds (v0.25) ---------- */
   const BEDS_KEY = 'garden-tracker:beds';
   let beds = [];
-  function loadBeds(){ try { const r=localStorage.getItem(BEDS_KEY); beds = r?JSON.parse(r):[]; } catch(e){ beds=[]; } beds.forEach(function(b){ if(!b.cols) b.cols=4; if(!b.rows) b.rows=4; if(!b.grid) b.grid={}; if(!b.history) b.history=[]; Object.keys(b.grid).forEach(function(k){ if (typeof b.grid[k] === 'string') b.grid[k] = { c:b.grid[k], n:sfgMax(b.grid[k]) }; }); }); }
+  function loadBeds(){ try { const r=localStorage.getItem(BEDS_KEY); beds = r?JSON.parse(r):[]; } catch(e){ beds=[]; } beds.forEach(function(b){ if(!b.cols) b.cols=4; if(!b.rows) b.rows=4; if(!b.grid) b.grid={}; if(!b.history) b.history=[]; Object.keys(b.grid).forEach(function(k){ var v=b.grid[k]; if (typeof v === 'string'){ v = { c:v, n:sfgMax(v) }; b.grid[k]=v; } if (v && v.c && !Array.isArray(v.slots)){ var mx=sfgMax(v.c); var nn=Math.min(mx, (typeof v.n==='number'?v.n:mx)); var arr=[]; for(var i=0;i<nn;i++) arr.push(i); v.slots=arr; v.n=arr.length; } }); }); }
   function saveBeds(){ try { localStorage.setItem(BEDS_KEY, JSON.stringify(beds)); } catch(e){} }
   function escBed(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   function bedName(id){ if(!id) return ''; const b = beds.find(function(x){ return x.id===id; }); return b ? b.name : ''; }
@@ -1398,6 +1402,8 @@
   function guideByKey(k){ for (let i=0;i<GUIDE.length;i++){ if (GUIDE[i].name===k) return GUIDE[i]; } return null; }
   function sfgMax(k){ const g=guideByKey(k); return (g&&g.sfg)?g.sfg:1; }
   function holeCols(m){ return Math.ceil(Math.sqrt(m)); }
+  function cellSlots(cell){ if(!Array.isArray(cell.slots)){ var mx=sfgMax(cell.c); var nn=Math.min(mx, (typeof cell.n==='number'?cell.n:mx)); cell.slots=[]; for(var i=0;i<nn;i++) cell.slots.push(i); } return cell.slots; }
+  function firstFreeSlot(cell, mx){ var sset=cellSlots(cell); for(var i=0;i<mx;i++){ if(sset.indexOf(i)<0) return i; } return -1; }
   /* companion adjacency (v0.27) */
   const ADJ_GROUPS = [
     { re:/squash|cucurbit|gourd|melon/, fam:'cucurbit' },
@@ -1540,7 +1546,7 @@
           if (cell && cell.c){
             const mx = sfgMax(cell.c); const col = cropColor(cell.c); const cols2 = holeCols(mx);
             let dots = '';
-            for (let i=0;i<mx;i++){ dots += '<div class="sfg-hole"'+(i<cell.n?' style="background:'+col+'"':'')+'></div>'; }
+            const fset=cellSlots(cell); for (let i=0;i<mx;i++){ dots += '<div class="sfg-hole"'+(fset.indexOf(i)>=0?' style="background:'+col+'"':'')+'></div>'; }
             h += '<div class="sfg-cell'+(cl.cells[key]?' clash':'')+(rot.cells[key]?' rot':'')+((guideByKey(cell.c)||{}).sprawl?' spread':'')+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')"><div class="sfg-holes" style="grid-template-columns:repeat('+cols2+',1fr)">'+dots+'</div></div>';
           } else {
             h += '<div class="sfg-cell empty" data-bed="'+b.id+'" data-key="'+key+'"></div>';
@@ -1572,8 +1578,8 @@
         if (sfgBrush === '__erase__'){ delete b.grid[key]; }
         else if (sfgBrush){
           const mx = sfgMax(sfgBrush);
-          if (cur && cur.c === sfgBrush){ cur.n = Math.min(mx, cur.n + 1); }
-          else { b.grid[key] = { c:sfgBrush, n:1 }; }
+          if (cur && cur.c === sfgBrush){ const free=firstFreeSlot(cur,mx); if(free>=0){ cur.slots.push(free); cur.slots.sort(function(a,b){return a-b;}); cur.n=cur.slots.length; } }
+          else { b.grid[key] = { c:sfgBrush, n:1, slots:[0] }; }
         }
         else if (b.grid[key]){ delete b.grid[key]; }
         saveBeds(); render();
@@ -1612,16 +1618,21 @@
   }
   function fsLetter(name){ return (String(name).trim().charAt(0) || '?').toUpperCase(); }
   function fsCellsHTML(b, cl, rot){
+    const brushMax = (sfgBrush && sfgBrush !== '__erase__') ? sfgMax(sfgBrush) : 0;
     let out = '';
     for (let r=0;r<b.rows;r++){
       for (let c=0;c<b.cols;c++){
         const key = r+'-'+c; const cell = b.grid[key];
         if (cell && cell.c){
-          const col = cropColor(cell.c); const mx = sfgMax(cell.c); const cols2 = holeCols(mx);
+          const col = cropColor(cell.c); const mx = sfgMax(cell.c); const cols2 = holeCols(mx); const set = cellSlots(cell);
           const extra = (cl.cells[key]?' clash':'')+(rot.cells[key]?' rot':'')+((guideByKey(cell.c)||{}).sprawl?' spread':'');
           let slots = '';
-          for (let i=0;i<mx;i++){ slots += (i<cell.n) ? '<div class="fs-slot on"><span class="lt" style="color:'+col+'">'+escBed(fsLetter(cell.c))+'</span></div>' : '<div class="fs-slot"></div>'; }
-          out += '<div class="fs-cell filled'+extra+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')"><div class="fs-sub" style="--sc:'+cols2+';grid-template-columns:repeat('+cols2+',1fr)">'+slots+'</div></div>';
+          for (let i=0;i<mx;i++){ slots += (set.indexOf(i)>=0) ? '<div class="fs-slot on" data-i="'+i+'"><span class="lt" style="color:'+col+'">'+escBed(fsLetter(cell.c))+'</span></div>' : '<div class="fs-slot" data-i="'+i+'"></div>'; }
+          out += '<div class="fs-cell filled'+extra+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+set.length+'/'+mx+')"><div class="fs-sub" style="--sc:'+cols2+';grid-template-columns:repeat('+cols2+',1fr)">'+slots+'</div></div>';
+        } else if (brushMax > 0){
+          const cols2 = holeCols(brushMax); let slots = '';
+          for (let i=0;i<brushMax;i++){ slots += '<div class="fs-slot" data-i="'+i+'"></div>'; }
+          out += '<div class="fs-cell empty preview" data-bed="'+b.id+'" data-key="'+key+'"><div class="fs-sub" style="--sc:'+cols2+';grid-template-columns:repeat('+cols2+',1fr)">'+slots+'</div></div>';
         } else {
           out += '<div class="fs-cell empty" data-bed="'+b.id+'" data-key="'+key+'"></div>';
         }
@@ -1665,23 +1676,32 @@
         +   '<aside class="bed-fs-rail"><div class="rail-title">Assigned plants</div><div class="fs-rail-list"></div></aside></div>'
         + '</div></div>';
       root.querySelectorAll('[data-fsclose]').forEach(function(el){ el.addEventListener('click', function(){ fsBed=null; renderBedFs(); }); });
+      root.querySelector('.fs-grid').addEventListener('click', function(e){
+        const cellEl = e.target.closest('.fs-cell'); if(!cellEl) return;
+        const bb = beds.find(function(x){ return x.id===cellEl.getAttribute('data-bed'); }); if(!bb) return;
+        const key = cellEl.getAttribute('data-key'); const cur = bb.grid[key];
+        const slotEl = e.target.closest('.fs-slot'); const i = slotEl ? parseInt(slotEl.getAttribute('data-i'),10) : -1;
+        if (sfgBrush === '__erase__'){ delete bb.grid[key]; }
+        else if (cur && cur.c && (!sfgBrush || sfgBrush===cur.c)){
+          if (i < 0) return;
+          const set = cellSlots(cur); const at = set.indexOf(i);
+          if (at >= 0) set.splice(at,1); else set.push(i);
+          if (set.length === 0){ delete bb.grid[key]; } else { set.sort(function(a,b){return a-b;}); cur.n = set.length; }
+        }
+        else if (sfgBrush){ bb.grid[key] = { c:sfgBrush, n:1, slots:[ i>=0 ? i : 0 ] }; }
+        else return;
+        saveBeds(); render();
+      });
+      root.querySelector('.fs-rail-list').addEventListener('click', function(e){
+        const btn = e.target.closest('.fs-plant'); if(!btn) return;
+        const k = btn.getAttribute('data-crop'); sfgBrush = (sfgBrush===k)?null:k; render();
+      });
     }
     const grid = root.querySelector('.fs-grid');
     grid.style.gridTemplateColumns = 'repeat('+b.cols+',var(--fs-cell))';
     grid.innerHTML = fsCellsHTML(b, cl, rot);
     root.querySelector('.fs-panels').innerHTML = fsPanelsHTML(b, cl, sh, rot);
     root.querySelector('.fs-rail-list').innerHTML = fsRailHTML(b);
-    grid.querySelectorAll('.fs-cell').forEach(function(cell){
-      cell.addEventListener('click', function(){
-        const bb = beds.find(function(x){ return x.id===cell.getAttribute('data-bed'); }); if(!bb) return;
-        const key = cell.getAttribute('data-key'); const cur = bb.grid[key];
-        if (sfgBrush === '__erase__'){ delete bb.grid[key]; }
-        else if (sfgBrush){ const mx=sfgMax(sfgBrush); if (cur && cur.c===sfgBrush){ cur.n=Math.min(mx,cur.n+1); } else { bb.grid[key]={c:sfgBrush,n:1}; } }
-        else if (bb.grid[key]){ delete bb.grid[key]; }
-        saveBeds(); render();
-      });
-    });
-    root.querySelectorAll('.fs-plant').forEach(function(ch){ ch.addEventListener('click', function(){ const k=ch.getAttribute('data-crop'); sfgBrush=(sfgBrush===k)?null:k; render(); }); });
   }
   function render(){
     renderSchedule();

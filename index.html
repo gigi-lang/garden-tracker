@@ -12,7 +12,7 @@
     /* surfaces, page->card->inset: --paper page bg, --plot card face, --inset pure-white inputs/cells/inner-cards, --wash faint hover */
     --ink:#20392b; --paper:#eef0e4; --plot:#f7f8f1; --inset:#fff; --wash:#f3f5ec;
     --seedling:#5e9367; --evergreen:#3f6f4d; --evergreen-dk:#345d40;
-    --tomato:#cf5e52; --soil:#7a6a55; --line:rgba(122,106,85,0.16);
+    --tomato:#cf5e52; --tomato-ink:#b23b30; --soil:#7a6a55; --line:rgba(122,106,85,0.16);
     --rotation:#7a4f7e; --rotation-ring:#9b6a9e;
     --r-cell:3px; --r:4px; --r-lg:8px; --r-pill:999px;
   }
@@ -101,7 +101,7 @@
   .btn.ghost:hover { background:rgba(94,147,103,0.08); }
   .data-actions { margin-top:1rem; display:flex; flex-wrap:wrap; gap:0.5rem; }
   .data-status { margin-top:0.75rem; font-size:0.8rem; color:var(--evergreen); min-height:1.1rem; }
-  .data-status.err { color:var(--tomato); }
+  .data-status.err { color:var(--tomato-ink); }
 
   .list { margin-top:1.5rem; display:grid; gap:0.5rem; list-style:none; }
   .empty { margin-top:1.5rem; color:var(--soil); font-size:0.95rem; font-style:italic; }
@@ -127,7 +127,7 @@
   .plant .pl-bed select:focus { outline:2px solid var(--seedling); outline-offset:1px; border-color:var(--seedling); }
   .age { font-size:0.7rem; letter-spacing:0.04em; color:var(--evergreen); background:rgba(94,147,103,0.12); border-radius:var(--r-pill); padding:0.15rem 0.6rem; white-space:nowrap; align-self:center; }
   .remove { background:none; border:none; cursor:pointer; color:var(--soil); font-size:1.1rem; line-height:1; padding:0.2rem; opacity:0.6; align-self:center; }
-  .remove:hover { opacity:1; color:var(--tomato); }
+  .remove:hover { opacity:1; color:var(--tomato-ink); }
   .guide-toggle { margin-top:0.5rem; margin-left:1.7rem; background:none; border:none; cursor:pointer; color:var(--evergreen); font-family:inherit; font-size:0.8rem; font-weight:600; padding:0; }
   .guide-toggle:hover { text-decoration:underline; }
   .no-guide { margin-top:0.5rem; margin-left:1.7rem; font-size:0.8rem; color:var(--soil); font-style:italic; }
@@ -144,7 +144,7 @@
   .chips { display:flex; flex-wrap:wrap; gap:0.25rem; margin-top:0.75rem; }
   .chip { font-size:0.8rem; border-radius:var(--r-pill); padding:0.12rem 0.55rem; border:1px solid var(--line); }
   .chip.good { color:var(--evergreen); border-color:rgba(94,147,103,0.4); background:rgba(94,147,103,0.08); }
-  .chip.bad { color:var(--tomato); border-color:rgba(207,94,82,0.4); background:rgba(207,94,82,0.07); }
+  .chip.bad { color:var(--tomato-ink); border-color:rgba(207,94,82,0.4); background:rgba(207,94,82,0.07); }
   .clabel { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; margin-top:0.75rem; }
   .pests { margin-top:0.5rem; display:grid; gap:0.25rem; font-size:0.875rem; }
   .pests .pest b { color:var(--ink); }
@@ -159,7 +159,7 @@
   .task .tkind { display:inline-flex; align-items:center; gap:0.25rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; border-radius:var(--r-pill); padding:0.1rem 0.5rem; flex:none; }
   .task-move .tkind { color:var(--soil); background:rgba(122,106,85,0.14); }
   .task-feed .tkind { color:var(--evergreen); background:rgba(94,147,103,0.14); }
-  .task-harvest .tkind { color:var(--tomato); background:rgba(207,94,82,0.12); }
+  .task-harvest .tkind { color:var(--tomato-ink); background:rgba(207,94,82,0.12); }
   .task .ttitle { flex:1; }
 
   /* calendar */
@@ -197,7 +197,7 @@
   .bed-card { position:relative; background:var(--inset); border:1px solid var(--line); border-radius:var(--r-lg); padding:1rem 1.25rem; }
   .bed-card h3 { font-family:'Fraunces',serif; font-weight:500; font-size:1.15rem; line-height:1.2; margin:0 0 0.6rem; color:var(--ink); }
   .bed-card .bed-remove { position:absolute; top:0.75rem; right:0.9rem; background:none; border:none; cursor:pointer; color:var(--soil); font-size:1.2rem; line-height:1; transition:color .15s; }
-  .bed-card .bed-remove:hover { color:var(--tomato); }
+  .bed-card .bed-remove:hover { color:var(--tomato-ink); }
   .bed-empty { color:var(--soil); font-size:0.875rem; font-style:italic; }
   /* sfg planner (v0.25) */
   .bed-add { flex-wrap:wrap; }
@@ -218,7 +218,7 @@
   .sfg-hole { border-radius:50%; background:rgba(122,106,85,0.16); }
   .sfg-hint { font-size:0.8rem; color:var(--soil); margin:0.5rem 0 0; }
   .sfg-cell.clash { box-shadow:0 0 0 2px var(--tomato); position:relative; z-index:1; }
-  .bed-warn { margin-top:0.6rem; font-size:0.82rem; line-height:1.4; color:var(--tomato); background:rgba(207,94,82,0.08); border:1px solid rgba(207,94,82,0.25); border-radius:var(--r); padding:0.5rem 0.7rem; }
+  .bed-warn { margin-top:0.6rem; font-size:0.82rem; line-height:1.4; color:var(--tomato-ink); background:rgba(207,94,82,0.08); border:1px solid rgba(207,94,82,0.25); border-radius:var(--r); padding:0.5rem 0.7rem; }
   .bed-warn .bw-ic { font-weight:700; margin-right:0.3rem; }
   .bed-shade { margin-top:0.5rem; font-size:0.82rem; line-height:1.4; color:var(--soil); background:rgba(122,106,85,0.08); border:1px solid rgba(122,106,85,0.25); border-radius:var(--r); padding:0.5rem 0.7rem; }
   .bed-shade .bw-ic { font-weight:700; margin-right:0.3rem; }
@@ -428,7 +428,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.37</span>
+      <span>Built by gigi-lang &middot; v0.38</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>

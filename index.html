@@ -12,7 +12,7 @@
     /* surfaces, page->card->inset: --paper page bg, --plot card face, --inset pure-white inputs/cells/inner-cards, --wash faint hover */
     --ink:#20392b; --paper:#eef0e4; --plot:#f7f8f1; --inset:#fff; --wash:#f3f5ec;
     --seedling:#5e9367; --evergreen:#3f6f4d; --evergreen-dk:#345d40;
-    --tomato:#cf5e52; --tomato-ink:#b23b30; --soil:#7a6a55; --line:rgba(122,106,85,0.16);
+    --tomato:#cf5e52; --tomato-ink:#b23b30; --soil:#7a6a55; --muted:#8a7f6b; --line:rgba(122,106,85,0.16);
     --rotation:#7a4f7e; --rotation-ring:#9b6a9e;
     --r-cell:3px; --r:4px; --r-lg:8px; --r-pill:999px;
   }
@@ -26,6 +26,7 @@
     background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2796%27%20height%3D%2796%27%20viewBox%3D%270%200%2096%2096%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%237a6a55%27%20stroke-opacity%3D%270.13%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cg%20transform%3D%27translate%2820%2018%29%20rotate%28-22%29%27%3E%3Cpath%20d%3D%27M0%200%20C5%20-5%2013%20-5%2018%200%20C13%205%205%205%200%200%20Z%27%2F%3E%3Cpath%20d%3D%27M3%200%20H15%27%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%2864%2030%29%20rotate%2818%29%27%3E%3Cpath%20d%3D%27M0%2011%20V0%27%2F%3E%3Cpath%20d%3D%27M0%205%20C-5%203%20-7%20-2%20-7%20-6%20C-2%20-5%200%200%200%205%20Z%27%2F%3E%3Cpath%20d%3D%27M0%207%20C5%205%207%200%207%20-4%20C2%20-3%200%203%200%207%20Z%27%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%2854%2064%29%20rotate%2844%29%27%3E%3Cpath%20d%3D%27M0%200%20C4%20-4%2011%20-4%2015%200%20C11%204%204%204%200%200%20Z%27%2F%3E%3Cpath%20d%3D%27M3%200%20H12%27%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%2815%2062%29%20rotate%288%29%27%3E%3Cpath%20d%3D%27M0%200%20C3%20-3%209%20-3%2012%200%20C9%203%203%203%200%200%20Z%27%2F%3E%3Cpath%20d%3D%27M2%200%20H10%27%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2740%27%20cy%3D%2744%27%20r%3D%271.3%27%2F%3E%3Ccircle%20cx%3D%2745%27%20cy%3D%2748%27%20r%3D%271.3%27%2F%3E%3Ccircle%20cx%3D%2782%27%20cy%3D%2774%27%20r%3D%271.3%27%2F%3E%3Ccircle%20cx%3D%2780%27%20cy%3D%2713%27%20r%3D%271.3%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
     background-size:96px 96px; line-height:1.5; min-height:100vh; padding:clamp(1.5rem,5vw,4rem) 1.25rem;
   }
+  body.beds-view { background-image:none; }
   .wrap { max-width:1240px; margin:0 auto; }
   .layout { display:flex; gap:1rem; align-items:flex-start; }
   .plots { flex:1 1 auto; min-width:0; }
@@ -125,6 +126,7 @@
   .plant .pl-bed label { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; }
   .plant .pl-bed select { font-family:inherit; font-size:0.8rem; color:var(--ink); background:var(--inset); border:1px solid var(--line); border-radius:var(--r); padding:0.25rem 0.5rem; transition:border-color .15s; }
   .plant .pl-bed select:focus { outline:2px solid var(--seedling); outline-offset:1px; border-color:var(--seedling); }
+  .pl-bed-sel option:disabled { color:var(--muted); }
   .age { font-size:0.7rem; letter-spacing:0.04em; color:var(--evergreen); background:rgba(94,147,103,0.12); border-radius:var(--r-pill); padding:0.15rem 0.6rem; white-space:nowrap; align-self:center; }
   .remove { background:none; border:none; cursor:pointer; color:var(--soil); font-size:1.1rem; line-height:1; padding:0.2rem; opacity:0.6; align-self:center; }
   .remove:hover { opacity:1; color:var(--tomato-ink); }
@@ -217,12 +219,13 @@
   .sfg-holes { display:grid; gap:2px; width:100%; height:100%; }
   .sfg-hole { border-radius:50%; background:rgba(122,106,85,0.16); }
   .sfg-hint { font-size:0.8rem; color:var(--soil); margin:0.5rem 0 0; }
+  /* advisory-signal grammar: square-conflict cues are a solid ring in the signal colour (companion = tomato, rotation = purple; they stack as concentric rings) - sprawl = corner bracket (spatial spread hint) - shade = panel only (whole-bed orientation). Every signal also carries a colour-matched panel with the words. */
   .sfg-cell.clash { box-shadow:0 0 0 2px var(--tomato); position:relative; z-index:1; }
   .bed-warn { margin-top:0.6rem; font-size:0.82rem; line-height:1.4; color:var(--tomato-ink); background:rgba(207,94,82,0.08); border:1px solid rgba(207,94,82,0.25); border-radius:var(--r); padding:0.5rem 0.7rem; }
   .bed-warn .bw-ic { font-weight:700; margin-right:0.3rem; }
   .bed-shade { margin-top:0.5rem; font-size:0.82rem; line-height:1.4; color:var(--soil); background:rgba(122,106,85,0.08); border:1px solid rgba(122,106,85,0.25); border-radius:var(--r); padding:0.5rem 0.7rem; }
   .bed-shade .bw-ic { font-weight:700; margin-right:0.3rem; }
-  .sfg-cell.rot { outline:2px dashed var(--rotation-ring); outline-offset:1px; }
+  .sfg-cell.rot { outline:2px solid var(--rotation); outline-offset:1px; }
   .bed-rot { margin-top:0.5rem; font-size:0.82rem; line-height:1.4; color:var(--rotation); background:rgba(155,106,158,0.10); border:1px solid rgba(155,106,158,0.30); border-radius:var(--r); padding:0.5rem 0.7rem; }
   .bed-rot .bw-ic { font-weight:700; margin-right:0.3rem; }
   .bed-hist { font-size:0.78rem; color:var(--soil); margin:0.5rem 0 0; }
@@ -261,7 +264,7 @@
   .fs-cell.preview .fs-slot:hover { opacity:1; }
   .fs-slot .lt { font-family:'Fraunces',serif; font-weight:600; line-height:1; font-size:calc(var(--fs-cell) / var(--sc) * 0.58); }
   .fs-cell.clash { box-shadow:0 0 0 2px var(--tomato); position:relative; z-index:1; }
-  .fs-cell.rot { outline:2px dashed var(--rotation-ring); outline-offset:1px; }
+  .fs-cell.rot { outline:2px solid var(--rotation); outline-offset:1px; }
   .fs-cell.spread { position:relative; }
   .fs-cell.spread::after { content:""; position:absolute; right:4px; bottom:4px; width:8px; height:8px; border-right:1.5px solid var(--soil); border-bottom:1.5px solid var(--soil); border-bottom-right-radius:1px; opacity:0.8; pointer-events:none; }
   .bed-fs-rail { flex:none; width:220px; display:flex; flex-direction:column; gap:0.4rem; border-left:1px solid var(--line); padding-left:1.25rem; }
@@ -474,7 +477,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.42</span>
+      <span>Built by gigi-lang &middot; v0.43</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -1882,6 +1885,7 @@
   const VIEWS = ['home','plantings','beds','doctor'];
   function showView(name){
     if (VIEWS.indexOf(name) === -1) name = 'home';
+    document.body.classList.toggle('beds-view', name === 'beds');
     document.querySelectorAll('.view').forEach(function(v){
       v.classList.toggle('active', v.getAttribute('data-view') === name);
     });

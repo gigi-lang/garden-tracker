@@ -428,7 +428,7 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.38</span>
+      <span>Built by gigi-lang &middot; v0.39</span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
@@ -1323,10 +1323,27 @@
   const CCOLOR_KEY = 'garden-tracker:cropcolors';
   let cropColors = {};
   const COLOR_PALETTE = ['#cf5e52','#5e9367','#e0a458','#6a8fb5','#9b6a9e','#4f9d8e','#b5556b','#7a9a3d','#c77f4a','#5b7fb0','#a05c9e','#8a8f3d','#c46a8c','#5fa37a','#9e7a4f','#6b8e9e'];
+  // plant-sensible marker colors (guide crops); custom plants fall back to COLOR_PALETTE
+  const CROP_COLOR = {
+    'Cherry tomatoes':'#cf5e52','Tomatoes':'#c44d43','German Johnson tomato':'#b0494a','Peppers':'#d9683f','Eggplant':'#6a4a7e','Potatoes':'#b39a6a',
+    'Pickling cucumbers':'#5f9a4e','Cucumbers':'#6faf58','Cantaloupe':'#e0a458','Zucchini / summer squash':'#4f8f47','Winter squash':'#cf954a','Pumpkin':'#d97b34','Watermelon':'#d95c6b',
+    'Carrots':'#e08740','Beets':'#a83e5f',
+    'Broccoli':'#4f8e5e','Cauliflower':'#cbbd94','Cabbage':'#6f976e','Kale':'#3f6f4d','Brussels sprouts':'#5a985e','Radish':'#d05f6e','Arugula':'#86a24a',
+    'Pole beans':'#6a9e46','Bush (green) beans':'#7cae4f','Peas':'#92bd6a',
+    'Bunching onions':'#9bb079','Onions (bulb)':'#c9a35c','Garlic':'#d3c6a2','Leeks':'#7fa08c','Chives':'#6f9f60',
+    'Basil':'#5e9367','Sage':'#8a9a7d','Dill':'#83a558','Parsley':'#5f9e58','Cilantro / coriander':'#74a44f','Thyme':'#7f9a6c','Rosemary':'#6a927e','Oregano':'#7d9a58','Mint':'#57a877',
+    'Lettuce':'#7fae5b','Spinach':'#4f8355','Swiss chard':'#b0576a',
+    'Sweet corn':'#e3b23c','Okra':'#8a9a4a',
+    'Strawberries':'#d34a5b','Blueberries':'#5b7fb0','Raspberries':'#c2566f','Blackberries':'#4e3a5e','Gooseberries':'#97a35a','Currants':'#a5455a',
+    'Apple':'#c1544a','Peach / nectarine':'#e0956a','Fig':'#6e4a5e','Citrus':'#e6a93a',
+    'Cannabis':'#5f8f3a'
+  };
   function loadCropColors(){ try{ const r=localStorage.getItem(CCOLOR_KEY); cropColors=r?JSON.parse(r):{}; }catch(e){ cropColors={}; } }
   function saveCropColors(){ try{ localStorage.setItem(CCOLOR_KEY, JSON.stringify(cropColors)); }catch(e){} }
   function cropKey(name){ const g=matchGuide(name); return g?g.name:normalize(name); }
   function cropColor(name){
+    const g = matchGuide(name);
+    if (g && CROP_COLOR[g.name]) return CROP_COLOR[g.name];
     const k = cropKey(name);
     if (!cropColors[k]){
       const used = Object.keys(cropColors).map(function(x){ return cropColors[x]; });
@@ -1474,7 +1491,7 @@
         for (let c=0;c<b.cols;c++){
           const key = r+'-'+c; const cell = b.grid[key];
           if (cell && cell.c){
-            const mx = sfgMax(cell.c); const col = cropColors[cell.c] || 'var(--seedling)'; const cols2 = holeCols(mx);
+            const mx = sfgMax(cell.c); const col = cropColor(cell.c); const cols2 = holeCols(mx);
             let dots = '';
             for (let i=0;i<mx;i++){ dots += '<div class="sfg-hole"'+(i<cell.n?' style="background:'+col+'"':'')+'></div>'; }
             h += '<div class="sfg-cell'+(cl.cells[key]?' clash':'')+(rot.cells[key]?' rot':'')+((guideByKey(cell.c)||{}).sprawl?' spread':'')+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')"><div class="sfg-holes" style="grid-template-columns:repeat('+cols2+',1fr)">'+dots+'</div></div>';

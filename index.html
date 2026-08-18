@@ -495,12 +495,19 @@
     </div>
 
     <footer>
-      <span>Built by gigi-lang &middot; v0.44</span>
+      <span>Built by gigi-lang &middot; <span id="app-version"></span></span>
       <span>Growing, one commit at a time &middot; <a href="https://github.com/gigi-lang/garden-tracker">repo</a></span>
     </footer>
   </div>
 
 <script>
+  /* ---------- app version: ONE place. The footer and the backup envelope both read it.
+     Bump APP_VERSION and nothing else. Bump BACKUP_SCHEMA only when the SHAPE of saved
+     data changes, not on every release. ---------- */
+  const APP_VERSION = 'v0.45';
+  const BACKUP_SCHEMA = 2;
+  (function(){ const el = document.getElementById('app-version'); if (el) el.textContent = APP_VERSION; })();
+
   /* ---------- icon set (original line icons, currentColor) ---------- */
   const ICONS = {
     home:'<svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 L12 4.5 L20 11"/><path d="M6 10 V20 H18 V10"/><path d="M12 20 V14.6"/><path d="M12 16 C10.6 16 9.6 15 9.6 13.7 C11 13.8 12 14.8 12 16 Z"/><path d="M12 15.2 C13.4 15.2 14.4 14.2 14.4 12.9 C13 13 12 14 12 15.2 Z"/></svg>',
@@ -1809,8 +1816,10 @@
 
   document.getElementById('export-btn').addEventListener('click', downloadICS);
 
-  /* ---------- backup: export / import (v0.12) ---------- */
+  /* ---------- backup: export / import ---------- */
   const BACKUP_PREFIX = 'garden-tracker:';
+  // device preference, not garden data - never travels in a backup
+  const BACKUP_EXCLUDE = ['garden-tracker:theme'];
   function backupStatus(msg, isErr){
     const el = document.getElementById('backup-status');
     if (!el) return;
@@ -1822,7 +1831,7 @@
     const data = {};
     for (let i = 0; i < localStorage.length; i++){
       const k = localStorage.key(i);
-      if (k && k.indexOf(BACKUP_PREFIX) === 0){
+      if (k && k.indexOf(BACKUP_PREFIX) === 0 && BACKUP_EXCLUDE.indexOf(k) < 0){
         const raw = localStorage.getItem(k);
         try { data[k] = JSON.parse(raw); } catch(e){ data[k] = raw; }
       }
@@ -1834,8 +1843,8 @@
     const payload = {
       app: 'garden-tracker',
       type: 'garden-tracker-backup',
-      schema: 1,
-      version: 'v0.12',
+      schema: BACKUP_SCHEMA,
+      version: APP_VERSION,
       exportedAt: new Date().toISOString(),
       data: data
     };
@@ -1852,8 +1861,12 @@
   function applyBackup(parsed){
     // accept the export format { data:{...} } or a bare { "garden-tracker:...": ... } map
     let data = null;
+    let schema = null;
+    let madeBy = '';
     if (parsed && typeof parsed === 'object' && parsed.data && typeof parsed.data === 'object'){
       data = parsed.data;
+      if (typeof parsed.schema === 'number') schema = parsed.schema;
+      if (typeof parsed.version === 'string') madeBy = parsed.version;
     } else if (parsed && typeof parsed === 'object'){
       const keys = Object.keys(parsed).filter(function(k){ return k.indexOf(BACKUP_PREFIX) === 0; });
       if (keys.length){ data = {}; keys.forEach(function(k){ data[k] = parsed[k]; }); }
@@ -1862,12 +1875,40 @@
       backupStatus("That file doesn't look like a garden backup.", true);
       return;
     }
+
+    // A NEWER file into an OLDER app is the one case that cannot be migrated: this
+    // build does not know what the extra fields mean. Refuse rather than half-restore.
+    if (schema !== null && schema > BACKUP_SCHEMA){
+      backupStatus('This backup was made by a newer version of Garden Tracker (' + (madeBy || 'schema ' + schema) + '). Update the app, then import it.', true);
+      return;
+    }
+
     const incoming = data[KEY];
     const count = Array.isArray(incoming) ? incoming.length : 0;
-    const ok = window.confirm('Replace your current garden with this backup? It has ' + count + plural(count) + '. This overwrites what\u2019s here now.');
+    const older = (schema === null) || (schema < BACKUP_SCHEMA);
+    const from = madeBy ? ' from ' + madeBy : '';
+
+    // TRUE REPLACE. The old code wrote only the keys present in the file, so an early
+    // backup (plantings + zone, before beds existed) left the current bed layouts in
+    // place, painted with crops the restored garden no longer contains. Silent, and the
+    // confirm text promised a replace. Everything garden-side goes first; the theme is
+    // a device preference and is deliberately left alone.
+    const ok = window.confirm(
+      'Replace your whole garden with this backup' + from + '?\n\n' +
+      'It has ' + count + plural(count) + '. Your current plantings, beds, bed layouts and zone will be removed first, so what you end up with is exactly what is in the file.' +
+      (older ? '\n\nThis file is older than this version of the app. Anything added since will simply be absent.' : '')
+    );
     if (!ok){ backupStatus('Import cancelled \u2014 nothing changed.'); return; }
+
+    let doomed = [];
     try {
+      for (let i = 0; i < localStorage.length; i++){
+        const k = localStorage.key(i);
+        if (k && k.indexOf(BACKUP_PREFIX) === 0 && BACKUP_EXCLUDE.indexOf(k) < 0) doomed.push(k);
+      }
+      doomed.forEach(function(k){ localStorage.removeItem(k); });
       Object.keys(data).forEach(function(k){
+        if (BACKUP_EXCLUDE.indexOf(k) >= 0) return;
         const v = data[k];
         localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
       });
@@ -1875,10 +1916,11 @@
       backupStatus('Could not save the backup to this browser.', true);
       return;
     }
+
     openGuides = {};
     loadZone(); applyZoneToUI();
     loadCropColors(); loadBeds(); load(); render();
-    backupStatus('Imported ' + count + plural(count) + '. Your garden is restored.');
+    backupStatus('Imported ' + count + plural(count) + from + '. Your garden is restored.');
   }
   document.getElementById('backup-export').addEventListener('click', exportBackup);
   document.getElementById('backup-import').addEventListener('click', function(){

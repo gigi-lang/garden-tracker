@@ -71,7 +71,6 @@
   .marker .mi { width:15px; height:15px; }
   .zone summary .z-lead { display:inline-flex; align-items:center; gap:0.5rem; }
   .zone summary .z-lead .mi { width:15px; height:15px; }
-  .water-line .mi { width:20px; height:20px; color:var(--seedling); }
   .task .tkind .mi { width:12px; height:12px; stroke-width:2; }
   .today { margin-top:1rem; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--evergreen); font-weight:600; }
 
@@ -213,10 +212,33 @@
   .gnote { margin-top:0.75rem; font-size:0.875rem; color:var(--soil); font-style:italic; }
 
   /* schedule */
-  .water-line { display:flex; gap:0.5rem; align-items:center; font-size:0.875rem; color:var(--ink); margin-top:0.5rem; }
-  .sched-list { list-style:none; margin-top:1rem; display:grid; gap:0.5rem; }
-  .task { display:flex; align-items:center; gap:0.75rem; border-top:1px solid var(--line); padding-top:0.5rem; font-size:0.95rem; }
-  .task .tdate { font-variant-numeric:tabular-nums; color:var(--soil); width:5.8rem; flex:none; white-space:nowrap; }
+  .export-note { margin-top:0.6rem; color:var(--soil); font-size:0.8rem; }
+  .export-note .wl .mi { width:14px; height:14px; color:var(--seedling); vertical-align:-2px; }
+  .sched-list { list-style:none; margin-top:1rem; display:grid; gap:0.25rem; }
+  .task { display:flex; align-items:center; gap:0.75rem; border-top:1px solid var(--line); font-size:0.95rem; }
+  /* wide enough for the longest label the column can hold, "Overdue · Feb 20, 2027" */
+  .task .tdate { font-variant-numeric:tabular-nums; color:var(--soil); width:8.8rem; flex:none; white-space:nowrap; }
+  @media (max-width:560px){
+    .task { flex-wrap:wrap; row-gap:0.15rem; }
+    .task .tdate { width:auto; }
+    .task .ttitle { flex:1 0 100%; padding-left:calc(44px + 0.75rem); }
+  }
+
+  /* ---- done / overdue / today (v0.48) ---- */
+  .tdone { flex:none; width:44px; height:44px; display:inline-flex; align-items:center; justify-content:center;
+    background:none; border:none; cursor:pointer; padding:0; margin-left:-0.35rem; }
+  .tdone .tick { width:20px; height:20px; border-radius:50%; border:1.5px solid var(--soil); display:flex;
+    align-items:center; justify-content:center; font-size:0.75rem; line-height:1; color:var(--inset);
+    transition:background .15s, border-color .15s, color .15s; }
+  .tdone:hover .tick { border-color:var(--evergreen); }
+  .tdone[aria-checked="true"] .tick { background:var(--evergreen); border-color:var(--evergreen); color:var(--plot); }
+  .task.is-done .tdate, .task.is-done .ttitle { color:var(--soil); text-decoration:line-through; }
+  .task.is-done .tkind { opacity:0.55; }
+  .task.is-today { border-top-color:var(--seedling); }
+  .task.is-today .tdate { color:var(--evergreen); font-weight:600; }
+  .task.is-overdue .tdate { color:var(--tomato-ink); font-weight:600; }
+  .task.is-overdue .tdone .tick { border-color:var(--tomato-ink); }
+  .sched-more { margin-top:0.6rem; font-size:0.8rem; color:var(--soil); font-style:italic; }
   .task .tkind { display:inline-flex; align-items:center; gap:0.25rem; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; border-radius:var(--r-pill); padding:0.1rem 0.5rem; flex:none; }
   .task-move .tkind { color:var(--soil); background:rgba(122,106,85,0.14); }
   .task-feed .tkind { color:var(--evergreen); background:rgba(94,147,103,0.14); }
@@ -410,7 +432,7 @@
         <p class="lede">Your watering, feeding, transplant, and harvest dates &mdash; pulled from your plantings and your zone. Send them to your phone's calendar and it does the reminding.</p>
         <div id="sched-body"></div>
         <button class="btn" id="export-btn" style="margin-top:1.2rem;">Add to my calendar</button>
-        <p style="margin-top:0.6rem;color:var(--soil);font-size:0.8rem;">Downloads a calendar file (.ics) &mdash; open it to drop these into Google or Apple Calendar, reminders and all. Re-export whenever you add plants.</p>
+        <p class="export-note" id="export-note">Downloads a calendar file (.ics) &mdash; open it to drop these into Google or Apple Calendar, reminders and all. <span class="wl" id="water-note"></span> Re-export whenever you add plants.</p>
       </section>
 
       <section class="plot">
@@ -563,14 +585,18 @@
   /* ---------- app version: ONE place. The footer and the backup envelope both read it.
      Bump APP_VERSION and nothing else. Bump BACKUP_SCHEMA only when the SHAPE of saved
      data changes, not on every release. ---------- */
-  const APP_VERSION = 'v0.47';
+  const APP_VERSION = 'v0.48';
   /* v0.46 bumps the schema because a planting gained a `finished` field. It is an
      ADDITIVE optional field, so an old file loads here untouched. The bump is for the
      other direction: a v0.46 file read by a v0.45 build would show every finished
      planting as still growing, and the honest answer to that is the refusal the import
      gate already gives ("update the app, then import it"), not a silently wrong garden.
      The cost is one reload, because the app is a static page. */
-  const BACKUP_SCHEMA = 3;
+  /* v0.48 adds a fifth garden key, `garden-tracker:done`. Same call as the v0.46
+     bump and for the same reason: a v0.48 file read by an older build would show
+     every completed task as still outstanding, and a refusal that says so beats a
+     garden that quietly nags you about work you already did. */
+  const BACKUP_SCHEMA = 4;
   (function(){ const el = document.getElementById('app-version'); if (el) el.textContent = APP_VERSION; })();
 
   /* ---------- icon set (original line icons, currentColor) ---------- */
@@ -1020,8 +1046,9 @@
   function daysSince(dateStr){
     const planted = asDate(dateStr); const today = new Date(); today.setHours(0,0,0,0);
     const diff = Math.round((today - planted)/86400000);
+    /* "day 25" made the reader do the work of remembering what it counted from */
     if (diff < 0) return 'not yet'; if (diff === 0) return 'planted today';
-    if (diff === 1) return 'day 1'; return 'day ' + diff;
+    if (diff === 1) return '1 day in'; return diff + ' days in';
   }
   function prettyFull(dateStr){ return asDate(dateStr).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); }
   function ageBadge(dateStr, g){
@@ -1290,7 +1317,36 @@
       tasks.push({ id:p.id, when:addDays(d, hd), plant:p.name, kind:'harvest', title:'Start harvesting ' + p.name });
     });
     tasks.sort(function(a,b){ return a.when - b.when; });
+    /* ONE identity per task, minted here and used by both the schedule and the .ics.
+       The export was already building this string inline; completions key on the same
+       thing, so a task you tick here is the same task your calendar knows about. */
+    tasks.forEach(function(t){ t.uid = t.id + '-' + (t.uidSuffix || t.kind); });
     return tasks;
+  }
+
+  /* ---------- completions (v0.48) ----------
+     The schedule used to forecast and never record: no way to say you did a thing,
+     no overdue state, and today styled exactly like next week. Tasks are DERIVED
+     from planting date + guide on every render, so a completion cannot live on the
+     task - it lives in its own map, keyed by the task's uid. */
+  const DONE_KEY = 'garden-tracker:done';
+  let doneMap = {};
+  function loadDone(){
+    try { const r = localStorage.getItem(DONE_KEY); doneMap = r ? JSON.parse(r) : {}; } catch(e){ doneMap = {}; }
+    if (!doneMap || typeof doneMap !== 'object' || Array.isArray(doneMap)) doneMap = {};
+    /* this map exists to stop things nagging, not to be a history - anything older
+       than the overdue window could ever reach is dead weight, so it is dropped */
+    const floor = addDays(new Date(), -400);
+    Object.keys(doneMap).forEach(function(k){
+      const d = asDate(String(doneMap[k]));
+      if (isNaN(d) || d < floor) delete doneMap[k];
+    });
+  }
+  function saveDone(){ try { localStorage.setItem(DONE_KEY, JSON.stringify(doneMap)); } catch(e){} }
+  function isDone(uid){ return !!doneMap[uid]; }
+  function toggleDone(t){
+    if (doneMap[t.uid]) delete doneMap[t.uid]; else doneMap[t.uid] = todayISO();
+    saveDone(); render();
   }
 
   function harvestEnd(){
@@ -1309,36 +1365,90 @@
     const btn = document.getElementById('export-btn');
     if (!body) return;
     /* nothing GROWING means nothing to schedule, even if the garden has a long history */
+    const note = document.getElementById('export-note');
     if (activePlantings().length === 0){
       body.innerHTML = '<p class="empty" style="margin-top:0.5rem;">' + (plantings.length
         ? 'Nothing is growing right now. Add a planting and its watering, feeding, and harvest dates will show up here.'
         : 'Add a planting and your watering, feeding, and harvest dates will show up here.') + '</p>';
       if (btn) btn.style.display = 'none';
+      if (note) note.style.display = 'none';
       return;
     }
     if (btn) btn.style.display = 'inline-block';
+    if (note) note.style.display = 'block';
+    /* F10: this sentence used to sit at the top of the schedule with a watering-can
+       icon, where it read as something the APP does every morning. It does not - the
+       recurring 7am reminder is a VEVENT inside the file you download, and only
+       exists once you import it. Moved next to the button that makes it true. */
+    const wn = document.getElementById('water-note');
+    if (wn) wn.innerHTML = ICONS.watering + ' The file includes a daily 7:00am watering reminder that runs while things are growing.';
     const today = new Date(); today.setHours(0,0,0,0);
-    // show only the NEXT occurrence of each plant + task (the full multi-year set stays in the calendar + .ics)
+    const all = buildTasks();
+    const sameDay = function(d){ return d.getTime() === today.getTime(); };
+
+    /* OVERDUE used to be invisible: the filter was `when >= today`, so a harvest date
+       you sailed past simply vanished off the board. It now surfaces, bounded to 30
+       days so a missed feed from last spring does not nag forever. */
+    const OVERDUE_WINDOW = 30;
+    const floor = addDays(today, -OVERDUE_WINDOW);
+    const stamp = todayISO();
+    /* something ticked TODAY stays on the board, struck through, so the tick has
+       visible consequence and a mis-tap can be taken back. It clears itself
+       tomorrow. Anything done before today has served its purpose and drops off. */
+    const doneToday = function(t){ return doneMap[t.uid] === stamp; };
+    const keep = function(t){ return !isDone(t.uid) || doneToday(t); };
+
+    const rows = []; const used = {};
+    const push = function(t){ if (used[t.uid]) return; used[t.uid] = true; rows.push(t); };
+    /* Overdue is capped so a first upgrade - or a fortnight away - cannot fill the
+       whole board with red and push today's actual work off the bottom. The cap is
+       SAID OUT LOUD below rather than silently swallowing the rest, because a
+       truncated list that looks complete is how the original bug read. */
+    const OVERDUE_CAP = 6;
+    const lateAll = all.filter(function(t){ return t.when < today && t.when >= floor && keep(t); });
+    const lateHidden = Math.max(0, lateAll.length - OVERDUE_CAP);
+    lateAll.slice(0, OVERDUE_CAP).forEach(push);
+    all.filter(function(t){ return sameDay(t.when) && keep(t); }).forEach(push);
+    // future: still only the NEXT occurrence per plant+task; the full set lives in the calendar + .ics
     const seen = {};
-    const upcoming = buildTasks()
-      .filter(function(t){ return t.when >= today; })
+    all.filter(function(t){ return t.when > today && keep(t); })
       .filter(function(t){ const k = t.id + '|' + t.kind; if (seen[k]) return false; seen[k] = true; return true; })
-      .slice(0, 12);
+      .forEach(push);
+    rows.splice(14);
     const labels = { move:'transplant', feed:'feed', harvest:'harvest' };
     const TAGIC = { move:ICONS.transplant, feed:ICONS.feed, harvest:ICONS.harvest };
-    let h = '<div class="water-line">' + ICONS.watering + '<span>Daily watering reminder at 7:00am while things are growing.</span></div>';
-    if (upcoming.length === 0){
+
+    let h = '';
+    if (rows.length === 0){
       h += '<p class="empty" style="margin-top:0.75rem;">No dated tasks coming up right now.</p>';
       body.innerHTML = h; return;
     }
     h += '<ul class="sched-list">';
-    upcoming.forEach(function(t){
-      h += '<li class="task task-' + t.kind + '"><span class="tdate">' + fmtSched(t.when) + '</span><span class="tkind">' + TAGIC[t.kind] + labels[t.kind] + '</span><span class="ttitle"></span></li>';
+    rows.forEach(function(t, i){
+      const done = isDone(t.uid);
+      const late = !done && t.when < today;
+      const now = sameDay(t.when);
+      const cls = 'task task-' + t.kind + (done ? ' is-done' : '') + (late ? ' is-overdue' : '') + (now ? ' is-today' : '');
+      const when = late ? 'Overdue · ' + fmtSched(t.when) : (now ? 'Today' : fmtSched(t.when));
+      h += '<li class="' + cls + '">'
+         + '<button class="tdone" type="button" data-i="' + i + '" role="switch" aria-checked="' + (done ? 'true' : 'false') + '"><span class="tick" aria-hidden="true">' + (done ? '✓' : '') + '</span></button>'
+         + '<span class="tdate">' + when + '</span>'
+         + '<span class="tkind">' + TAGIC[t.kind] + labels[t.kind] + '</span>'
+         + '<span class="ttitle"></span></li>';
     });
     h += '</ul>';
+    if (lateHidden > 0){
+      h += '<p class="sched-more">' + lateHidden + ' more overdue task' + (lateHidden === 1 ? '' : 's')
+         + ' not shown &mdash; tick these off and the next ones appear.</p>';
+    }
     body.innerHTML = h;
     const titleEls = body.querySelectorAll('.ttitle');
-    upcoming.forEach(function(t, i){ if (titleEls[i]) titleEls[i].textContent = t.title; });
+    rows.forEach(function(t, i){ if (titleEls[i]) titleEls[i].textContent = t.title; });
+    body.querySelectorAll('.tdone').forEach(function(b){
+      const t = rows[parseInt(b.getAttribute('data-i'), 10)];
+      b.setAttribute('aria-label', (isDone(t.uid) ? 'Mark not done: ' : 'Mark done: ') + t.title);
+      b.addEventListener('click', function(){ toggleDone(t); });
+    });
   }
 
   /* ---------- calendar export (.ics) ---------- */
@@ -1354,8 +1464,9 @@
     const L = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Garden Tracker//EN','CALSCALE:GREGORIAN'];
     let uid = 0;
     buildTasks().forEach(function(t){
+      if (isDone(t.uid)) return; // done means stop nagging, in the calendar too
       L.push('BEGIN:VEVENT');
-      L.push('UID:gt-' + t.id + '-' + (t.uidSuffix || t.kind) + '@garden-tracker');
+      L.push('UID:gt-' + t.uid + '@garden-tracker');
       L.push('DTSTAMP:' + stamp);
       L.push('DTSTART;VALUE=DATE:' + icsDate(t.when));
       L.push('DTEND;VALUE=DATE:' + icsDate(addDays(t.when, 1)));
@@ -1681,7 +1792,7 @@
       var spreads = {}; Object.keys(b.grid).forEach(function(k){ var vv=b.grid[k]; if (vv && vv.c){ var gg=guideByKey(vv.c); if (gg && gg.sprawl) spreads[vv.c]=true; } });
       if (Object.keys(spreads).length){ h += '<div class="bed-spread"><span class="bw-ic">\u2922</span>Give room \u2014 ' + Object.keys(spreads).map(escBed).join(', ') + ' sprawl, so leave a square or two open around each.</div>'; }
       h += '<p class="sfg-hint">Pick a crop, then tap a square to plant one \u2014 tap again to add more, up to the square\u2019s limit. Tap with nothing selected to clear.</p>';
-      if (b.history && b.history.length){ h += '<p class="bed-hist">Remembered: ' + b.history.map(function(s){ return escBed(s.label); }).join(', ') + '</p>'; }
+      if (b.history && b.history.length){ h += '<p class="bed-hist">Past seasons: ' + b.history.map(function(s){ return escBed(s.label); }).join(', ') + ' &mdash; used for the rotation warnings above.</p>'; }
       h += '<button class="bed-season" data-bed="'+b.id+'">\u21bb Start next season</button>';
       h += '</div>';
     });
@@ -2197,7 +2308,7 @@
     openGuides = {};
     clearUndo(); // the garden that undo referred to is gone
     loadZone(); applyZoneToUI();
-    loadCropColors(); loadBeds(); load(); render();
+    loadCropColors(); loadBeds(); loadDone(); load(); render();
     backupStatus('Imported ' + count + plural(count) + from + '. Your garden is restored.');
   }
   document.getElementById('backup-export').addEventListener('click', exportBackup);
@@ -2249,6 +2360,7 @@
   load();
   loadBeds();
   loadCropColors();
+  loadDone();
   (function(){
     const today = new Date();
     calState.y = today.getFullYear(); calState.m = today.getMonth();

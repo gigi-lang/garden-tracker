@@ -4,6 +4,18 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Garden Tracker</title>
+<meta name="description" content="A quiet place to keep track of everything growing. Plantings, care guides, square-foot bed layouts and a schedule you can send to your calendar - all kept in your own browser." />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#eef0e4" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#1a231c" media="(prefers-color-scheme: dark)" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Garden Tracker" />
+<meta property="og:description" content="A quiet place to keep track of everything growing." />
+<meta property="og:url" content="https://gigi-lang.github.io/garden-tracker/" />
+<meta name="twitter:card" content="summary" />
+<link rel="canonical" href="https://gigi-lang.github.io/garden-tracker/" />
+<!-- the sprout mark, inline so the icon costs no request and cannot 404 -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235e9367' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V11'/%3E%3Cpath d='M12 11C12 7 9 5 4 5c0 4 3 6 8 6Z'/%3E%3Cpath d='M12 13c0-3 2.5-5 7-5 0 3.5-2.5 5-7 5Z'/%3E%3C/svg%3E" />
 <script>(function(){try{var t=localStorage.getItem('garden-tracker:theme');if(!t)t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -54,7 +66,15 @@
   header { margin-bottom:clamp(1.5rem,5vw,2.5rem); }
   .mark { display:inline-flex; align-items:center; gap:0.5rem; margin-bottom:1rem; }
   .mark .sprout { width:26px; height:26px; flex:none; }
-  .wordmark { font-family:'Fraunces',serif; font-weight:600; font-size:clamp(2.2rem,7vw,3.1rem); letter-spacing:-0.01em; line-height:1.05; }
+  .wordmark { font-family:'Fraunces',serif; font-weight:600; font-size:clamp(2.2rem,7vw,3.1rem); letter-spacing:-0.01em; line-height:1.05; margin:0; }
+  /* skip link: present for keyboard and screen-reader users, out of the way otherwise */
+  .skip { position:absolute; left:-9999px; top:0; z-index:100; background:var(--plot); color:var(--evergreen);
+    font-family:inherit; font-size:0.875rem; font-weight:600; border:1px solid var(--seedling);
+    border-radius:var(--r); padding:0.7rem 1rem; text-decoration:none; }
+  .skip:focus { left:0.75rem; top:0.75rem; }
+  /* text for assistive tech only - used by the live region that announces changes */
+  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0 0 0 0); white-space:nowrap; border:0; }
   .wordmark .leaf { color:var(--seedling); }
   .tagline { font-size:1.05rem; color:var(--soil); max-width:34ch; }
   .menu { display:flex; flex-direction:column; gap:0.15rem; flex:0 0 160px; position:sticky; top:1rem; align-self:flex-start; }
@@ -252,19 +272,27 @@
   .cal-nav:hover { background:var(--inset); border-color:var(--seedling); color:var(--evergreen); }
   .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-top:1rem; }
   .cal-dow { text-align:center; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); padding-bottom:0.2rem; }
-  .cal-cell { position:relative; min-height:2.6rem; border:1px solid var(--line); border-radius:var(--r-cell); background:var(--inset); padding:0.2rem 0.3rem; font-size:0.8rem; color:var(--ink); }
+  /* a day is a <button> when it has work on it and a <div> when it does not, so the
+     shared properties are declared once and the button resets sit alongside */
+  .cal-cell { position:relative; display:block; width:100%; min-height:2.6rem; border:1px solid var(--line); border-radius:var(--r-cell); background:var(--inset); padding:0.2rem 0.3rem; font-size:0.8rem; font-family:inherit; color:var(--ink); text-align:left; }
   .cal-cell.empty { background:transparent; border-color:transparent; }
   .cal-cell.today { border:2px solid var(--seedling); font-weight:600; }
   .cal-cell.has { cursor:pointer; }
   .cal-cell.has:hover { background:var(--wash); }
-  .cal-dots { position:absolute; left:0.3rem; right:0.3rem; bottom:0.25rem; display:flex; gap:2px; flex-wrap:wrap; }
-  .cal-dot { width:6px; height:6px; border-radius:50%; }
-  .cal-dot.move { background:var(--soil); }
-  .cal-dot.feed { background:var(--seedling); }
-  .cal-dot.harvest { background:var(--tomato); }
+  .cal-cell.has[aria-pressed="true"] { background:var(--wash); box-shadow:inset 0 0 0 1px var(--seedling); }
+  .cal-dots { position:absolute; left:0.3rem; right:0.3rem; bottom:0.25rem; display:flex; gap:3px; flex-wrap:wrap; }
+  /* F14: three kinds, three SHAPES, so the distinction survives without colour.
+     harvest = filled disc, feed = hollow ring, transplant = diamond. */
+  .cal-dot { width:7px; height:7px; box-sizing:border-box; }
+  .cal-dot.harvest { background:var(--tomato); border-radius:50%; }
+  .cal-dot.feed { background:transparent; border:1.5px solid var(--seedling); border-radius:50%; }
+  .cal-dot.move { background:var(--soil); border-radius:1px; transform:rotate(45deg); }
   .cal-legend { display:flex; flex-wrap:wrap; gap:1rem; margin-top:0.75rem; font-size:0.7rem; color:var(--soil); }
-  .cal-legend span { display:inline-flex; align-items:center; gap:0.25rem; }
-  .cal-legend i { width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .cal-legend span { display:inline-flex; align-items:center; gap:0.35rem; }
+  .cal-legend i { width:8px; height:8px; box-sizing:border-box; display:inline-block; flex:none; }
+  .cal-legend i.harvest { background:var(--tomato); border-radius:50%; }
+  .cal-legend i.feed { background:transparent; border:1.5px solid var(--seedling); border-radius:50%; }
+  .cal-legend i.move { background:var(--soil); border-radius:1px; transform:rotate(45deg); }
   .cal-day-detail { margin-top:1rem; font-size:0.875rem; }
   .cal-day-detail .d-title { font-weight:600; margin-bottom:0.25rem; }
   .cal-day-detail .d-task { color:var(--ink); padding:0.15rem 0; }
@@ -301,7 +329,7 @@
   /* F6: an empty square IS soil, matching the full-screen view. It used to be pure
      white, so the inline grid read as white tiles with brown grout while the modal
      read as soil squares with paths - the same bed, inverted figure and ground. */
-  .sfg-cell { width:54px; height:54px; box-sizing:border-box; background:var(--fs-soil); border-radius:var(--r-cell); padding:5px; cursor:pointer; user-select:none; transition:background .15s; }
+  .sfg-cell { display:block; width:54px; height:54px; box-sizing:border-box; background:var(--fs-soil); border:none; font-family:inherit; border-radius:var(--r-cell); padding:5px; cursor:pointer; user-select:none; transition:background .15s; }
   .sfg-cell.empty:hover { background:var(--soil); }
   .sfg-holes { display:grid; gap:2px; width:100%; height:100%; }
   .sfg-hole { border-radius:50%; background:rgba(60,48,32,0.22); }
@@ -340,11 +368,11 @@
   .bed-fs-main { min-width:0; }
   .fs-gridwrap { overflow:auto; }
   .fs-grid { display:grid; gap:5px; background:var(--soil); padding:5px; border-radius:var(--r); width:max-content; }
-  .fs-cell { position:relative; width:var(--fs-cell); height:var(--fs-cell); box-sizing:border-box; background:var(--fs-soil); border-radius:var(--r-cell); cursor:pointer; user-select:none; transition:background .15s; }
+  .fs-cell { display:block; position:relative; width:var(--fs-cell); height:var(--fs-cell); box-sizing:border-box; background:var(--fs-soil); border:none; padding:0; font-family:inherit; border-radius:var(--r-cell); cursor:pointer; user-select:none; transition:background .15s; }
   .fs-cell.filled { background:var(--soil); }
   .fs-cell.empty:hover { background:var(--wash); }
   .fs-sub { display:grid; gap:2px; width:100%; height:100%; }
-  .fs-slot { background:var(--fs-soil); border-radius:1px; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; transition:box-shadow .1s; }
+  .fs-slot { background:var(--fs-soil); border:none; padding:0; font-family:inherit; border-radius:1px; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; transition:box-shadow .1s; }
   .fs-slot:hover { box-shadow:inset 0 0 0 2px var(--seedling); }
   .fs-cell.preview { background:var(--soil); }
   .fs-cell.preview .fs-slot { opacity:0.5; }
@@ -372,16 +400,34 @@
   .bed-spread { margin-top:0.5rem; font-size:0.82rem; line-height:1.4; color:var(--soil); background:rgba(122,106,85,0.06); border:1px solid rgba(122,106,85,0.22); border-radius:var(--r); padding:0.5rem 0.7rem; }
   .bed-spread .bw-ic { font-weight:700; margin-right:0.3rem; }
   @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+
+  /* ---- ONE focus ring for everything that takes focus (v0.49) ----
+     The app used to define its 2px seedling ring for five selectors and let every
+     other control fall back to the browser's 1px default. Visible, but a different
+     indicator depending on which control you happened to tab to. This rule is the
+     whole set; the per-control rules above are now redundant and kept only where
+     they carry a different offset. */
+  a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible,
+  textarea:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+    outline:2px solid var(--seedling); outline-offset:2px;
+  }
+  /* inside the packed grids an offset ring would be clipped by the neighbour, so it
+     sits inside the cell instead - same colour, same weight, still unmistakable */
+  .sfg-cell:focus-visible, .fs-cell:focus-visible, .fs-slot:focus-visible, .cal-cell:focus-visible {
+    outline:2px solid var(--seedling); outline-offset:-2px; z-index:2;
+  }
 </style>
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
+  <p class="sr-only" id="announce" role="status" aria-live="polite"></p>
   <div class="wrap">
     <header>
       <div class="mark">
         <svg class="sprout" viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M12 22V11" /><path d="M12 11C12 7 9 5 4 5c0 4 3 6 8 6Z" /><path d="M12 13c0-3 2.5-5 7-5 0 3.5-2.5 5-7 5Z" />
         </svg>
-        <span class="wordmark">Garden <span class="leaf">Tracker</span></span>
+        <h1 class="wordmark">Garden <span class="leaf">Tracker</span></h1>
       </div>
       <p class="tagline">A quiet place to keep track of everything growing.</p>
       <p class="today" id="today"></p>
@@ -422,7 +468,7 @@
         <a href="#doctor" data-route="doctor">Plant doctor</a>
         <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"><span class="tt-ic">☾</span> <span class="tt-label">Dark</span></button>
       </nav>
-      <main class="plots">
+      <main class="plots" id="main" tabindex="-1">
 
       <div class="view active" data-view="home">
 
@@ -566,9 +612,9 @@
           </div>
           <div class="cal-grid" id="cal-grid"></div>
           <div class="cal-legend">
-            <span><i style="background:var(--soil)"></i>transplant</span>
-            <span><i style="background:var(--seedling)"></i>feed</span>
-            <span><i style="background:var(--tomato)"></i>harvest</span>
+            <span><i class="move"></i>transplant</span>
+            <span><i class="feed"></i>feed</span>
+            <span><i class="harvest"></i>harvest</span>
           </div>
           <div class="cal-day-detail" id="cal-detail"></div>
         </section>
@@ -585,7 +631,7 @@
   /* ---------- app version: ONE place. The footer and the backup envelope both read it.
      Bump APP_VERSION and nothing else. Bump BACKUP_SCHEMA only when the SHAPE of saved
      data changes, not on every release. ---------- */
-  const APP_VERSION = 'v0.48';
+  const APP_VERSION = 'v0.49';
   /* v0.46 bumps the schema because a planting gained a `finished` field. It is an
      ADDITIVE optional field, so an old file loads here untouched. The bump is for the
      other direction: a v0.46 file read by a v0.45 build would show every finished
@@ -1506,6 +1552,9 @@
   const calState = { y: new Date().getFullYear(), m: new Date().getMonth(), sel: null };
   const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const DOW = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  /* F14: what each dot MEANS, in words, for the accessible name of the day button.
+     The shape that carries it visually lives in .cal-dot in the stylesheet. */
+  const CAL_KIND = { move:{ label:'transplant' }, feed:{ label:'feed' }, harvest:{ label:'harvest' } };
 
   function tasksByDay(y, m){
     const map = {};
@@ -1534,23 +1583,42 @@
     for (let i = 0; i < first; i++){ h += '<div class="cal-cell empty"></div>'; }
     for (let day = 1; day <= days; day++){
       const ts = byDay[day] || [];
-      const cls = 'cal-cell' + (ts.length ? ' has' : '') + (isThisMonth && today.getDate() === day ? ' today' : '');
-      h += '<div class="' + cls + '" data-day="' + day + '">' + day;
+      const isToday = isThisMonth && today.getDate() === day;
+      const cls = 'cal-cell' + (ts.length ? ' has' : '') + (isToday ? ' today' : '');
+      /* F3: a day with work is a real button, so it can be tabbed to and pressed.
+         A day with nothing on it stays a plain div - there is nothing to activate,
+         and 30 empty tab stops is its own accessibility problem. */
       if (ts.length){
         const kinds = {}; ts.forEach(function(t){ kinds[t.kind] = true; });
-        h += '<div class="cal-dots">';
+        const names = Object.keys(kinds).map(function(k){ return CAL_KIND[k].label; });
+        /* F14: the name carries what kind of work it is, so the meaning does not
+           live in the dot colour alone */
+        const aria = MONTHS[calState.m] + ' ' + day + (isToday ? ', today' : '') + ' - ' + names.join(', ');
+        h += '<button type="button" class="' + cls + '" data-day="' + day + '" aria-label="' + aria + '">' + day;
+        h += '<span class="cal-dots" aria-hidden="true">';
+        /* F14: shape as well as hue - filled disc, hollow ring, diamond - so the
+           three kinds stay apart for a red/green colour-blind reader */
         Object.keys(kinds).forEach(function(k){ h += '<span class="cal-dot ' + k + '"></span>'; });
-        h += '</div>';
+        h += '</span></button>';
+      } else {
+        h += '<div class="' + cls + '"' + (isToday ? ' aria-label="' + MONTHS[calState.m] + ' ' + day + ', today"' : '') + '>' + day + '</div>';
       }
-      h += '</div>';
     }
     grid.innerHTML = h;
 
     grid.querySelectorAll('.cal-cell.has').forEach(function(cell){
       cell.addEventListener('click', function(){
         calState.sel = parseInt(cell.getAttribute('data-day'), 10);
+        /* renderDetail only, never renderCalendar - re-rendering the grid would
+           destroy the button the keyboard user is standing on */
+        grid.querySelectorAll('.cal-cell.has').forEach(function(c){
+          c.setAttribute('aria-pressed', c === cell ? 'true' : 'false');
+        });
         renderDetail();
       });
+    });
+    grid.querySelectorAll('.cal-cell.has').forEach(function(c){
+      c.setAttribute('aria-pressed', String(parseInt(c.getAttribute('data-day'), 10) === calState.sel));
     });
     if (calState.sel == null && isThisMonth && byDay[today.getDate()]) calState.sel = today.getDate();
     renderDetail();
@@ -1580,7 +1648,7 @@
   /* ---------- beds (v0.25) ---------- */
   const BEDS_KEY = 'garden-tracker:beds';
   let beds = [];
-  function loadBeds(){ try { const r=localStorage.getItem(BEDS_KEY); beds = r?JSON.parse(r):[]; } catch(e){ beds=[]; } beds.forEach(function(b){ if(!b.cols) b.cols=4; if(!b.rows) b.rows=4; if(!b.grid) b.grid={}; if(!b.history) b.history=[]; Object.keys(b.grid).forEach(function(k){ var v=b.grid[k]; if (typeof v === 'string'){ v = { c:v, n:sfgMax(v) }; b.grid[k]=v; } if (v && v.c && !Array.isArray(v.slots)){ var mx=sfgMax(v.c); var nn=Math.min(mx, (typeof v.n==='number'?v.n:mx)); var arr=[]; for(var i=0;i<nn;i++) arr.push(i); v.slots=arr; v.n=arr.length; } }); }); }
+  function loadBeds(){ try { const r=localStorage.getItem(BEDS_KEY); beds = r?JSON.parse(r):[]; } catch(e){ beds=[]; } beds.forEach(function(b){ if(!b.cols) b.cols=4; if(!b.rows) b.rows=4; if(!b.grid) b.grid={}; if(!b.history) b.history=[]; Object.keys(b.grid).forEach(function(k){ var v=b.grid[k]; if (typeof v === 'string'){ v = { c:v, n:sfgMax(v) }; b.grid[k]=v; } if (v && v.c && !Array.isArray(v.slots)){ var mx=sfgMax(v.c); var nn=Math.min(mx, (typeof v.n==='number'?v.n:mx)); var arr=[]; for(var i=0;i<nn;i++) arr.push(i); v.slots=arr; v.n=arr.length; } if (v && v.c && Array.isArray(v.slots)){ /* an EXISTING slot array was never clamped, so a hand-edited or older file could hold more slots than the crop allows - it rendered as "3/1" in the tooltip and, once the squares got accessible names in v0.49, read aloud as "3 of 1 planted" */ var mx2=sfgMax(v.c); v.slots=v.slots.filter(function(i){ return typeof i==='number' && i>=0 && i<mx2; }).sort(function(a,b){return a-b;}); v.n=v.slots.length; if (!v.slots.length) delete b.grid[k]; } }); }); }
   function saveBeds(){ try { localStorage.setItem(BEDS_KEY, JSON.stringify(beds)); } catch(e){} }
   function escBed(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   function bedName(id){ if(!id) return ''; const b = beds.find(function(x){ return x.id===id; }); return b ? b.name : ''; }
@@ -1741,6 +1809,11 @@
   }
   let sfgBrush = null;
   let fsBed = null;
+  /* The bed id whose control opened the dialog - an ID, never the element. renderBeds()
+     rewrites body.innerHTML on every render, and opening the dialog CALLS render(), so a
+     stored element reference is detached before the dialog is even on screen. Measured:
+     focus fell back to <body> every time until this became a lookup. */
+  let fsOpenerBed = null;
   function bedPalette(b){
     const palette = []; const seen = {};
     function addBrush(nm){ const g = matchGuide(nm); if (!g || !g.sfg) return; if (seen[g.name]) return; seen[g.name]=true; palette.push({ key:g.name, sfg:g.sfg, color:cropColor(nm) }); }
@@ -1775,13 +1848,20 @@
       for (let r=0;r<b.rows;r++){
         for (let c=0;c<b.cols;c++){
           const key = r+'-'+c; const cell = b.grid[key];
+          /* F3: every square is a real <button> with a name that says where it is
+             and what is in it, so the planner can be worked entirely from the
+             keyboard and read aloud. It used to be a <div> with a click handler -
+             28 of them in a 4x4 garden, none reachable by Tab. */
+          const where = 'Row ' + (r + 1) + ', column ' + (c + 1);
           if (cell && cell.c){
             const mx = sfgMax(cell.c); const col = cropColor(cell.c); const cols2 = holeCols(mx);
             let dots = '';
             const fset=cellSlots(cell); for (let i=0;i<mx;i++){ dots += '<div class="sfg-hole"'+(fset.indexOf(i)>=0?' style="background:'+col+'"':'')+'></div>'; }
-            h += '<div class="sfg-cell'+(cl.cells[key]?' clash':'')+(rot.cells[key]?' rot':'')+((guideByKey(cell.c)||{}).sprawl?' spread':'')+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')"><div class="sfg-holes" style="grid-template-columns:repeat('+cols2+',1fr)">'+dots+'</div></div>';
+            const flags = (cl.cells[key] ? ', keep apart' : '') + (rot.cells[key] ? ', rotation warning' : '');
+            const aria = where + ': ' + cell.c + ', ' + cell.n + ' of ' + mx + ' planted' + flags;
+            h += '<button type="button" class="sfg-cell'+(cl.cells[key]?' clash':'')+(rot.cells[key]?' rot':'')+((guideByKey(cell.c)||{}).sprawl?' spread':'')+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')" aria-label="'+escBed(aria)+'"><div class="sfg-holes" aria-hidden="true" style="grid-template-columns:repeat('+cols2+',1fr)">'+dots+'</div></button>';
           } else {
-            h += '<div class="sfg-cell empty" data-bed="'+b.id+'" data-key="'+key+'"></div>';
+            h += '<button type="button" class="sfg-cell empty" data-bed="'+b.id+'" data-key="'+key+'" aria-label="'+escBed(where + ': empty')+'"></button>';
           }
         }
       }
@@ -1843,8 +1923,8 @@
       });
     });
     body.querySelectorAll('[data-fs]').forEach(function(el){
-      el.addEventListener('click', function(){ fsBed = el.getAttribute('data-fs'); render(); });
-      if (el.tagName === 'H3'){ el.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fsBed = el.getAttribute('data-fs'); render(); } }); }
+      el.addEventListener('click', function(){ fsOpenerBed = el.getAttribute('data-fs'); fsBed = fsOpenerBed; render(); });
+      if (el.tagName === 'H3'){ el.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fsOpenerBed = el.getAttribute('data-fs'); fsBed = fsOpenerBed; render(); } }); }
     });
     renderBedFs();
   }
@@ -1919,19 +1999,33 @@
     for (let r=0;r<b.rows;r++){
       for (let c=0;c<b.cols;c++){
         const key = r+'-'+c; const cell = b.grid[key];
+        /* F3: in the full-screen grid the SLOT is the thing you act on, so the slot
+           is the button and the cell around it stays a plain div - a button inside a
+           button is invalid and the browser would swallow one of them. A cell with no
+           slots to press (nothing planted, no brush held) is itself the button. */
+        const where = 'Row ' + (r + 1) + ', column ' + (c + 1);
         if (cell && cell.c){
           const col = cropColor(cell.c); const mx = sfgMax(cell.c); const cols2 = holeCols(mx); const set = cellSlots(cell);
           const extra = (cl.cells[key]?' clash':'')+(rot.cells[key]?' rot':'')+((guideByKey(cell.c)||{}).sprawl?' spread':'');
           let slots = '';
           const mk = fsLetter(cell.c);
-          for (let i=0;i<mx;i++){ slots += (set.indexOf(i)>=0) ? '<div class="fs-slot on" data-i="'+i+'"><span class="lt'+ltClass(mk)+'" style="color:'+col+'">'+escBed(mk)+'</span></div>' : '<div class="fs-slot" data-i="'+i+'"></div>'; }
-          out += '<div class="fs-cell filled'+extra+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+set.length+'/'+mx+')"><div class="fs-sub" style="--sc:'+cols2+';grid-template-columns:repeat('+cols2+',1fr)">'+slots+'</div></div>';
+          for (let i=0;i<mx;i++){
+            const on = set.indexOf(i) >= 0;
+            const nm = where + ', spot ' + (i+1) + ' of ' + mx + ': ' + (on ? cell.c + ', planted' : 'empty');
+            slots += on
+              ? '<button type="button" class="fs-slot on" data-i="'+i+'" aria-label="'+escBed(nm)+'"><span class="lt'+ltClass(mk)+'" aria-hidden="true" style="color:'+col+'">'+escBed(mk)+'</span></button>'
+              : '<button type="button" class="fs-slot" data-i="'+i+'" aria-label="'+escBed(nm)+'"></button>';
+          }
+          const flags = (cl.cells[key] ? ', keep apart' : '') + (rot.cells[key] ? ', rotation warning' : '');
+          out += '<div class="fs-cell filled'+extra+'" role="group" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+set.length+'/'+mx+')" aria-label="'+escBed(where + ': ' + cell.c + ', ' + set.length + ' of ' + mx + flags)+'"><div class="fs-sub" style="--sc:'+cols2+';grid-template-columns:repeat('+cols2+',1fr)">'+slots+'</div></div>';
         } else if (brushMax > 0){
           const cols2 = holeCols(brushMax); let slots = '';
-          for (let i=0;i<brushMax;i++){ slots += '<div class="fs-slot" data-i="'+i+'"></div>'; }
-          out += '<div class="fs-cell empty preview" data-bed="'+b.id+'" data-key="'+key+'"><div class="fs-sub" style="--sc:'+cols2+';grid-template-columns:repeat('+cols2+',1fr)">'+slots+'</div></div>';
+          for (let i=0;i<brushMax;i++){
+            slots += '<button type="button" class="fs-slot" data-i="'+i+'" aria-label="'+escBed(where + ', spot ' + (i+1) + ' of ' + brushMax + ': empty, plant ' + sfgBrush + ' here')+'"></button>';
+          }
+          out += '<div class="fs-cell empty preview" role="group" data-bed="'+b.id+'" data-key="'+key+'"><div class="fs-sub" style="--sc:'+cols2+';grid-template-columns:repeat('+cols2+',1fr)">'+slots+'</div></div>';
         } else {
-          out += '<div class="fs-cell empty" data-bed="'+b.id+'" data-key="'+key+'"></div>';
+          out += '<button type="button" class="fs-cell empty" data-bed="'+b.id+'" data-key="'+key+'" aria-label="'+escBed(where + ': empty')+'"></button>';
         }
       }
     }
@@ -1960,7 +2054,21 @@
   function renderBedFs(){
     const root = document.getElementById('fs-root'); if(!root) return;
     const b = fsBed ? beds.find(function(x){ return x.id===fsBed; }) : null;
-    if (!b){ root.innerHTML=''; document.body.style.overflow=''; return; }
+    if (!b){
+      const wasOpen = !!root.innerHTML;
+      root.innerHTML=''; document.body.style.overflow='';
+      /* F3: hand focus back to the control that opened the dialog. Without this,
+         closing drops the caret to <body> and a keyboard user tabs from the top of
+         the page to get back to the bed they were working on. Looked up fresh,
+         because the original button was replaced by the render that opened this. */
+      if (wasOpen && fsOpenerBed){
+        const back = document.querySelector('.bed-expand[data-fs="' + fsOpenerBed + '"]')
+                  || document.querySelector('[data-fs="' + fsOpenerBed + '"]');
+        if (back){ try { back.focus(); } catch(e){} }
+      }
+      fsOpenerBed = null;
+      return;
+    }
     document.body.style.overflow='hidden';
     const cl = bedClashes(b); const sh = bedShade(b); const rot = bedRotation(b);
     let panel = root.querySelector('.bed-fs');
@@ -1994,6 +2102,23 @@
         const btn = e.target.closest('.fs-plant'); if(!btn) return;
         const k = btn.getAttribute('data-crop'); sfgBrush = (sfgBrush===k)?null:k; render();
       });
+
+      /* F3: aria-modal="true" tells assistive tech everything behind this is inert.
+         It was not - six Tab presses walked straight out onto the controls behind the
+         backdrop. Keep Tab inside the dialog for as long as it is open, so the promise
+         the markup makes is one the DOM actually keeps. */
+      root.querySelector('.bed-fs').addEventListener('keydown', function(e){
+        if (e.key !== 'Tab') return;
+        const focusables = [...root.querySelectorAll('button, [href], select, textarea, input, [tabindex]:not([tabindex="-1"])')]
+          .filter(function(el){ return el.offsetParent !== null || el === document.activeElement; });
+        if (!focusables.length) return;
+        const first = focusables[0], last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+      });
+      /* move focus IN on open - it used to stay on <body> */
+      const closeBtn = root.querySelector('.bed-fs-close');
+      if (closeBtn) setTimeout(function(){ try { closeBtn.focus(); } catch(e){} }, 0);
     }
     const grid = root.querySelector('.fs-grid');
     grid.style.gridTemplateColumns = 'repeat('+b.cols+',var(--fs-cell))';
@@ -2020,13 +2145,23 @@
     pendingUndo = null;
     const bar = document.getElementById('undo-bar'); if (bar) bar.hidden = true;
   }
+  /* F12: the app had exactly one live region - the backup status - so adding,
+     finishing, reopening or deleting a planting changed the page in total silence
+     for a screen-reader user. Every mutation now says what it did. */
+  function announce(msg){
+    const el = document.getElementById('announce'); if (!el) return;
+    el.textContent = '';               // re-set so an identical message is re-read
+    setTimeout(function(){ el.textContent = msg; }, 50);
+  }
   function finishPlanting(p){
     p.finished = todayISO();
     clearUndo(); save(); render();
+    announce('Finished ' + p.name + '. Moved to your finished plantings.');
   }
   function reopenPlanting(p){
     delete p.finished;
     clearUndo(); save(); render();
+    announce('Reopened ' + p.name + '. Back in your active plantings.');
   }
   function deletePlanting(p){
     const idx = plantings.findIndex(function(x){ return x.id === p.id; });
@@ -2040,6 +2175,7 @@
     delete openGuides[p.id];
     save(); render();
     showUndo('Deleted “' + p.name + '”.');
+    announce('Deleted ' + p.name + '. Undo is available.');
   }
   function undoDelete(){
     if (!pendingUndo) return;
@@ -2047,6 +2183,7 @@
     plantings.splice(Math.min(pendingUndo.index, plantings.length), 0, pendingUndo.planting);
     clearUndo(); save(); render();
     backupStatusSafe('Restored “' + name + '”.');
+    announce('Restored ' + name + '.');
   }
   function backupStatusSafe(msg){ try { backupStatus(msg); } catch(e){} }
   (function(){
@@ -2188,6 +2325,7 @@
     e.target.reset();
     document.getElementById('date').value = date;
     document.getElementById('name').focus();
+    announce('Added ' + name + '.');
   });
 
   document.getElementById('bed-form').addEventListener('submit', function(e){

@@ -92,7 +92,7 @@
   .zone .hint { font-size:0.8rem; color:var(--soil); }
 
   .view { display:none; }
-  .view.active { display:grid; gap:1rem; }
+  .view.active { display:grid; gap:1rem; grid-template-columns:minmax(0,1fr); }
   .plot { position:relative; background:var(--plot); border:1px solid rgba(122,106,85,0.22); border-left:none; border-radius:var(--r); padding:1.5rem; overflow:hidden; box-shadow:0 1px 2px rgba(32,57,43,0.06), 0 6px 16px -4px rgba(32,57,43,0.11); }
   .plot::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--seedling); }
   .plot.soil::before { background:var(--soil); }
@@ -254,8 +254,8 @@
   .bed-add { display:flex; gap:0.5rem; margin-top:1rem; }
   .bed-add input { flex:1; font-family:inherit; font-size:0.875rem; color:var(--ink); background:var(--inset); border:1px solid var(--line); border-radius:var(--r); padding:0.5rem 0.75rem; }
   .bed-add .btn { white-space:nowrap; }
-  .beds-list { display:grid; gap:0.75rem; margin-top:1rem; }
-  .bed-card { position:relative; background:var(--inset); border:1px solid var(--line); border-radius:var(--r-lg); padding:1rem 1.25rem; }
+  .beds-list { display:grid; gap:0.75rem; margin-top:1rem; grid-template-columns:minmax(0,1fr); }
+  .bed-card { position:relative; min-width:0; background:var(--inset); border:1px solid var(--line); border-radius:var(--r-lg); padding:1rem 1.25rem; }
   .bed-card h3 { font-family:'Fraunces',serif; font-weight:500; font-size:1.15rem; line-height:1.2; margin:0 0 0.6rem; color:var(--ink); }
   .bed-card .bed-remove { position:absolute; top:0.75rem; right:0.9rem; background:none; border:none; cursor:pointer; color:var(--soil); font-size:1.2rem; line-height:1; transition:color .15s; }
   .bed-card .bed-remove:hover { color:var(--tomato-ink); }
@@ -271,12 +271,18 @@
   .sfg-chip .sw { width:11px; height:11px; border-radius:var(--r-cell); flex:none; }
   .sfg-chip .perc { color:var(--soil); }
   .sfg-chip.active { border-color:var(--ink); box-shadow:0 0 0 2px var(--seedling); }
-  .sfg-gridwrap { overflow-x:auto; margin-top:0.25rem; }
+  /* F5: the wrapper only scrolls if every ancestor lets it be narrower than its
+     content. Without min-width:0 on the grid/flex chain a 12ft bed widens the whole
+     LAYOUT VIEWPORT on a phone and the page gets clipped instead. */
+  .sfg-gridwrap { overflow-x:auto; overscroll-behavior-x:contain; max-width:100%; margin-top:0.25rem; }
   .sfg-grid { display:grid; gap:4px; background:var(--soil); padding:4px; border-radius:var(--r); width:max-content; }
-  .sfg-cell { width:54px; height:54px; box-sizing:border-box; background:var(--inset); border-radius:var(--r-cell); padding:5px; cursor:pointer; user-select:none; transition:background .15s; }
-  .sfg-cell.empty:hover { background:var(--wash); }
+  /* F6: an empty square IS soil, matching the full-screen view. It used to be pure
+     white, so the inline grid read as white tiles with brown grout while the modal
+     read as soil squares with paths - the same bed, inverted figure and ground. */
+  .sfg-cell { width:54px; height:54px; box-sizing:border-box; background:var(--fs-soil); border-radius:var(--r-cell); padding:5px; cursor:pointer; user-select:none; transition:background .15s; }
+  .sfg-cell.empty:hover { background:var(--soil); }
   .sfg-holes { display:grid; gap:2px; width:100%; height:100%; }
-  .sfg-hole { border-radius:50%; background:rgba(122,106,85,0.16); }
+  .sfg-hole { border-radius:50%; background:rgba(60,48,32,0.22); }
   .sfg-hint { font-size:0.8rem; color:var(--soil); margin:0.5rem 0 0; }
   /* advisory-signal grammar: square-conflict cues are a solid ring in the signal colour (companion = tomato, rotation = purple; they stack as concentric rings) - sprawl = corner bracket (spatial spread hint) - shade = panel only (whole-bed orientation). Every signal also carries a colour-matched panel with the words. */
   .sfg-cell.clash { box-shadow:0 0 0 2px var(--tomato); position:relative; z-index:1; }
@@ -322,6 +328,11 @@
   .fs-cell.preview .fs-slot { opacity:0.5; }
   .fs-cell.preview .fs-slot:hover { opacity:1; }
   .fs-slot .lt { font-family:'Fraunces',serif; font-weight:600; line-height:1; font-size:calc(var(--fs-cell) / var(--sc) * 0.58); }
+  /* a two- or three-letter marker has to fit the same square (F7) */
+  .fs-slot .lt.lt2 { font-size:calc(var(--fs-cell) / var(--sc) * 0.46); letter-spacing:-0.03em; }
+  .fs-slot .lt.lt3 { font-size:calc(var(--fs-cell) / var(--sc) * 0.34); letter-spacing:-0.04em; }
+  .fs-plant-badge .lt.lt2 { font-size:0.8rem; }
+  .fs-plant-badge .lt.lt3 { font-size:0.65rem; }
   .fs-cell.clash { box-shadow:0 0 0 2px var(--tomato); position:relative; z-index:1; }
   .fs-cell.rot { outline:2px solid var(--rotation); outline-offset:1px; }
   .fs-cell.spread { position:relative; }
@@ -552,7 +563,7 @@
   /* ---------- app version: ONE place. The footer and the backup envelope both read it.
      Bump APP_VERSION and nothing else. Bump BACKUP_SCHEMA only when the SHAPE of saved
      data changes, not on every release. ---------- */
-  const APP_VERSION = 'v0.46';
+  const APP_VERSION = 'v0.47';
   /* v0.46 bumps the schema because a planting gained a `finished` field. It is an
      ADDITIVE optional field, so an old file loads here untouched. The bump is for the
      other direction: a v0.46 file read by a v0.45 build would show every finished
@@ -591,14 +602,20 @@
     if (zl && !zl.querySelector('.mi')) zl.insertAdjacentHTML('afterbegin', ICONS.zone);
   }
 
-  /* ---------- today + season ---------- */
-  (function () {
+  /* ---------- today + season ----------
+     This used to be a one-shot IIFE, which meant the app read the clock once at load
+     and then trusted its memory of it forever. Leave the tab open overnight - on a
+     kitchen counter, on a phone you never close - and the header, the calendar's
+     today box and the schedule's cutoff all kept showing yesterday. See the rollover
+     watcher at the bottom of this file. */
+  function renderToday(){
     const now = new Date();
     const date = now.toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' });
     const m = now.getMonth();
     const season = m <= 1 || m === 11 ? 'winter' : m <= 4 ? 'spring' : m <= 7 ? 'summer' : 'autumn';
-    document.getElementById('today').textContent = date + ' \u00B7 ' + season;
-  })();
+    const el = document.getElementById('today');
+    if (el) el.textContent = date + ' \u00B7 ' + season;
+  }
 
   /* ---------- the plant guide (data sourced from horticultural references;
      days-to-maturity are typical ranges and vary by variety and region) ---------- */
@@ -1720,7 +1737,71 @@
     });
     renderBedFs();
   }
-  function fsLetter(name){ return (String(name).trim().charAt(0) || '?').toUpperCase(); }
+  /* ---------- crop markers (v0.47) ----------
+     This was name.charAt(0), so Basil and Bush beans both rendered a green B in the
+     same bed and colour was the only thing telling them apart - which is no help at
+     all to a colour-blind reader, and not much help to anyone at a glance. A marker
+     is now the SHORTEST PREFIX that is unique across every crop in the garden:
+     Basil/Bush beans -> Ba/Bu, Cherry tomatoes/Chives -> Che/Chi. Deterministic, so
+     the same garden always yields the same markers. Rebuilt on every render. */
+  let markerCache = null;
+  function cropsInUse(){
+    const set = {};
+    /* normalise through the guide, exactly as bedPalette() keys its brushes. A grid
+       cell can hold a name that is not the canonical guide name - saved by an older
+       build, or typed by hand - and counting "Bush beans" and "Bush (green) beans"
+       as two crops invents a collision, which then lengthens BOTH markers to break
+       it. The marker map has to be keyed the same way the palette is, or the badge
+       in the rail and the letter in the square stop agreeing. */
+    function add(nm){ if (!nm) return; const g = matchGuide(nm); set[(g && g.name) ? g.name : nm] = true; }
+    beds.forEach(function(b){
+      Object.keys(b.grid).forEach(function(k){ const v = b.grid[k]; if (v && v.c) add(v.c); });
+    });
+    plantings.forEach(function(p){ if (!isFinished(p)) add(p.name); });
+    return Object.keys(set).sort();
+  }
+  function cleanKey(k){ return (String(k).replace(/[^A-Za-z]+/g, '') || String(k)).trim(); }
+  function cased(s){ return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase(); }
+  function buildMarkers(){
+    const out = {}; const groups = {};
+    /* group by first letter first. If a letter collides, EVERY crop in that group
+       lengthens together - Ba/Bu, Ca/Ch - rather than the alphabetically-first crop
+       keeping a bare B while the others grow. Symmetric pairs are far easier to tell
+       apart at a glance than B against Bu. */
+    cropsInUse().forEach(function(k){
+      const first = cleanKey(k).charAt(0).toUpperCase() || '?';
+      if (!groups[first]) groups[first] = [];
+      groups[first].push(k);
+    });
+    Object.keys(groups).forEach(function(first){
+      const members = groups[first];
+      if (members.length === 1){ out[members[0]] = first; return; }
+      let len = 2;
+      for (; len <= 3; len++){
+        const seen = {}; let clash = false;
+        members.forEach(function(k){
+          const mk = cased(cleanKey(k).slice(0, len));
+          if (seen[mk]) clash = true; seen[mk] = true;
+        });
+        if (!clash) break;
+      }
+      const taken = {};
+      members.forEach(function(k){
+        let mk = cased(cleanKey(k).slice(0, Math.min(len, 3)));
+        let n = 2;
+        while (taken[mk]){ mk = first + n; n++; } // never collide silently
+        taken[mk] = true; out[k] = mk;
+      });
+    });
+    return out;
+  }
+  function fsLetter(name){
+    if (!markerCache) markerCache = buildMarkers();
+    const g = matchGuide(name);
+    const key = (g && g.name) ? g.name : name;
+    return markerCache[key] || ((String(name).trim().charAt(0) || '?').toUpperCase());
+  }
+  function ltClass(mk){ return mk.length >= 3 ? ' lt3' : (mk.length === 2 ? ' lt2' : ''); }
   function fsCellsHTML(b, cl, rot){
     const brushMax = (sfgBrush && sfgBrush !== '__erase__') ? sfgMax(sfgBrush) : 0;
     let out = '';
@@ -1731,7 +1812,8 @@
           const col = cropColor(cell.c); const mx = sfgMax(cell.c); const cols2 = holeCols(mx); const set = cellSlots(cell);
           const extra = (cl.cells[key]?' clash':'')+(rot.cells[key]?' rot':'')+((guideByKey(cell.c)||{}).sprawl?' spread':'');
           let slots = '';
-          for (let i=0;i<mx;i++){ slots += (set.indexOf(i)>=0) ? '<div class="fs-slot on" data-i="'+i+'"><span class="lt" style="color:'+col+'">'+escBed(fsLetter(cell.c))+'</span></div>' : '<div class="fs-slot" data-i="'+i+'"></div>'; }
+          const mk = fsLetter(cell.c);
+          for (let i=0;i<mx;i++){ slots += (set.indexOf(i)>=0) ? '<div class="fs-slot on" data-i="'+i+'"><span class="lt'+ltClass(mk)+'" style="color:'+col+'">'+escBed(mk)+'</span></div>' : '<div class="fs-slot" data-i="'+i+'"></div>'; }
           out += '<div class="fs-cell filled'+extra+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+set.length+'/'+mx+')"><div class="fs-sub" style="--sc:'+cols2+';grid-template-columns:repeat('+cols2+',1fr)">'+slots+'</div></div>';
         } else if (brushMax > 0){
           const cols2 = holeCols(brushMax); let slots = '';
@@ -1749,7 +1831,8 @@
     if (!palette.length) return '<p class="rail-hint">No plants assigned to this bed yet. Add one on the Plantings page (its Bed field) and it’ll show up here.</p>';
     let out = '';
     palette.forEach(function(p){
-      out += '<button class="fs-plant'+(sfgBrush===p.key?' active':'')+'" data-crop="'+p.key+'"><span class="fs-plant-badge"><span class="lt" style="color:'+p.color+'">'+escBed(fsLetter(p.key))+'</span></span><span class="fs-plant-nm">'+escBed(p.key)+'</span><span class="fs-plant-sq">'+p.sfg+'/sq</span></button>';
+      const mk = fsLetter(p.key);
+      out += '<button class="fs-plant'+(sfgBrush===p.key?' active':'')+'" data-crop="'+p.key+'"><span class="fs-plant-badge"><span class="lt'+ltClass(mk)+'" style="color:'+p.color+'">'+escBed(mk)+'</span></span><span class="fs-plant-nm">'+escBed(p.key)+'</span><span class="fs-plant-sq">'+p.sfg+'/sq</span></button>';
     });
     out += '<button class="fs-plant erase'+(sfgBrush==='__erase__'?' active':'')+'" data-crop="__erase__"><span class="fs-plant-badge erase">⌫</span><span class="fs-plant-nm">Erase</span></button>';
     return out;
@@ -1922,6 +2005,7 @@
   }
 
   function render(){
+    markerCache = null; // crops may have come or gone; markers are derived, never stored
     renderSchedule();
     renderCalendar();
     renderBeds();
@@ -2158,7 +2242,9 @@
   routeFromHash();
 
   /* ---------- start up ---------- */
-  document.getElementById('date').value = new Date().toISOString().slice(0,10);
+  /* todayISO(), not toISOString() - the latter converts to UTC and hands the wrong
+     default date to anyone east of Greenwich in the evening. */
+  document.getElementById('date').value = todayISO();
   loadZone(); applyZoneToUI();
   load();
   loadBeds();
@@ -2169,7 +2255,49 @@
   })();
   injectIcons();
   populatePlantList();
+  renderToday();
   render();
+
+  /* ---------- keep up with the clock (v0.47) ----------
+     Everything date-shaped in this app is derived, not stored, so a rollover only
+     needs a re-render - but SOMETHING has to notice. Three listeners cover picking
+     the phone back up; the interval is the one that carries a tab nobody touches,
+     which is the case this bug was actually found in. The check is a string compare
+     that early-returns, so the interval costs nothing. It also catches a machine
+     waking from sleep, a timezone change while travelling, and a clock correction -
+     none of which fire an event of their own. */
+  let renderedDay = todayISO();
+  function checkDayRollover(){
+    const now = todayISO();
+    if (now === renderedDay) return;
+    const prev = renderedDay;
+    renderedDay = now;
+
+    renderToday();
+
+    /* the "date planted" default follows the day, but ONLY while it is still the
+       untouched default - never clobber a date the gardener typed */
+    const dateInput = document.getElementById('date');
+    if (dateInput && dateInput.value === prev) dateInput.value = now;
+
+    /* follow the month too, but only if the calendar was still sitting on the old
+       today. Someone who paged forward to plan October stays in October. */
+    const p = prev.split('-'), n = now.split('-');
+    const wasOnOldToday = (calState.y === +p[0] && calState.m === +p[1] - 1);
+    if (wasOnOldToday && (n[0] !== p[0] || n[1] !== p[1])){
+      calState.y = +n[0]; calState.m = +n[1] - 1; calState.sel = null;
+    } else if (wasOnOldToday && calState.sel === +p[2]){
+      calState.sel = null; // let the new today re-select itself
+    }
+
+    render(); // schedule cutoff, calendar today-box and day dots all re-derive here
+  }
+  setInterval(checkDayRollover, 60000);
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'visible') checkDayRollover();
+  });
+  window.addEventListener('focus', checkDayRollover);
+  window.addEventListener('pageshow', checkDayRollover); // bfcache restore, mobile Safari
   const THEME_KEY = 'garden-tracker:theme';
   function currentTheme(){ return document.documentElement.classList.contains('dark') ? 'dark' : 'light'; }
   function applyThemeLabel(){ const b=document.getElementById('theme-toggle'); if(!b) return; const dark=currentTheme()==='dark'; b.querySelector('.tt-ic').textContent = dark ? '☀' : '☾'; b.querySelector('.tt-label').textContent = dark ? 'Light' : 'Dark'; b.setAttribute('aria-pressed', dark?'true':'false'); }

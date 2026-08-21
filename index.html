@@ -17,9 +17,24 @@
 <!-- the sprout mark, inline so the icon costs no request and cannot 404 -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235e9367' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22V11'/%3E%3Cpath d='M12 11C12 7 9 5 4 5c0 4 3 6 8 6Z'/%3E%3Cpath d='M12 13c0-3 2.5-5 7-5 0 3.5-2.5 5-7 5Z'/%3E%3C/svg%3E" />
 <script>(function(){try{var t=localStorage.getItem('garden-tracker:theme');if(!t)t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();</script>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<style>
+  /* ---- fonts, self-hosted (F16, v0.51) ----
+     These used to come from fonts.googleapis.com behind a BLOCKING stylesheet link
+     in <head>, which made a third party the first thing between you and your own
+     garden. Offline the page fell back to system faces; on a weak signal the link
+     could hold up first paint. Six woff2 files next to the HTML remove the last
+     external request in the project, and they are what the service worker caches
+     so offline looks the same as online rather than merely working.
+     font-display:swap so text is readable immediately either way. */
+  @font-face { font-family:'Fraunces'; src:url('fraunces-latin-400-normal.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }
+  @font-face { font-family:'Fraunces'; src:url('fraunces-latin-500-normal.woff2') format('woff2'); font-weight:500; font-style:normal; font-display:swap; }
+  @font-face { font-family:'Fraunces'; src:url('fraunces-latin-600-normal.woff2') format('woff2'); font-weight:600; font-style:normal; font-display:swap; }
+  @font-face { font-family:'Inter'; src:url('inter-latin-400-normal.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }
+  @font-face { font-family:'Inter'; src:url('inter-latin-500-normal.woff2') format('woff2'); font-weight:500; font-style:normal; font-display:swap; }
+  @font-face { font-family:'Inter'; src:url('inter-latin-600-normal.woff2') format('woff2'); font-weight:600; font-style:normal; font-display:swap; }
+</style>
 <style>
   :root {
     /* surfaces, page->card->inset: --paper page bg, --plot card face, --inset pure-white inputs/cells/inner-cards, --wash faint hover */
@@ -145,6 +160,25 @@
      right edge. CSS cannot detect overflow, so this is measured, not guessed. */
   .menu.is-scrollable { -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 20px),transparent);
                         mask-image:linear-gradient(90deg,#000 calc(100% - 20px),transparent); }
+
+  /* ---- the update bar (v0.51) ----
+     A service worker's whole job is to serve the cached copy, so without a
+     deliberate path a new release is invisible forever. This says so, out loud,
+     and waits for you to press it rather than swapping the page mid-task. */
+  .sw-update { position:fixed; left:50%; transform:translateX(-50%); bottom:1rem; z-index:60;
+    display:none; align-items:center; gap:0.85rem; max-width:min(30rem, calc(100vw - 1.5rem));
+    background:var(--plot); color:var(--ink); border:1px solid var(--seedling);
+    border-radius:var(--r-lg); padding:0.7rem 0.85rem 0.7rem 1.1rem; font-size:0.875rem;
+    box-shadow:0 10px 30px rgba(32,57,43,0.22); }
+  .sw-update.show { display:flex; }
+  .sw-update .swu-msg { flex:1; }
+  .sw-update .swu-btn { flex:none; font-family:inherit; font-size:0.8rem; font-weight:600;
+    color:var(--inset); background:var(--evergreen); border:none; border-radius:var(--r-pill);
+    padding:0.5rem 1rem; min-height:44px; cursor:pointer; }
+  .sw-update .swu-btn:hover { background:var(--evergreen-dk); }
+  .sw-update .swu-later { flex:none; background:none; border:none; font-family:inherit;
+    font-size:0.8rem; color:var(--soil); cursor:pointer; min-height:44px; padding:0 0.35rem; }
+  .sw-update .swu-later:hover { color:var(--ink); }
   .mi { fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex:none; }
   .menu a .mi { width:20px; height:20px; }
   .marker .mi { width:15px; height:15px; }
@@ -547,6 +581,11 @@
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <p class="sr-only" id="announce" role="status" aria-live="polite"></p>
+  <div class="sw-update" id="sw-update" role="status" aria-live="polite">
+    <span class="swu-msg">A new version of Garden Tracker is ready.</span>
+    <button class="swu-later" type="button" id="sw-later">Later</button>
+    <button class="swu-btn" type="button" id="sw-reload">Reload</button>
+  </div>
   <div class="wrap">
     <header>
       <div class="mark">
@@ -760,7 +799,7 @@
   /* ---------- app version: ONE place. The footer and the backup envelope both read it.
      Bump APP_VERSION and nothing else. Bump BACKUP_SCHEMA only when the SHAPE of saved
      data changes, not on every release. ---------- */
-  const APP_VERSION = 'v0.50';
+  const APP_VERSION = 'v0.51';
   /* v0.46 bumps the schema because a planting gained a `finished` field. It is an
      ADDITIVE optional field, so an old file loads here untouched. The bump is for the
      other direction: a v0.46 file read by a v0.45 build would show every finished
@@ -2712,6 +2751,40 @@
     flag();
     window.addEventListener('resize', flag);
     if (window.ResizeObserver) new ResizeObserver(flag).observe(nav);
+  })();
+
+  /* ---- service worker (F1, v0.51) ----
+     The worker holds the app so it opens with no signal. It also watches for a new
+     release and says so here, because a worker's whole job is serving the cached
+     copy and without a visible path a new upload would never be seen.
+
+     The page does NOT reload itself. This app is full of forms and swapping the
+     page out from under someone mid-entry is its own bug; the bar waits. */
+  (function(){
+    if (!('serviceWorker' in navigator)) return;
+    if (location.protocol === 'file:') return; // no worker on a bare file:// open
+
+    const bar = document.getElementById('sw-update');
+    const later = document.getElementById('sw-later');
+    const reload = document.getElementById('sw-reload');
+    if (later) later.addEventListener('click', function(){ if (bar) bar.classList.remove('show'); });
+    if (reload) reload.addEventListener('click', function(){ location.reload(); });
+
+    navigator.serviceWorker.addEventListener('message', function(e){
+      if (e.data && e.data.type === 'update-ready' && bar) bar.classList.add('show');
+    });
+
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(err){
+        console.warn('[app] service worker did not register', err);
+      });
+    });
+
+    // a tab left open for days should still notice a release
+    document.addEventListener('visibilitychange', function(){
+      if (document.visibilityState !== 'visible') return;
+      if (navigator.serviceWorker.controller) navigator.serviceWorker.controller.postMessage({ type:'check' });
+    });
   })();
 
   setInterval(checkDayRollover, 60000);

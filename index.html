@@ -56,12 +56,21 @@
   .layout { display:flex; gap:1rem; align-items:flex-start; }
   .plots { flex:1 1 auto; min-width:0; }
   .sidebar { width:350px; flex:0 0 350px; position:sticky; top:1rem; align-self:flex-start; }
+  /* ---- the phone fold (F4, v0.50) ----
+     Measured at 390x844 before this: header 227px + nav 243px stacked as four
+     full-width rows, so the first actual task began at y=806 - the last 38 pixels
+     of the viewport, before browser chrome. Everything you could see was chrome.
+     The nav becomes one compact scrollable row, the wordmark is allowed to shrink,
+     and the header loses the vertical padding it does not need on a small screen. */
   @media (max-width:900px){
     .wrap { max-width:720px; }
-    .layout { flex-direction:column; }
+    .layout { flex-direction:column; gap:0.75rem; }
     .sidebar { width:auto; flex:1 1 auto; position:static; max-height:none; overflow:visible; }
-    .menu { position:static; flex:0 0 auto; width:100%; }
+
   }
+  /* The header's and the nav's mobile rules live AFTER their base rules, further
+     down. Putting them here loses to those on source order at equal specificity -
+     which is exactly what happened the first time, twice. */
 
   header { margin-bottom:clamp(1.5rem,5vw,2.5rem); }
   .mark { display:inline-flex; align-items:center; gap:0.5rem; margin-bottom:1rem; }
@@ -86,6 +95,56 @@
   .theme-toggle:hover { color:var(--ink); background:var(--wash); border-color:var(--seedling); }
   .theme-toggle:focus-visible { outline:2px solid var(--seedling); outline-offset:2px; }
   .theme-toggle .tt-ic { font-size:0.95rem; line-height:1; }
+
+  /* ---- the nav becomes one compact row on a phone (F4, v0.50) ----
+     Placed here, after the .menu rules above, on purpose: these are the same
+     specificity, so source order decides and the later block has to be this one. */
+  @media (max-width:900px){
+    .menu {
+      position:sticky; top:0; z-index:20; flex-direction:row; align-items:stretch;
+      flex:0 0 auto; width:100%; gap:0.25rem; overflow-x:auto; overscroll-behavior-x:contain;
+      scrollbar-width:none; padding:0.35rem 0; margin:0 0 0.25rem;
+      background:var(--paper); border-bottom:1px solid var(--line);
+    }
+    .menu::-webkit-scrollbar { display:none; }
+    .menu a {
+      flex:1 1 auto; justify-content:center; gap:0.35rem; min-height:44px;
+      padding:0.5rem 0.5rem; font-size:0.85rem; border-left:none; border-bottom:3px solid transparent;
+      border-radius:var(--r) var(--r) 0 0;
+    }
+    .menu a.active { border-left-color:transparent; border-bottom-color:var(--seedling); }
+    /* the toggle is a control, not a destination - it does not need equal width */
+    /* label hidden to save the row's width, so the glyph alone has to carry the
+       target - min-WIDTH as well as min-height, or it lands at 39px */
+    .theme-toggle { flex:0 0 auto; margin-top:0; min-height:44px; min-width:44px;
+      justify-content:center; padding:0.5rem 0.7rem; }
+    .theme-toggle .tt-label { display:none; }
+    .theme-toggle .tt-ic { font-size:1.05rem; }
+  }
+  .menu .lbl-short { display:none; }
+  /* Narrow phones: the four labels plus the toggle measured 438px of content in a
+     363px row, so "Plant doctor" was cut mid-word with nothing to say the row
+     scrolled. It shortens to "Doctor" - the anchor keeps the full name for
+     assistive tech - and the row gets a fade at its right edge for the cases where
+     it still has somewhere to go. */
+  @media (max-width:430px){
+    .menu { gap:0; }
+    .menu a { flex:1 1 auto; font-size:0.78rem; padding:0.5rem 0.3rem; gap:0.25rem; }
+    .menu .lbl-full { display:none; }
+    .menu .lbl-short { display:inline; }
+    .menu a .mi { width:15px; height:15px; }
+  }
+  /* Below 400px the icons cost about 19px each and the row runs out of width. The
+     labels are the meaning and the icons are decoration (already aria-hidden), so
+     the icons go and every width from 320px up fits without scrolling. */
+  @media (max-width:400px){
+    .menu a .mi { display:none; }
+    .menu a { gap:0; }
+  }
+  /* If the row still cannot fit, JS adds .is-scrollable and a fade appears at the
+     right edge. CSS cannot detect overflow, so this is measured, not guessed. */
+  .menu.is-scrollable { -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 20px),transparent);
+                        mask-image:linear-gradient(90deg,#000 calc(100% - 20px),transparent); }
   .mi { fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex:none; }
   .menu a .mi { width:20px; height:20px; }
   .marker .mi { width:15px; height:15px; }
@@ -110,6 +169,21 @@
   .zone select, .zone input { width:100%; font-family:inherit; font-size:0.875rem; color:var(--ink); background:var(--inset); border:1px solid var(--line); border-radius:var(--r); padding:0.5rem 0.75rem; }
   .zone .hint { font-size:0.8rem; color:var(--soil); }
 
+  /* ---- header trimmed for the phone fold (F4, v0.50) ----
+     After the base header/mark/wordmark/tagline/today/zone rules, deliberately. */
+  @media (max-width:900px){
+    header { margin-bottom:1rem; }
+    .mark { margin-bottom:0.4rem; gap:0.4rem; }
+    .mark .sprout { width:22px; height:22px; }
+    .wordmark { font-size:clamp(1.55rem,6.5vw,2.2rem); }
+    .tagline { font-size:0.9rem; max-width:44ch; }
+    .today { margin-top:0.6rem; font-size:0.75rem; }
+    .zone { margin-top:0.75rem; padding:0.6rem 0.85rem; }
+    /* here, not up with the rest of the nav block: `.menu a .mi` is defined below
+       that block, so an override there loses on source order (caught by audit) */
+    .menu a .mi { width:17px; height:17px; }
+  }
+
   .view { display:none; }
   .view.active { display:grid; gap:1rem; grid-template-columns:minmax(0,1fr); }
   .plot { position:relative; background:var(--plot); border:1px solid rgba(122,106,85,0.22); border-left:none; border-radius:var(--r); padding:1.5rem; overflow:hidden; box-shadow:0 1px 2px rgba(32,57,43,0.06), 0 6px 16px -4px rgba(32,57,43,0.11); }
@@ -123,7 +197,22 @@
   .plot p.lede { color:var(--soil); font-size:0.95rem; max-width:46ch; }
   .status { margin-top:1rem; display:inline-block; font-size:0.7rem; letter-spacing:0.04em; color:var(--evergreen); border:1px dashed var(--seedling); border-radius:var(--r-pill); padding:0.2rem 0.7rem; }
 
-  .add-form { margin-top:1.25rem; display:grid; gap:0.75rem; }
+  /* ---- the add form folds away (F18, v0.50) ----
+     Reading your garden is the frequent act; adding to it is the occasional one, and
+     the page opened with a five-field form above the list every time. It starts open
+     when there is nothing planted yet - where the empty state is already doing this
+     job - and closed once you have a garden to read. */
+  .add-wrap { margin-top:1.25rem; }
+  .add-summary { display:inline-flex; align-items:center; gap:0.5rem; cursor:pointer; list-style:none;
+    font-family:inherit; font-size:0.875rem; font-weight:600; color:var(--evergreen);
+    background:var(--inset); border:1px solid var(--seedling); border-radius:var(--r-pill);
+    padding:0.55rem 1.1rem; transition:background .15s, color .15s; }
+  .add-summary::-webkit-details-marker { display:none; }
+  .add-summary:hover { background:rgba(94,147,103,0.08); color:var(--evergreen-dk); }
+  .add-summary .ic { font-size:1.05rem; line-height:1; transition:transform .15s; }
+  details[open] > .add-summary .ic { transform:rotate(45deg); }
+  details[open] > .add-summary { border-radius:var(--r); }
+  .add-form { margin-top:1rem; display:grid; gap:0.75rem; }
   .field { display:grid; gap:0.25rem; }
   .field label { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--soil); font-weight:600; }
   .field input, .field select, .field textarea { font-family:inherit; font-size:0.95rem; color:var(--ink); background:var(--inset); border:1px solid var(--line); border-radius:var(--r); padding:0.5rem 0.75rem; width:100%; }
@@ -238,12 +327,6 @@
   .task { display:flex; align-items:center; gap:0.75rem; border-top:1px solid var(--line); font-size:0.95rem; }
   /* wide enough for the longest label the column can hold, "Overdue · Feb 20, 2027" */
   .task .tdate { font-variant-numeric:tabular-nums; color:var(--soil); width:8.8rem; flex:none; white-space:nowrap; }
-  @media (max-width:560px){
-    .task { flex-wrap:wrap; row-gap:0.15rem; }
-    .task .tdate { width:auto; }
-    .task .ttitle { flex:1 0 100%; padding-left:calc(44px + 0.75rem); }
-  }
-
   /* ---- done / overdue / today (v0.48) ---- */
   .tdone { flex:none; width:44px; height:44px; display:inline-flex; align-items:center; justify-content:center;
     background:none; border:none; cursor:pointer; padding:0; margin-left:-0.35rem; }
@@ -264,6 +347,15 @@
   .task-feed .tkind { color:var(--evergreen); background:rgba(94,147,103,0.14); }
   .task-harvest .tkind { color:var(--tomato-ink); background:rgba(207,94,82,0.12); }
   .task .ttitle { flex:1; }
+  /* Narrow screens get a fixed two-line shape: date + kind on one line, title on
+     its own. This block sits AFTER `.task .ttitle { flex:1 }` on purpose - it used
+     to sit before it, lost on source order, and the rows only LOOKED right when the
+     date happened to be long enough to force a wrap anyway. */
+  @media (max-width:560px){
+    .task { flex-wrap:wrap; row-gap:0.15rem; column-gap:0.5rem; }
+    .task .tdate { width:auto; }
+    .task .ttitle { flex:1 0 100%; padding-left:calc(44px + 0.5rem); }
+  }
 
   /* calendar */
   .cal-head { display:flex; align-items:center; justify-content:space-between; margin-top:0.5rem; }
@@ -399,6 +491,40 @@
   @media (max-width:640px){ :root { --fs-cell:60px; } .bed-fs-body { flex-direction:column; } .bed-fs-rail { width:auto; border-left:none; border-top:1px solid var(--line); padding-left:0; padding-top:1rem; flex-direction:row; flex-wrap:wrap; } }
   .bed-spread { margin-top:0.5rem; font-size:0.82rem; line-height:1.4; color:var(--soil); background:rgba(122,106,85,0.06); border:1px solid rgba(122,106,85,0.22); border-radius:var(--r); padding:0.5rem 0.7rem; }
   .bed-spread .bw-ic { font-weight:700; margin-right:0.3rem; }
+  /* ---- touch-target floor (F9, v0.50) ----
+     Measured at 390x844 before this: 32 of 36 controls on Plantings and 15 of 43 on
+     Beds were under 44x44. Remove bed was 11x19. This is a phone used standing in a
+     garden with wet hands, so the floor applies where the pointer is coarse, and
+     desktop keeps its density. Padding does the work, never font-size, so the visual
+     weight of the design survives it. */
+  @media (max-width:900px){
+    .btn, .theme-toggle, .cal-nav, .bed-expand, .bed-season, .sfg-chip, .fs-plant,
+    .bed-fs-close, .ub-btn, .pl-act, .guide-toggle, .remove, .bed-remove,
+    .field input, .field select, .field textarea, .zone select, .zone input,
+    .bed-add input, .bed-dim input, .plant .pl-bed select, .fin-sum, .add-summary {
+      min-height:44px;
+    }
+    .btn { padding:0.7rem 1.2rem; }
+    .cal-nav { min-width:44px; display:inline-flex; align-items:center; justify-content:center; }
+    /* icon-only controls need width as well as height, and the glyph stays small */
+    .remove, .bed-remove { min-width:44px; display:inline-flex; align-items:center; justify-content:center; }
+    .bed-remove { position:absolute; top:0.35rem; right:0.45rem; }
+    .sfg-chip, .fs-plant, .bed-expand, .bed-season { padding-top:0.55rem; padding-bottom:0.55rem; }
+    .field textarea { min-height:5rem; }
+    .bed-dim input { min-width:3.25rem; }
+  }
+  /* A month grid is seven columns wide whatever you do, so on a phone the only way
+     a day reaches 44px is to stop spending the width on gutters. Measured at 390px:
+     20px body padding + 24px card padding + 3px gaps left each day 40x42. Trimming
+     both and tightening the gap gets it to 45x44 with room to spare. */
+  @media (max-width:480px){
+    body { padding-left:0.85rem; padding-right:0.85rem; }
+    .plot { padding:1.1rem; }
+    .cal-grid { gap:2px; }
+    .cal-cell { min-height:44px; }
+    .cal-dots { left:0.2rem; right:0.2rem; }
+  }
+
   @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
 
   /* ---- ONE focus ring for everything that takes focus (v0.49) ----
@@ -465,7 +591,7 @@
         <a href="#home" data-route="home">Home</a>
         <a href="#plantings" data-route="plantings">Plantings</a>
         <a href="#beds" data-route="beds">Beds</a>
-        <a href="#doctor" data-route="doctor">Plant doctor</a>
+        <a href="#doctor" data-route="doctor" aria-label="Plant doctor"><span class="lbl-full">Plant doctor</span><span class="lbl-short" aria-hidden="true">Doctor</span></a>
         <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"><span class="tt-ic">☾</span> <span class="tt-label">Dark</span></button>
       </nav>
       <main class="plots" id="main" tabindex="-1">
@@ -502,6 +628,8 @@
         <h2>What you planted, and when</h2>
         <p class="lede">Add a seed or seedling. If it's one of the plants in the guide, a care card comes with it.</p>
 
+        <details class="add-wrap" id="add-wrap">
+        <summary class="add-summary"><span class="ic" aria-hidden="true">+</span> <span class="add-label">Add a planting</span></summary>
         <form class="add-form" id="add-form">
           <div class="field">
             <label for="name">Plant</label>
@@ -533,6 +661,7 @@
           </div>
           <button class="btn" type="submit">Add planting</button>
         </form>
+        </details>
 
         <div class="undo-bar" id="undo-bar" role="status" aria-live="polite" hidden>
           <span class="ub-msg" id="undo-msg"></span>
@@ -631,7 +760,7 @@
   /* ---------- app version: ONE place. The footer and the backup envelope both read it.
      Bump APP_VERSION and nothing else. Bump BACKUP_SCHEMA only when the SHAPE of saved
      data changes, not on every release. ---------- */
-  const APP_VERSION = 'v0.49';
+  const APP_VERSION = 'v0.50';
   /* v0.46 bumps the schema because a planting gained a `finished` field. It is an
      ADDITIVE optional field, so an old file loads here untouched. The bump is for the
      other direction: a v0.46 file read by a v0.45 build would show every finished
@@ -1801,7 +1930,7 @@
       const fk = famKey(v.c); if (!fk) return;
       for (let i=recent.length-1;i>=0;i--){
         const pc = recent[i].cells ? recent[i].cells[key] : null;
-        if (pc && famKey(pc) === fk){ cells[key] = true; noteSet[escBed(v.c)+'|'+fk] = { crop:escBed(v.c), fam:famLabel(fk) }; break; }
+        if (pc && famKey(pc) === fk){ cells[key] = true; noteSet[v.c+'|'+fk] = { crop:lbl(b, v.c), fam:famLabel(fk) }; break; }
       }
     });
     const notes = Object.keys(noteSet).map(function(k){ const o=noteSet[k]; return o.crop+' \u2014 '+o.fam+' grew here last season'; });
@@ -1814,12 +1943,36 @@
      stored element reference is detached before the dialog is even on screen. Measured:
      focus fell back to <body> every time until this became a lookup. */
   let fsOpenerBed = null;
+  /* F11: a chip carries the name YOU typed, not the internal guide key. You enter
+     "Zucchini" and the planner used to answer "Zucchini / summer squash"; you enter
+     "Bush beans" and it said "Bush (green) beans". Those slashes and parentheses
+     exist so matchGuide() can match loosely - they were never meant to be read, and
+     on a 390px phone one of them was 241px wide. The KEY stays the guide name, so
+     spacing, companions, rotation and markers are unaffected; only the label moves. */
   function bedPalette(b){
     const palette = []; const seen = {};
-    function addBrush(nm){ const g = matchGuide(nm); if (!g || !g.sfg) return; if (seen[g.name]) return; seen[g.name]=true; palette.push({ key:g.name, sfg:g.sfg, color:cropColor(nm) }); }
+    function addBrush(nm){
+      const g = matchGuide(nm); if (!g || !g.sfg) return;
+      if (seen[g.name]) return; seen[g.name] = true;
+      palette.push({ key:g.name, label:nm, sfg:g.sfg, color:cropColor(nm) });
+    }
+    // plantings first, so a crop you named yourself wins the label over the grid value
     plantings.forEach(function(p){ if (p.bed === b.id && !isFinished(p)) addBrush(p.name); });
     Object.keys(b.grid).forEach(function(k){ const v=b.grid[k]; if (v && v.c) addBrush(v.c); });
     return palette;
+  }
+  /* The label for a crop key inside a given bed, falling back to the key. Memoised
+     per bed and cleared on every render - a 12x12 grid asks 144 times and rebuilding
+     the palette for each would be quadratic for no reason. */
+  let labelCache = {};
+  function lbl(b, key){ return escBed(cropLabel(b, key)); }
+  function cropLabel(b, key){
+    if (!labelCache[b.id]){
+      const m = {};
+      bedPalette(b).forEach(function(p){ m[p.key] = p.label || p.key; });
+      labelCache[b.id] = m;
+    }
+    return labelCache[b.id][key] || key;
   }
   function renderBeds(){
     const body = document.getElementById('beds-body'); if(!body) return;
@@ -1837,7 +1990,7 @@
       if (palette.length){
         h += '<div class="sfg-palette">';
         palette.forEach(function(c){
-          h += '<button class="sfg-chip'+(sfgBrush===c.key?' active':'')+'" data-crop="'+c.key+'"><span class="sw" style="background:'+c.color+'"></span><span class="cn"></span> <span class="perc">'+c.sfg+'/sq</span></button>';
+          h += '<button class="sfg-chip'+(sfgBrush===c.key?' active':'')+'" data-crop="'+c.key+'" data-label="'+escBed(c.label||c.key)+'" aria-pressed="'+(sfgBrush===c.key?'true':'false')+'"><span class="sw" aria-hidden="true" style="background:'+c.color+'"></span><span class="cn"></span> <span class="perc">'+c.sfg+'/sq</span></button>';
         });
         h += '<button class="sfg-chip'+(sfgBrush==='__erase__'?' active':'')+'" data-crop="__erase__">\u232b Erase</button>';
         h += '</div>';
@@ -1858,19 +2011,19 @@
             let dots = '';
             const fset=cellSlots(cell); for (let i=0;i<mx;i++){ dots += '<div class="sfg-hole"'+(fset.indexOf(i)>=0?' style="background:'+col+'"':'')+'></div>'; }
             const flags = (cl.cells[key] ? ', keep apart' : '') + (rot.cells[key] ? ', rotation warning' : '');
-            const aria = where + ': ' + cell.c + ', ' + cell.n + ' of ' + mx + ' planted' + flags;
-            h += '<button type="button" class="sfg-cell'+(cl.cells[key]?' clash':'')+(rot.cells[key]?' rot':'')+((guideByKey(cell.c)||{}).sprawl?' spread':'')+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+cell.n+'/'+mx+')" aria-label="'+escBed(aria)+'"><div class="sfg-holes" aria-hidden="true" style="grid-template-columns:repeat('+cols2+',1fr)">'+dots+'</div></button>';
+            const aria = where + ': ' + cropLabel(b, cell.c) + ', ' + cell.n + ' of ' + mx + ' planted' + flags;
+            h += '<button type="button" class="sfg-cell'+(cl.cells[key]?' clash':'')+(rot.cells[key]?' rot':'')+((guideByKey(cell.c)||{}).sprawl?' spread':'')+'" data-bed="'+b.id+'" data-key="'+key+'" title="'+lbl(b, cell.c)+' ('+cell.n+'/'+mx+')" aria-label="'+escBed(aria)+'"><div class="sfg-holes" aria-hidden="true" style="grid-template-columns:repeat('+cols2+',1fr)">'+dots+'</div></button>';
           } else {
             h += '<button type="button" class="sfg-cell empty" data-bed="'+b.id+'" data-key="'+key+'" aria-label="'+escBed(where + ': empty')+'"></button>';
           }
         }
       }
       h += '</div></div>';
-      if (cl.pairs.length){ h += '<div class="bed-warn"><span class="bw-ic">\u26a0</span>Keep apart \u2014 ' + cl.pairs.map(function(p){ const ab=p.split('|'); return escBed(ab[0])+' &amp; '+escBed(ab[1]); }).join('; ') + '</div>'; }
-      if (sh.shaded.length){ h += '<div class="bed-shade"><span class="bw-ic">\u263c</span>Shade risk \u2014 move taller crops (' + sh.tall.map(escBed).join(', ') + ') to the north (top) edge so they don\u2019t shade ' + sh.shaded.map(escBed).join(', ') + '.</div>'; }
+      if (cl.pairs.length){ h += '<div class="bed-warn"><span class="bw-ic">\u26a0</span>Keep apart \u2014 ' + cl.pairs.map(function(p){ const ab=p.split('|'); return lbl(b,ab[0])+' &amp; '+lbl(b,ab[1]); }).join('; ') + '</div>'; }
+      if (sh.shaded.length){ h += '<div class="bed-shade"><span class="bw-ic">\u263c</span>Shade risk \u2014 move taller crops (' + sh.tall.map(function(k){ return lbl(b,k); }).join(', ') + ') to the north (top) edge so they don\u2019t shade ' + sh.shaded.map(function(k){ return lbl(b,k); }).join(', ') + '.</div>'; }
       if (rot.notes.length){ h += '<div class="bed-rot"><span class="bw-ic">\u21bb</span>Rotation \u2014 ' + rot.notes.join('; ') + '. Try a different square.</div>'; }
       var spreads = {}; Object.keys(b.grid).forEach(function(k){ var vv=b.grid[k]; if (vv && vv.c){ var gg=guideByKey(vv.c); if (gg && gg.sprawl) spreads[vv.c]=true; } });
-      if (Object.keys(spreads).length){ h += '<div class="bed-spread"><span class="bw-ic">\u2922</span>Give room \u2014 ' + Object.keys(spreads).map(escBed).join(', ') + ' sprawl, so leave a square or two open around each.</div>'; }
+      if (Object.keys(spreads).length){ h += '<div class="bed-spread"><span class="bw-ic">\u2922</span>Give room \u2014 ' + Object.keys(spreads).map(function(k){ return lbl(b,k); }).join(', ') + ' sprawl, so leave a square or two open around each.</div>'; }
       h += '<p class="sfg-hint">Pick a crop, then tap a square to plant one \u2014 tap again to add more, up to the square\u2019s limit. Tap with nothing selected to clear.</p>';
       if (b.history && b.history.length){ h += '<p class="bed-hist">Past seasons: ' + b.history.map(function(s){ return escBed(s.label); }).join(', ') + ' &mdash; used for the rotation warnings above.</p>'; }
       h += '<button class="bed-season" data-bed="'+b.id+'">\u21bb Start next season</button>';
@@ -1879,7 +2032,7 @@
     body.innerHTML = h;
     const cards = body.querySelectorAll('.bed-card');
     beds.forEach(function(b, i){ const card = cards[i]; if(card) card.querySelector('h3').innerHTML = escBed(b.name) + ' <span class="bed-sub">' + b.cols + '\u00d7' + b.rows + ' ft</span>'; });
-    body.querySelectorAll('.sfg-chip .cn').forEach(function(el){ const k = el.closest('.sfg-chip').getAttribute('data-crop'); if (k !== '__erase__') el.textContent = k; });
+    body.querySelectorAll('.sfg-chip .cn').forEach(function(el){ const chip = el.closest('.sfg-chip'); if (chip.getAttribute('data-crop') !== '__erase__') el.textContent = chip.getAttribute('data-label') || chip.getAttribute('data-crop'); });
     body.querySelectorAll('.sfg-chip').forEach(function(chip){
       chip.addEventListener('click', function(){ const k = chip.getAttribute('data-crop'); sfgBrush = (sfgBrush===k)?null:k; render(); });
     });
@@ -2017,7 +2170,7 @@
               : '<button type="button" class="fs-slot" data-i="'+i+'" aria-label="'+escBed(nm)+'"></button>';
           }
           const flags = (cl.cells[key] ? ', keep apart' : '') + (rot.cells[key] ? ', rotation warning' : '');
-          out += '<div class="fs-cell filled'+extra+'" role="group" data-bed="'+b.id+'" data-key="'+key+'" title="'+escBed(cell.c)+' ('+set.length+'/'+mx+')" aria-label="'+escBed(where + ': ' + cell.c + ', ' + set.length + ' of ' + mx + flags)+'"><div class="fs-sub" style="--sc:'+cols2+';grid-template-columns:repeat('+cols2+',1fr)">'+slots+'</div></div>';
+          out += '<div class="fs-cell filled'+extra+'" role="group" data-bed="'+b.id+'" data-key="'+key+'" title="'+lbl(b, cell.c)+' ('+set.length+'/'+mx+')" aria-label="'+escBed(where + ': ' + cropLabel(b, cell.c) + ', ' + set.length + ' of ' + mx + flags)+'"><div class="fs-sub" style="--sc:'+cols2+';grid-template-columns:repeat('+cols2+',1fr)">'+slots+'</div></div>';
         } else if (brushMax > 0){
           const cols2 = holeCols(brushMax); let slots = '';
           for (let i=0;i<brushMax;i++){
@@ -2037,18 +2190,18 @@
     let out = '';
     palette.forEach(function(p){
       const mk = fsLetter(p.key);
-      out += '<button class="fs-plant'+(sfgBrush===p.key?' active':'')+'" data-crop="'+p.key+'"><span class="fs-plant-badge"><span class="lt'+ltClass(mk)+'" style="color:'+p.color+'">'+escBed(mk)+'</span></span><span class="fs-plant-nm">'+escBed(p.key)+'</span><span class="fs-plant-sq">'+p.sfg+'/sq</span></button>';
+      out += '<button class="fs-plant'+(sfgBrush===p.key?' active':'')+'" data-crop="'+p.key+'" aria-pressed="'+(sfgBrush===p.key?'true':'false')+'"><span class="fs-plant-badge" aria-hidden="true"><span class="lt'+ltClass(mk)+'" style="color:'+p.color+'">'+escBed(mk)+'</span></span><span class="fs-plant-nm">'+escBed(p.label||p.key)+'</span><span class="fs-plant-sq">'+p.sfg+'/sq</span></button>';
     });
     out += '<button class="fs-plant erase'+(sfgBrush==='__erase__'?' active':'')+'" data-crop="__erase__"><span class="fs-plant-badge erase">⌫</span><span class="fs-plant-nm">Erase</span></button>';
     return out;
   }
   function fsPanelsHTML(b, cl, sh, rot){
     let panels = '';
-    if (cl.pairs.length){ panels += '<div class="bed-warn"><span class="bw-ic">⚠</span>Keep apart — ' + cl.pairs.map(function(p){ const ab=p.split('|'); return escBed(ab[0])+' &amp; '+escBed(ab[1]); }).join('; ') + '</div>'; }
-    if (sh.shaded.length){ panels += '<div class="bed-shade"><span class="bw-ic">☼</span>Shade risk — move taller crops (' + sh.tall.map(escBed).join(', ') + ') to the north (top) edge so they don’t shade ' + sh.shaded.map(escBed).join(', ') + '.</div>'; }
+    if (cl.pairs.length){ panels += '<div class="bed-warn"><span class="bw-ic">⚠</span>Keep apart — ' + cl.pairs.map(function(p){ const ab=p.split('|'); return lbl(b,ab[0])+' &amp; '+lbl(b,ab[1]); }).join('; ') + '</div>'; }
+    if (sh.shaded.length){ panels += '<div class="bed-shade"><span class="bw-ic">☼</span>Shade risk — move taller crops (' + sh.tall.map(function(k){ return lbl(b,k); }).join(', ') + ') to the north (top) edge so they don’t shade ' + sh.shaded.map(function(k){ return lbl(b,k); }).join(', ') + '.</div>'; }
     if (rot.notes.length){ panels += '<div class="bed-rot"><span class="bw-ic">↻</span>Rotation — ' + rot.notes.join('; ') + '. Try a different square.</div>'; }
     var spreads={}; Object.keys(b.grid).forEach(function(k){ var vv=b.grid[k]; if (vv&&vv.c){ var gg=guideByKey(vv.c); if (gg&&gg.sprawl) spreads[vv.c]=true; } });
-    if (Object.keys(spreads).length){ panels += '<div class="bed-spread"><span class="bw-ic">⤢</span>Give room — ' + Object.keys(spreads).map(escBed).join(', ') + ' sprawl, so leave a square or two open around each.</div>'; }
+    if (Object.keys(spreads).length){ panels += '<div class="bed-spread"><span class="bw-ic">⤢</span>Give room — ' + Object.keys(spreads).map(function(k){ return lbl(b,k); }).join(', ') + ' sprawl, so leave a square or two open around each.</div>'; }
     return panels;
   }
   function renderBedFs(){
@@ -2254,6 +2407,7 @@
 
   function render(){
     markerCache = null; // crops may have come or gone; markers are derived, never stored
+    labelCache = {};    // and so are the chip labels
     renderSchedule();
     renderCalendar();
     renderBeds();
@@ -2507,6 +2661,13 @@
   populatePlantList();
   renderToday();
   render();
+  /* F18: set ONCE, at startup, and never again. Recomputing this on every render
+     would slam the form shut the moment you added a planting, mid-typing, which is
+     the opposite of helpful. After this the gardener owns the toggle. */
+  (function(){
+    const wrap = document.getElementById('add-wrap');
+    if (wrap) wrap.open = (activePlantings().length === 0);
+  })();
 
   /* ---------- keep up with the clock (v0.47) ----------
      Everything date-shaped in this app is derived, not stored, so a rollover only
@@ -2542,6 +2703,17 @@
 
     render(); // schedule cutoff, calendar today-box and day dots all re-derive here
   }
+  /* F4: mark the nav when its content genuinely overflows, so the fade that says
+     "this scrolls" appears only when there is somewhere to scroll to. Measured, not
+     assumed - CSS has no overflow selector. */
+  (function(){
+    const nav = document.getElementById('menu'); if (!nav) return;
+    function flag(){ nav.classList.toggle('is-scrollable', nav.scrollWidth > nav.clientWidth + 1); }
+    flag();
+    window.addEventListener('resize', flag);
+    if (window.ResizeObserver) new ResizeObserver(flag).observe(nav);
+  })();
+
   setInterval(checkDayRollover, 60000);
   document.addEventListener('visibilitychange', function(){
     if (document.visibilityState === 'visible') checkDayRollover();
